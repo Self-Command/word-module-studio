@@ -14,6 +14,18 @@ def apply(package, target, module, props):
         from .math import apply as math_apply
         return math_apply(package, target, props)
     operation = props.get('operation')
+    if module == 'M02':
+        from .text import apply as text_apply
+        return text_apply(package, target, props)
+    if module == 'M04':
+        from .numbering import apply as list_apply
+        return list_apply(package, target, props)
+    if module == 'M06':
+        from .headers import apply as header_apply
+        return header_apply(package, target, props)
+    if module == 'M13':
+        from .shapes import apply as shape_apply
+        return shape_apply(package, target, props)
     if module == 'M05' and operation == 'unequal_columns':
         package.save()
         result = _sdk(package.path, target['id'], module, props)

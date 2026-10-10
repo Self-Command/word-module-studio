@@ -12,6 +12,7 @@ from .runtime import require_actions, WordError
 def apply(package, target, props):
     require_actions()
     if props.get('operation') == 'bind': return bind(package, target, props)
+    if props.get('operation') == 'repeat_create': return repeat_create(package, target, props)
     if props.get('operation') != 'fill': raise WordError('CONTROL_OPERATION_UNSUPPORTED')
     if set(props) - {'operation', 'data'}: raise WordError('CONTROL_PROPERTY_UNSUPPORTED')
     data = props['data']
@@ -40,6 +41,9 @@ def apply(package, target, props):
                     for node in instance.iter():
                         if ID in node.attrib: del node.attrib[ID]
                     _render(instance, environment, {**data, 'item': value, 'index': index})
+                    for nested in instance.iter(W + 'sdtPr'):
+                        control_id = nested.find(W + 'id')
+                        if control_id is not None: control_id.set(W + 'val', str(100000 + index * 100 + len(content)))
                     content.append(instance)
             count += 1
         else:
@@ -49,10 +53,48 @@ def apply(package, target, props):
 
 
 def _render(root, environment, data):
-    for text in root.iter(W + 't'):
-        if '{{' in (text.text or '') or '{%' in (text.text or ''):
-            if '{%' in text.text: raise WordError('TEMPLATE_CONTROL_TAG_IN_TEXT', 'Use native if./repeat. controls')
-            text.text = environment.from_string(text.text).render(data)
+    # Word routinely splits a variable over runs during ordinary editing.
+    for paragraph in root.iter(W + 'p'):
+        texts = list(paragraph.iter(W + 't'))
+        joined = ''.join(t.text or '' for t in texts)
+        if '{%' in joined: raise WordError('TEMPLATE_CONTROL_TAG_IN_TEXT', 'Use native if./repeat. controls')
+        if '{{' not in joined: continue
+        import re
+        for match in reversed(list(re.finditer(r'\{\{.*?\}\}', joined))):
+            replacement = environment.from_string(match[0]).render(data)
+            offset = 0; affected = []
+            for node in texts:
+                end = offset + len(node.text or '')
+                if end > match.start() and offset < match.end(): affected.append((node, offset, end))
+                offset = end
+            if not affected: raise WordError('CONTROL_TOKEN_RANGE_INVALID')
+            first, start, _ = affected[0]; last, last_start, _ = affected[-1]
+            prefix = (first.text or '')[:match.start() - start]
+            suffix = (last.text or '')[match.end() - last_start:]
+            first.text = prefix + replacement + (suffix if first is last else '')
+            for node, _, _ in affected[1:]: node.text = suffix if node is last else ''
+        if '{{' in ''.join(t.text or '' for t in texts): raise WordError('CONTROL_TOKEN_UNRESOLVED')
+
+
+def repeat_create(package, target, props):
+    if set(props) - {'operation', 'tag', 'text', 'alias'}: raise WordError('REPEAT_PROPERTY_UNSUPPORTED')
+    namespace = 'http://schemas.microsoft.com/office/word/2012/wordml'
+    control = E.Element(W + 'sdt', nsmap={'w15': namespace})
+    settings = E.SubElement(control, W + 'sdtPr')
+    E.SubElement(settings, W + 'alias').set(W + 'val', props.get('alias', props['tag']))
+    E.SubElement(settings, W + 'id').set(W + 'val', str(1000000 + len(list(package.xml('word/document.xml').iter(W + 'sdt')))))
+    E.SubElement(settings, W + 'tag').set(W + 'val', 'repeat.' + props['tag'])
+    E.SubElement(settings, '{' + namespace + '}repeatingSection')
+    content = E.SubElement(control, W + 'sdtContent')
+    item = E.SubElement(content, W + 'sdt'); item_props = E.SubElement(item, W + 'sdtPr')
+    E.SubElement(item_props, '{' + namespace + '}repeatingSectionItem')
+    paragraph = E.SubElement(E.SubElement(item, W + 'sdtContent'), W + 'p')
+    E.SubElement(E.SubElement(paragraph, W + 'r'), W + 't').text = props['text']
+    from .math import _append
+    _append(target['element'], control)
+    from .ooxml import order_properties
+    order_properties(control)
+    return {'type': 'native-repeating-section', 'tag': props['tag']}
 
 
 def _lookup(data, key):
