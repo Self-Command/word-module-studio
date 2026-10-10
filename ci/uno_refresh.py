@@ -59,7 +59,7 @@ try:
         native_index = document.DocumentIndexes.getByIndex(index)
         if native_index.getServiceName() != 'com.sun.star.text.DocumentIndex': continue
         for mark in native_index.DocumentIndexMarks:
-            if mark.PrimaryKey in simple_entries and not mark.SecondaryKey and not mark.AlternativeText:
+            if mark.PrimaryKey in simple_entries and not mark.SecondaryKey.strip() and not mark.AlternativeText.strip():
                 entry = mark.PrimaryKey; mark.AlternativeText = entry; mark.PrimaryKey = ''
                 index_mark_changes.append({'entry': entry, 'operation': 'Restore simple source XE entry from empty imported child'})
     embedded = document.getEmbeddedObjects()
