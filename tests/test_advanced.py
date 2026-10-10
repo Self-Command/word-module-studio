@@ -70,7 +70,10 @@ def test_native_repeat_block_and_split_token(document, tmp_path):
     package = Package(output)
     paragraph = next(p for p in package.xml('word/document.xml').iter(W + 'p') if '{{item.name}}' in ''.join(p.xpath('.//w:t/text()', namespaces=NS)))
     run = paragraph.find(W + 'r'); run.find(W + 't').text = 'Item {{item.'
-    clone = deepcopy(run); clone.find(W + 't').text = 'name}}'; paragraph.append(clone); package.save()
+    clone = deepcopy(run)
+    from word_module_studio.package import ID
+    if ID in clone.attrib: del clone.attrib[ID]
+    clone.find(W + 't').text = 'name}}'; paragraph.append(clone); package.save()
     output = apply(output, tmp_path, 'M16', item(output, 'document'), action='extension',
         props={'operation': 'fill', 'data': {'records': [{'name': 'Ada'}, {'name': 'Lin'}]}}, name='fill')
     root = Package(output).xml('word/document.xml')

@@ -168,11 +168,14 @@ def compose(markdown, manifest, output, *, region=None, resources=(), data=None)
         marker['element'].getparent().remove(marker['element'])
     from .tables import apply as table_apply
     from .captions import apply as caption_apply
-    tables = [o for o in package.objects() if o['kind'] == 'table' and o['element'].find('w:tblPr/w:tblCaption', namespaces=NS) is None]
+    tables = [o for o in package.objects() if o['kind'] == 'table'
+        and not any(c.get(W + 'val') == 'word-module-studio-equation-layout' for c in o['element'].xpath('./w:tblPr/w:tblCaption', namespaces=NS))]
     for index, table in enumerate(tables, 1):
         previous = table['element'].getprevious()
         title = ''.join(previous.xpath('.//w:t/text()', namespaces=NS)) if previous is not None and previous.tag == W + 'p' and previous.find('w:pPr/w:pStyle', namespaces=NS) is not None and previous.find('w:pPr/w:pStyle', namespaces=NS).get(W + 'val') == 'Caption' else None
         if title: previous.getparent().remove(previous)
+        metadata_caption = table['element'].find('w:tblPr/w:tblCaption', namespaces=NS)
+        if title is None and metadata_caption is not None: title = metadata_caption.get(W + 'val')
         table_apply(package, table, {'operation': 'format', 'header_rows': 1, 'three_line': True,
             **({'title': title, 'number': index, 'caption_position': spec['captions']['table']} if title else {})})
     for index, picture in enumerate([o for o in package.objects() if o['kind'] == 'picture'], 1):

@@ -70,6 +70,16 @@ def execute(batch, input_path, output_path, *, template=None):
                         if '/charts/' in name and name.endswith('.xml') and chart_before.get(name) != data]
                     if changed: result = {'backend': result, 'editable_data': _sdk(work, target['id'], module, {'operation': 'sync_charts', 'parts': changed})}
             package = Package(work)
+            if module == 'M16' and action == 'add' and props.get('type') == 'richtext':
+                from lxml import etree as E
+                from .package import W, NS
+                controls = list(package.xml('word/document.xml').iter(W + 'sdt'))
+                control = next((c for c in reversed(controls) if c.find('w:sdtPr/w:tag', namespaces=NS) is not None
+                    and c.find('w:sdtPr/w:tag', namespaces=NS).get(W + 'val') == props.get('tag')), controls[-1])
+                settings = control.find(W + 'sdtPr')
+                if settings.find(W + 'richText') is None: E.SubElement(settings, W + 'richText')
+                from .ooxml import order_properties
+                order_properties(settings)
             package.objects(stamp=True)
             package.save()
             ledger.append({"operation_id": operation["id"], "module": module, "target": target["id"], "result": result})
