@@ -277,7 +277,12 @@ def test_generic_layout_gallery(tmp_path, variant):
 @pytest.mark.parametrize('chart_type', ['column', 'bar', 'line', 'pie', 'area', 'scatter'])
 def test_core_chart_gallery(document, tmp_path, chart_type):
     output = apply(document, tmp_path, 'M12', item(document, 'paragraph', 'second'), action='add', kind='chart',
-        props={'chartType': chart_type, 'data': 'Series:1,3,2', 'categories': 'A,B,C', 'title': chart_type + ' editable chart', 'width': '11cm', 'height': '7cm'})
+        props={'chartType': chart_type, 'data': 'Series:1,3,2', 'categories': '1,2,3' if chart_type == 'scatter' else 'A,B,C',
+            'title': chart_type + ' editable chart', 'width': '11cm', 'height': '7cm'})
+    if chart_type == 'scatter':
+        charts = [p for p in Package(output).parts if p.startswith('word/charts/') and p.endswith('.xml')]
+        root = Package(output).xml(charts[0]); namespace = {'c': 'http://schemas.openxmlformats.org/drawingml/2006/chart'}
+        assert root.xpath('//c:xVal//c:pt/c:v/text()', namespaces=namespace) == ['1', '2', '3']
     report = render(output, tmp_path / 'proof'); assert report['automatic_pass'], report['issues']
     assert report['container_proof']['shapes']
 
@@ -300,7 +305,7 @@ def test_core_object_gallery(tmp_path):
         props={'text': 'Editable box content', 'width': '5cm', 'height': '1.5cm', 'anchor.x': '4cm', 'anchor.y': '0cm'}, name='box')
     # Independent native frame interface uses a complete framed paragraph.
     output = apply(output, tmp_path, 'M03', item(output, 'paragraph', 'Container anchor text.'), action='extension',
-        props={'operation': 'frame', 'attributes': {'w': 3000, 'h': 600, 'wrap': 'around', 'hAnchor': 'margin', 'vAnchor': 'text', 'hSpace': 120}}, name='frame')
+        props={'operation': 'frame', 'attributes': {'w': 3000, 'h': 600, 'wrap': 'around', 'hAnchor': 'margin', 'vAnchor': 'text', 'hSpace': 120, 'y': 1000}}, name='frame')
     report = render(output, tmp_path / 'proof'); assert report['automatic_pass'], report['issues']
     assert report['container_proof']['frames'] or report['container_proof']['shapes']
 
