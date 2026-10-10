@@ -34,17 +34,20 @@ class Package:
             if len(set(z.namelist())) != len(z.namelist()): raise WordError("DUPLICATE_PACKAGE_PART")
             self.parts = {n: z.read(n) for n in z.namelist()}
         self.roots = {}
+        self.original_trees = {}
 
     def xml(self, part):
         if part not in self.roots:
             parser = E.XMLParser(resolve_entities=False, no_network=True)
             self.roots[part] = E.fromstring(self.parts[part], parser)
+            self.original_trees[part] = E.tostring(self.roots[part], method='c14n')
         return self.roots[part]
 
     def save(self, path=None):
         require_actions()
         for name, root in self.roots.items():
-            self.parts[name] = E.tostring(root, xml_declaration=True, encoding="UTF-8", standalone=True)
+            if E.tostring(root, method='c14n') != self.original_trees[name]:
+                self.parts[name] = E.tostring(root, xml_declaration=True, encoding="UTF-8", standalone=True)
         target = Path(path or self.path)
         with ZipFile(target, "w", ZIP_DEFLATED) as z:
             for name, data in self.parts.items(): z.writestr(name, data)
@@ -57,6 +60,8 @@ class Package:
         for part in sorted(self.parts):
             if not part.startswith("word/") or not part.endswith(".xml"): continue
             root = self.xml(part)
+            if not any(E.QName(e).namespace in (NS['w'], NS['m']) and E.QName(e).localname in KINDS for e in root.iter()):
+                continue
             if stamp:
                 namespaces = dict(root.nsmap)
                 namespaces.update(wms=NS["wms"], mc=NS["mc"])
@@ -70,7 +75,7 @@ class Package:
             sections = list(root.iter(W + "sectPr"))
             for element in root.iter():
                 local = E.QName(element).localname
-                if local not in KINDS: continue
+                if local not in KINDS or E.QName(element).namespace not in (NS['w'], NS['m']): continue
                 xpath = element.getroottree().getpath(element)
                 object_id = element.get(ID) or "o_" + hashlib.sha256((part + ":" + xpath).encode()).hexdigest()[:20]
                 if not element.get(ID):
@@ -117,7 +122,7 @@ def snapshot(path):
     require_actions()
     package = Package(path)
     objects = [{k: v for k, v in o.items() if k != "element"} for o in package.objects()]
-    known = {o["part"] for o in objects}
+    known = {o["part"] for o in objects} | {'word/settings.xml', 'word/fontTable.xml', 'word/webSettings.xml'}
     return {"schema_version": 1, "sha256": digest(path), "objects": objects,
             "parts": {n: hashlib.sha256(v).hexdigest() for n, v in package.parts.items()},
             "unknown_parts": sorted(n for n in package.parts if n.startswith("word/") and n not in known and not n.endswith(".rels"))}

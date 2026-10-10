@@ -19,7 +19,7 @@ jobs:
         with:
           dotnet-version: '10.0.100'
       - run: bash ci/bootstrap.sh
-      - run: python -m pytest -q --junitxml=build/tests.xml
+      - run: python -m pytest -q --basetemp=build/test-work --junitxml=build/tests.xml
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:

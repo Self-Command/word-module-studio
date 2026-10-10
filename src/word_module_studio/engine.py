@@ -19,6 +19,7 @@ def execute(batch, input_path, output_path, *, template=None):
     require_actions()
     from .contracts import validate
     validate("operation-batch", batch)
+    if len({o['id'] for o in batch['operations']}) != len(batch['operations']): raise WordError('DUPLICATE_OPERATION_ID')
     if digest(input_path) != batch["input_sha256"]: raise WordError("STALE_INPUT")
     if batch["mode"] == "locked_template" and not template: raise WordError("TEMPLATE_REQUIRED")
     if batch["mode"] == "locked_template":
