@@ -63,9 +63,17 @@ def execute(batch, input_path, output_path, *, template=None):
         final = snapshot(work)
         touched_parts = {o["part"] for o in source["objects"]}
         preserved = [p for p in source["unknown_parts"] if p not in touched_parts]
+        modules = {operation['module'] for operation in batch['operations']}
+        if 'M12' in modules:
+            preserved = [p for p in preserved if not p.startswith(('word/charts/', 'word/embeddings/'))]
+        if 'M15' in modules:
+            preserved = [p for p in preserved if not p.startswith(('word/commentsExtended', 'word/commentsIds', 'word/people'))]
         for part in preserved:
             if source["parts"][part] != final["parts"].get(part): raise WordError("UNKNOWN_PART_CHANGED", part)
         validation = json.loads(run(["dotnet", ".tools/sdk/WordSdk.dll", "validate", work]))
+        from .verify import relationships, preservation
+        integrity = relationships(work)
+        retained = preservation(input_path, work, batch['operations'])
         if batch["mode"] == "locked_template":
             from .templates import verify_locked
             verify_locked(work, template)
@@ -73,6 +81,7 @@ def execute(batch, input_path, output_path, *, template=None):
     report = {"schema_version": 1, "build_success": True, "automatic_pass": True,
         "visual_review_complete": False, "delivery_accepted": False,
         "input_sha256": source["sha256"], "output_sha256": digest(output_path),
-        "operations": ledger, "preserved_unknown_parts": preserved, "sdk": validation}
+        "operations": ledger, "preserved_unknown_parts": preserved, "sdk": validation,
+        "relationships": integrity, "content_preservation": retained}
     write_json(output_path.with_suffix(".operations.json"), report)
     return report

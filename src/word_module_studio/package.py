@@ -24,6 +24,7 @@ KINDS = {"document": "document", "body": "body", "p": "paragraph", "r": "run",
          "numbering": "numbering", "abstractNum": "abstractNum", "num": "num",
          "oMath": "equation", "oMathPara": "equation", "bookmarkStart": "bookmark",
          "hyperlink": "hyperlink", "fldSimple": "field"}
+KINDS.update({name: 'revision' for name in ('ins', 'del', 'moveFrom', 'moveTo', 'rPrChange', 'pPrChange', 'tblPrChange', 'trPrChange', 'tcPrChange', 'sectPrChange')})
 
 
 class Package:
@@ -91,6 +92,26 @@ class Package:
                     "region": element.get("{" + NS["wms"] + "}region"),
                     "element": element})
         if len({o["id"] for o in objects}) != len(objects): raise WordError("DUPLICATE_OBJECT_ID")
+        # Composite fields and drawings use their host's identity, not current indexes.
+        counters = {'field': 0, 'chart': 0, 'shape': 0, 'textbox': 0}
+        extra = []
+        for item in objects:
+            element = item['element']
+            if item['kind'] == 'run':
+                begin = element.find(W + 'fldChar')
+                if begin is not None and begin.get(W + 'fldCharType') == 'begin':
+                    counters['field'] += 1
+                    extra.append({**item, 'id': item['id'] + ':field', 'kind': 'field', 'path': f"/field[{counters['field']}]"})
+                drawing = element.find(W + 'drawing')
+                if drawing is None: continue
+                xml = E.tostring(drawing).decode()
+                kind = 'chart' if 'http://schemas.openxmlformats.org/drawingml/2006/chart' in xml else 'textbox' if 'txbxContent' in xml else 'shape' if ':wsp' in xml else 'picture'
+                if kind in counters:
+                    counters[kind] += 1
+                    path = f"/chart[{counters[kind]}]" if kind == 'chart' else f"/body/{kind}[{counters[kind]}]"
+                else: path = item['path']
+                extra.append({**item, 'id': item['id'] + ':' + kind, 'kind': kind, 'path': path})
+        objects.extend(extra)
         return objects
 
     def locate(self, object_id):
@@ -106,7 +127,9 @@ def native_path(element, part, sections):
     if local == "style": return "/styles/" + element.get(W + "styleId", "")
     if local in ("footnote", "endnote", "comment"):
         attribute = {"footnote": "footnoteId", "endnote": "endnoteId", "comment": "commentId"}[local]
-        return f"/{local}[@{attribute}={element.get(W + 'id')}]"
+        return f"/{'comments/' if local == 'comment' else ''}{local}[@{attribute}={element.get(W + 'id')}]"
+    if local in ('ins', 'del', 'moveFrom', 'moveTo', 'rPrChange', 'pPrChange', 'tblPrChange', 'trPrChange', 'tcPrChange', 'sectPrChange'):
+        return f"/revision[@id={element.get(W + 'id')}]"
     if local in ("hdr", "ftr"):
         prefix = "header" if local == "hdr" else "footer"
         index = re.search(r"(\d+)\.xml$", part)
@@ -140,8 +163,13 @@ def semantic(path):
                     if attribute.startswith("{" + NS["wms"] + "}"): del element.attrib[attribute]
             result[part] = {
                 "text": root.xpath("//w:t/text() | //w:delText/text()", namespaces=NS),
-                "math": [E.tostring(m, method="c14n").decode() for m in root.iter(M + "oMath")],
+                "math": [_math_tree(m) for m in root.iter(M + "oMath")],
                 "tables": [["".join(c.xpath(".//w:t/text()", namespaces=NS)) for c in row.findall(W + "tc")]
                            for table in root.iter(W + "tbl") for row in table.findall(W + "tr")]
             }
     return result
+
+
+def _math_tree(node):
+    return (node.tag, tuple(sorted(node.attrib.items())), node.text or '',
+            tuple(_math_tree(child) for child in node if child.tag != W + 'rPr'))

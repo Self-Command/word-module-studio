@@ -2,6 +2,7 @@ name: W0 backend qualification
 on:
   push:
     branches: [main]
+    paths: [ci/qualification.py, ci/bootstrap.sh, sdk/**, pins.json, '.github/workflows/qualification.yml']
   workflow_dispatch:
 permissions:
   contents: read
