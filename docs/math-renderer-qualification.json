@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "run_id": "38052432267",
+  "renderer": "LibreOffice 26.8.1",
+  "test": "tests/test_core_layout.py::test_qualify_renderer_native_math_breaks",
+  "operator_runs": 24,
+  "native_manual_break_visible": false,
+  "native_break_source_sha256": "b5ad1f7b683683ed0a3d2ae15a3331410584937a2f75c7a2c4fe76109108052e",
+  "default_compatibility_strategy": "outer_array",
+  "microsoft_word_native_rendering": "not-tested"
+}

@@ -43,6 +43,9 @@ def preservation(before, after, operations):
     old_objects = old_package.objects(); new_objects = {o['id']: o for o in new_package.objects()}
     authorized = set()
     for operation in operations:
+        if operation['module'] == 'M08' and operation.get('props', {}).get('operation') == 'refresh_fields':
+            from .field_cache import cached_run_ids
+            authorized.update(cached_run_ids(old_package))
         props = operation.get('props', {})
         changes_content = operation['action'] == 'remove' or operation['action'] == 'extension' and operation['module'] in ('M02', 'M10', 'M13', 'M16') or any(
             key in props for key in ('text', 'find', 'replace', 'data', 'formula', 'revision.type', 'revision.action'))

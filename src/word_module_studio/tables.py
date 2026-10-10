@@ -51,7 +51,10 @@ def apply(package, target, props):
     for index, row in enumerate(rows):
         row_props = row.find(W + 'trPr')
         if row_props is None: row_props = E.Element(W + 'trPr'); row.insert(0, row_props)
-        _set(row_props, 'cantSplit', {'val': '0' if props.get('allow_row_split', False) else '1'})
+        if props.get('allow_row_split', False):
+            old = row_props.find(W + 'cantSplit')
+            if old is not None: row_props.remove(old)
+        else: _set(row_props, 'cantSplit')
         if index < headers: _set(row_props, 'tblHeader')
         position = 0
         for cell in row.findall(W + 'tc'):

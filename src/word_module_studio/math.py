@@ -30,7 +30,7 @@ def convert(formula, mode='display'):
 
 def apply(package, item, props, *, metrics=None):
     require_actions()
-    allowed = {'formula', 'mode', 'number', 'number_width_twips', 'size_pt', 'wrap', 'operation', 'bookmarks'}
+    allowed = {'formula', 'mode', 'number', 'number_width_twips', 'size_pt', 'wrap', 'operation', 'bookmarks', 'policy', 'break_strategy'}
     if set(props) - allowed: raise WordError('MATH_PROPERTY_UNSUPPORTED')
     target = item['element']
     mode = props.get('mode', 'display')
@@ -55,8 +55,17 @@ def apply(package, item, props, *, metrics=None):
     number_width = props.get('number_width_twips', 600) if props.get('number') else 0
     budget = (context.available_width_twips - number_width) / 20 - 8
     if budget <= 0: raise WordError('EQUATION_NUMBER_REGION_TOO_WIDE')
+    formula_id = 'eq_' + __import__('hashlib').sha256((props['formula'] + ':' + str(props.get('number', ''))).encode()).hexdigest()[:16]
+    formula.set('{' + NS['wms'] + '}formula', formula_id)
     original = tree(formula)
-    changes = wrap(formula, budget, size, metrics=metrics) if props.get('wrap', True) else []
+    policy = props.get('policy', 'practical')
+    if policy not in ('practical', 'safe_wrap', 'fail'): raise WordError('INVALID_MATH_POLICY')
+    from .math_breaks import DEFAULT_STRATEGY
+    strategy = props.get('break_strategy', DEFAULT_STRATEGY)
+    if policy == 'practical':
+        from .math_breaks import wrap as outer_wrap
+        changes = outer_wrap(formula, budget, size, metrics=metrics, strategy=strategy) if props.get('wrap', True) else []
+    else: changes = wrap(formula, budget, size, metrics=metrics) if policy == 'safe_wrap' and props.get('wrap', True) else []
     if tree(restore(formula, changes)) != original: raise WordError('FORMULA_RECOVERY_FAILED')
     measured = math_width_pt(formula, size, metrics)
     if measured > budget + 0.1:
@@ -66,7 +75,15 @@ def apply(package, item, props, *, metrics=None):
         (diagnostics / (name + '.xml')).write_bytes(E.tostring(formula, pretty_print=True))
         write_json(diagnostics / (name + '.json'), {'number': props.get('number'), 'budget_pt': budget,
             'measured_pt': measured, 'parts': [{'kind': E.QName(c).localname, 'width_pt': math_width_pt(c, size, metrics)} for c in formula]})
-        raise WordError('FORMULA_CANNOT_FIT', f"{props.get('number', 'unlabelled')}: {measured:.2f} pt exceeds {budget:.2f} pt; {name}")
+        if policy != 'practical': raise WordError('FORMULA_CANNOT_FIT', f"{props.get('number', 'unlabelled')}: {measured:.2f} pt exceeds {budget:.2f} pt; {name}")
+    formula_id = 'eq_' + __import__('hashlib').sha256((props['formula'] + ':' + str(props.get('number', ''))).encode()).hexdigest()[:16]
+    formula.set('{' + NS['wms'] + '}formula', formula_id)
+    adjustment = measured > budget + .1
+    result = {'formula_id': formula_id, 'original_math': original, 'changes': changes, 'mode': mode, 'number': props.get('number'),
+        'budget_pt': budget, 'estimated_width_pt': measured, 'policy': policy, 'break_strategy': strategy,
+        'layout_status': 'needs_minor_adjustment' if adjustment else 'pass',
+        'manual_adjustments': [{'formula_id': formula_id, 'reason': 'Estimated width needs real page review', 'suggestion': 'Adjust an outer operator break or continuation alignment; retain all mathematical content'}] if adjustment else [],
+        'visual_review_required': True}
     if mode == 'inline':
         if target.tag != W + 'p': raise WordError('INLINE_MATH_REQUIRES_PARAGRAPH')
         target.append(formula)
@@ -82,7 +99,7 @@ def apply(package, item, props, *, metrics=None):
             table = _equation_table(formula, '(' + str(props['number']) + ')', context.available_width_twips, number_width)
             _append(target, table)
             _number_bookmarks(package, table, props)
-            return {'original_math': original, 'changes': changes, 'mode': mode, 'number': props['number'], 'layout': 'centered-multiline', 'budget_pt': budget}
+            return {**result, 'layout': 'centered-multiline'}
         else:
             tabs = E.SubElement(ppr, W + 'tabs')
             center = E.SubElement(tabs, W + 'tab'); center.set(W + 'val', 'center'); center.set(W + 'pos', str((context.available_width_twips - number_width) // 2))
@@ -93,18 +110,27 @@ def apply(package, item, props, *, metrics=None):
             E.SubElement(E.SubElement(p, W + 'r'), W + 't').text = '(' + str(props['number']) + ')'
         _append(target, p)
         _number_bookmarks(package, p, props)
-    return {'original_math': original, 'changes': changes, 'mode': mode, 'number': props.get('number'), 'budget_pt': budget}
+    return result
 
 
-def fit_inline(package, element, size, metrics):
+def fit_inline(package, element, size, metrics, *, policy='practical', strategy=None):
     """Reversible fitting uses the owning cell's budget as well as the column."""
     context = LayoutContext.resolve(package, {'element': element, 'part': 'word/document.xml'})
     budget = context.available_width_twips / 20 - 4
+    from .math_breaks import DEFAULT_STRATEGY
+    strategy = strategy or DEFAULT_STRATEGY
+    formula_id = 'eq_' + __import__('hashlib').sha256(E.tostring(element)).hexdigest()[:16]
+    element.set('{' + NS['wms'] + '}formula', formula_id)
     original = tree(element)
-    changes = wrap(element, budget, size, metrics=metrics)
+    if policy == 'practical':
+        from .math_breaks import wrap as outer_wrap
+        changes = outer_wrap(element, budget, size, metrics=metrics, strategy=strategy)
+    else: changes = wrap(element, budget, size, metrics=metrics) if policy == 'safe_wrap' else []
     if tree(restore(element, changes)) != original: raise WordError('INLINE_MATH_RECOVERY_FAILED')
-    if math_width_pt(element, size, metrics) > budget + .1: raise WordError('INLINE_FORMULA_CANNOT_FIT', element.getroottree().getpath(element))
-    return {'element': element, 'original_math': original, 'changes': changes, 'budget_pt': budget}
+    adjustment = math_width_pt(element, size, metrics) > budget + .1
+    if adjustment and policy != 'practical': raise WordError('INLINE_FORMULA_CANNOT_FIT', element.getroottree().getpath(element))
+    return {'element': element, 'formula_id': formula_id, 'original_math': original, 'changes': changes, 'budget_pt': budget, 'policy': policy,
+        'layout_status': 'needs_minor_adjustment' if adjustment else 'pass', 'manual_adjustments': ['Review inline operator break/alignment'] if adjustment else []}
 
 
 def _number_bookmarks(package, element, props):

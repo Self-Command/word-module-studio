@@ -184,8 +184,15 @@ def compose(markdown, manifest, output, *, region=None, resources=(), data=None)
         and n.find('w:sdtPr/w:tag', namespaces=NS).get(W + 'val') == 'region.' + region), None)
     if slot is None: raise WordError('TEMPLATE_REGION_SLOT_MISSING', region)
     content = slot.find(W + 'sdtContent')
+    slot_frame = next((deepcopy(n) for n in content.iter(W + 'framePr')), None)
     for child in list(content): content.remove(child)
     elements = [clean(deepcopy(e), spec) for e in source.element.body if e.tag != W + 'sectPr']
+    if slot_frame is not None:
+        first = next((p for e in elements for p in e.iter(W + 'p')), None)
+        if first is not None:
+            properties = first.find(W + 'pPr')
+            if properties is None: properties = E.Element(W + 'pPr'); first.insert(0, properties)
+            properties.append(slot_frame)
     expected_text = [''.join(t.text or '' for t in p.iter(W + 't')) for e in elements for p in e.iter(W + 'p')]
     import_resources(source, destination, elements); import_lists(source, destination, elements)
     composer = ContentComposer(destination, spec)
@@ -257,7 +264,7 @@ def compose(markdown, manifest, output, *, region=None, resources=(), data=None)
     from .math import fit_inline
     inline_elements = [math for math in package.xml('word/document.xml').iter(M + 'oMath') if math.get(inline_attribute) is not None]
     for math in inline_elements: del math.attrib[inline_attribute]
-    inline = [fit_inline(package, element, size, metrics) for element in inline_elements]
+    inline = [fit_inline(package, element, size, metrics, policy=spec.get('equations', {}).get('long_formula', 'practical')) for element in inline_elements]
     from .migration.math_layout import restore, tree
     recovered = {id(record['element']): restore(record['element'], record['changes']) for record in inline}
     from collections import Counter
@@ -290,6 +297,8 @@ def compose(markdown, manifest, output, *, region=None, resources=(), data=None)
         'template': {key: manifest[key] for key in ('id', 'version', 'spec_sha256', 'master_sha256')},
         'display_equations': len(equations), 'equations': ledger, 'references': references,
         'inline_math_preserved': len(expected_math), 'inline_math_layout': inline_ledger,
-        'source_title_promoted': promoted_title, 'relationships': integrity, 'sdk': sdk}
+        'source_title_promoted': promoted_title, 'relationships': integrity, 'sdk': sdk,
+        'math_layout_status': 'needs_minor_adjustment' if any(e.get('layout_status') == 'needs_minor_adjustment' for e in ledger + inline_ledger) else 'pass',
+        'manual_adjustments': [a for e in ledger + inline_ledger for a in e.get('manual_adjustments', [])]}
     write_json(output.with_suffix('.compose.json'), report)
     return report

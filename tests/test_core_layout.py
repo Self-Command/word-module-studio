@@ -78,7 +78,8 @@ def test_font_is_really_embedded_and_reversible(document, tmp_path):
     ref = table.find('.//' + W + 'embedRegular'); assert ref is not None
     rel = next(n for n in package.xml('word/_rels/fontTable.xml.rels') if n.get('Id') == ref.get('{' + NS['r'] + '}id'))
     import posixpath
-    data = bytearray(package.parts[posixpath.normpath(posixpath.join('word', rel.get('Target')))])
+    target = rel.get('Target')
+    data = bytearray(package.parts[posixpath.normpath(target.lstrip('/') if target.startswith('/') else posixpath.join('word', target))])
     mask = bytes.fromhex(ref.get(W + 'fontKey').strip('{}').replace('-', ''))[::-1]
     for index in range(32): data[index] ^= mask[index % 16]
     decoded = TTFont(BytesIO(data)); assert decoded['name'].getDebugName(1) == 'Liberation Serif'; decoded.close()
@@ -137,3 +138,42 @@ def test_qualify_renderer_native_math_breaks(document, tmp_path):
     write_json(tmp_path / 'native-break-qualification.json', {'renderer': report['renderer'], 'operator_runs': len(operators),
         'native_manual_break_visible': len(ys) >= 2, 'operator_line_positions': ys, 'source_sha256': digest(output)})
     assert operators, 'Probe must place a real native operator break'
+
+
+def test_practical_math_preserves_author_alignment(document, tmp_path):
+    from word_module_studio.migration.semantic_import import normalize_aligned
+    formula = r'\begin{aligned}x+y&=1\\x-y&=0\end{aligned}'
+    assert normalize_aligned(formula) == formula
+    output = apply(document, tmp_path, 'M09', item(document, 'body'), action='extension',
+        props={'formula': formula, 'number': 'A1', 'policy': 'practical'})
+    root = Package(output).xml('word/document.xml')
+    assert ''.join(root.xpath('//m:t/text()', namespaces=NS)).count('=') == 2
+    assert root.find('.//' + M + 'm') is not None or root.find('.//' + M + 'eqArr') is not None
+    report = render(output, tmp_path / 'alignment-proof'); assert report['automatic_pass'], report['issues']
+
+
+def test_practical_math_never_splits_nested_atoms(document, tmp_path):
+    from word_module_studio.math import convert
+    numerator = '+'.join('x_{' + str(i) + '}' for i in range(35))
+    formula = r'\frac{' + numerator + '}{1+x^2}'
+    expected = convert(formula).find(M + 'f')
+    output = apply(document, tmp_path, 'M09', item(document, 'body'), action='extension',
+        props={'formula': formula, 'number': 'F1', 'policy': 'practical'})
+    actual = Package(output).xml('word/document.xml').find('.//' + M + 'f')
+    from word_module_studio.migration.math_layout import tree
+    assert tree(actual) == tree(expected)
+    assert actual.find('.//' + M + 'eqArr') is None
+    report = json.loads(output.with_suffix('.operations.json').read_text())['operations'][0]['result']
+    assert report['layout_status'] == 'needs_minor_adjustment' and report['manual_adjustments']
+
+
+def test_field_cache_refresh_changes_only_results(document, tmp_path):
+    from word_module_studio.field_cache import refresh, fields, without_cache
+    package = Package(document); body = package.xml('word/document.xml').find(W + 'body')
+    p = E.Element(W + 'p'); field = E.SubElement(p, W + 'fldSimple'); field.set(W + 'instr', ' NUMPAGES ')
+    E.SubElement(E.SubElement(field, W + 'r'), W + 't').text = '999'; body.insert(0, p)
+    package.save(); before = digest(document); baseline = without_cache(Package(document))
+    output = tmp_path / 'cached.docx'; result = refresh(document, output, tmp_path / 'cache-proof')
+    assert result['fields_updated'][0]['result_text'] == '1'
+    assert without_cache(Package(output)) == baseline and digest(document) == before
+    assert result['cache_convergence_passes'] == 2

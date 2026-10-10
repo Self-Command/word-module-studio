@@ -93,18 +93,17 @@ def expand_semantic_tex(ast,output):
 
 
 def normalize_aligned(expression):
-    """Discard alignment markers only at the aligned level, not in cases/matrices."""
+    """Validate environment nesting without discarding author alignment or line breaks."""
     tokens=re.split(r"(\\begin\{[^}]+\}|\\end\{[^}]+\}|(?<!\\)&)",expression)
     stack=[];output=[]
     for token in tokens:
         start=re.fullmatch(r"\\begin\{([^}]+)\}",token)
         end=re.fullmatch(r"\\end\{([^}]+)\}",token)
         if start:
-            stack.append(start[1]);output.append(r"\begin{array}{l}" if start[1]=="aligned" else token)
+            stack.append(start[1]);output.append(token)
         elif end:
             if not stack or stack.pop()!=end[1]:raise StudioError("UNBALANCED_MATH_ENVIRONMENT")
-            output.append(r"\end{array}" if end[1]=="aligned" else token)
-        elif token=="&" and stack and stack[-1]=="aligned":continue
+            output.append(token)
         else:output.append(token)
     if stack:raise StudioError("UNBALANCED_MATH_ENVIRONMENT")
     return "".join(output)

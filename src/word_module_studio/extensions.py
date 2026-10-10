@@ -55,6 +55,15 @@ def apply(package, target, module, props):
     if module == 'M07' and operation == 'caption':
         from .captions import apply as caption_apply
         return caption_apply(package, target, props)
+    if module == 'M08' and operation == 'refresh_fields':
+        if set(props) != {'operation'}: raise WordError('FIELD_REFRESH_PROPERTY_UNSUPPORTED')
+        from .field_cache import refresh
+        package.save()
+        with tempfile.TemporaryDirectory() as temporary:
+            result = refresh(package.path, Path(temporary) / 'refreshed.docx', Path('build/field-proofs') / target['id'])
+            package.parts = type(package)(Path(temporary) / 'refreshed.docx').parts
+            package.roots, package.original_trees = {}, {}
+        return result
     raise WordError('EXTENSION_UNSUPPORTED', f'{module}/{operation}')
 
 

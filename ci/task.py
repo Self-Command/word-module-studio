@@ -73,6 +73,9 @@ def execute_task(root, folder, *, task_id, engine_commit):
         from word_module_studio.render import render
         shutil.copyfile(one('document'), output)
         result = render(output, folder / 'proof')
+    elif stage == 'refresh-fields':
+        from word_module_studio.field_cache import refresh
+        result = refresh(one('document'), output, folder / 'field-proof')
     elif stage == 'verify':
         from word_module_studio.verify import relationships
         from word_module_studio.runtime import run

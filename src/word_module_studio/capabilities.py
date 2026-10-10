@@ -23,7 +23,7 @@ MODULES = {
  "M16": ("Forms and content controls", ["sdt", "formfield"]),
  "M17": ("Extraction and merge", []),
  "M18": ("Metadata and accessibility", ["document", "picture", "table", "paragraph"]),
- "M19": ("Template composition and fonts", []),
+ "M19": ("Template composition and fonts", ["document", "style", "styles"]),
  "M20": ("Rendering and verification", [])
 }
 
@@ -80,7 +80,8 @@ def catalog():
     require_actions()
     coverage = json.loads((ROOT / 'docs/module-coverage.json').read_text())
     evidence = {item['id']: item for item in coverage['modules']}
-    return {"schema_version": 1, "modules": [{"id": key, "name": value[0], "elements": value[1],
+    features = json.loads((ROOT / 'docs/core-features.json').read_text())
+    return {"schema_version": 1, "profile": "core-layout", "features": features['features'], "modules": [{"id": key, "name": value[0], "elements": value[1],
         "implementation": "officecli-contract-adapter" if value[1] else "native-extension",
-        **evidence[key], "automatic_acceptance": coverage['automatic_acceptance'],
+        **evidence[key], "features": [f for f in features['features'] if key in f['modules']], "automatic_acceptance": coverage['automatic_acceptance'],
         "visual_acceptance": coverage['visual_acceptance']} for key, value in MODULES.items()]}
