@@ -18,6 +18,17 @@ def render(source, folder):
     source, folder = Path(source).resolve(), Path(folder).resolve()
     folder.mkdir(parents=True, exist_ok=True)
     pdf = folder / (source.stem + '.pdf')
+    from .context import LayoutContext
+    from .package import M
+    package = Package(source)
+    formulas = []
+    for element in package.xml('word/document.xml').iter(M + 'oMath'):
+        context = LayoutContext.resolve(package, {'element': element, 'part': 'word/document.xml'})
+        direct = element.xpath('.//w:sz/@w:val', namespaces=NS)
+        size = max(map(int, direct)) / 2 if direct else int(context.effective_format['run'].get('sz', {}).get(W + 'val', '22')) / 2
+        formulas.append({'formula_id': element.get('{' + NS['wms'] + '}formula'), 'size_pt': size,
+            'available_width_pt': context.available_width_twips / 20, 'container': context.container})
+    math_input = folder / 'math-input.json'; write_json(math_input, formulas)
     fingerprints = []
     with tempfile.TemporaryDirectory() as temporary:
         with socket.socket() as connection:
@@ -26,7 +37,7 @@ def render(source, folder):
         process = subprocess.Popen(['libreoffice', '-env:UserInstallation=' + profile.as_uri(), '--headless', '--norestore', '--nodefault',
             f'--accept=socket,host=127.0.0.1,port={port};urp;StarOffice.ServiceManager'], stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
         try:
-            run(['/usr/bin/python3', ROOT / 'ci/uno_refresh.py', source, pdf, port], timeout=120)
+            run(['/usr/bin/python3', ROOT / 'ci/uno_refresh.py', source, pdf, port, math_input], timeout=120)
         finally:
             if process.poll() is None: process.terminate()
             try: process.wait(timeout=10)

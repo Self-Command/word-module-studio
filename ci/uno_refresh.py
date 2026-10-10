@@ -18,6 +18,7 @@ def prop(name, value):
 
 
 source, output, port = Path(sys.argv[1]).resolve(), Path(sys.argv[2]).resolve(), sys.argv[3]
+source_math = json.loads(Path(sys.argv[4]).read_text()) if len(sys.argv) > 4 else []
 context = uno.getComponentContext()
 resolver = context.ServiceManager.createInstanceWithContext('com.sun.star.bridge.UnoUrlResolver', context)
 connection = None
@@ -48,7 +49,10 @@ try:
     for index in range(embedded.Count):
         item = embedded.getByIndex(index); model = item.Model
         if not model.supportsService('com.sun.star.formula.FormulaProperties'): continue
+        source_properties = source_math[len(formula_fonts)] if len(formula_fonts) < len(source_math) else {}
+        imported_height = model.BaseFontHeight
         if math_font:
+            if source_properties: model.BaseFontHeight = max(1, round(source_properties['size_pt']))
             for name in font_properties:
                 model.setPropertyValue(name, math_font)
             control = item.ExtendedControlOverEmbeddedObject
@@ -58,8 +62,9 @@ try:
             # a few points. Use the native area rather than measuring glyphs here.
             if control.getMapUnit(1) != uno.getConstantByName('com.sun.star.embed.EmbedMapUnits.ONE_100TH_MM'):
                 raise RuntimeError('FORMULA_VISUAL_AREA_UNIT_UNSUPPORTED')
-            item.Size = control.getVisualAreaSize(1)
+            item.setSize(control.getVisualAreaSize(1))
         formula_fonts.append({'index': index, 'requested': math_font, 'formula': model.Formula,
+            'source_order_candidate': source_properties, 'imported_base_height_pt': imported_height,
             'base_font_height_pt': model.BaseFontHeight,
             'object_width_pt': item.Size.Width * 72 / 2540, 'object_height_pt': item.Size.Height * 72 / 2540,
             'actual': {name: model.getPropertyValue(name) for name in font_properties}})

@@ -100,14 +100,16 @@ def split_drop_cap(package, target, count):
         prefix = deepcopy(run)
         for child in list(prefix):
             if child.tag != W + 'rPr': prefix.remove(child)
-        E.SubElement(prefix, W + 't').text = text[:take]
+        node = E.SubElement(prefix, W + 't'); node.text = text[:take]
+        node.set('{http://www.w3.org/XML/1998/namespace}space', 'preserve')
         if prefix.get(ID): del prefix.attrib[ID]
         cap.append(prefix)
         if take == len(text): paragraph.remove(run)
         else:
             for child in list(run):
                 if child.tag != W + 'rPr': run.remove(child)
-            E.SubElement(run, W + 't').text = text[take:]
+            node = E.SubElement(run, W + 't'); node.text = text[take:]
+            node.set('{http://www.w3.org/XML/1998/namespace}space', 'preserve')
         remaining -= take
     paragraph.addprevious(cap)
     if ''.join(cap.xpath('.//w:t/text()', namespaces=NS)) + ''.join(paragraph.xpath('.//w:t/text()', namespaces=NS)) != full:
