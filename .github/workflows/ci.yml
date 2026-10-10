@@ -44,3 +44,11 @@ jobs:
           name: module-ci-${{ matrix.suite }}-${{ github.run_id }}
           path: build/
           retention-days: 30
+      - run: python ci/reviewpack.py
+        if: always()
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: review-${{ matrix.suite }}-${{ github.run_id }}
+          path: build/review/
+          retention-days: 30

@@ -9,7 +9,7 @@ from . import __version__
 
 ROOT = Path(__file__).resolve().parents[2]
 CORE = ('src', 'schemas', 'sdk', 'ci', 'consumers', 'third_party', 'docs', 'examples', '.github/workflows',
-        'pyproject.toml', 'requirements.lock', 'pins.json', 'LICENSE', 'THIRD_PARTY_NOTICES.md', 'README.md')
+        'pyproject.toml', 'requirements.lock', 'requirements-resolved.lock', 'pins.json', 'LICENSE', 'THIRD_PARTY_NOTICES.md', 'README.md', 'README.zh-CN.md')
 
 
 def build_package(folder):
