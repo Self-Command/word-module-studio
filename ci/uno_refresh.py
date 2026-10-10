@@ -7,6 +7,7 @@ import time
 import uno
 import zipfile
 import shutil
+import re
 from xml.etree import ElementTree
 from com.sun.star.beans import PropertyValue
 
@@ -52,6 +53,14 @@ try:
         source_properties = source_math[len(formula_fonts)] if len(formula_fonts) < len(source_math) else {}
         imported_height = model.BaseFontHeight
         imported_formula = model.Formula
+        # Writer imports a native matrix cell beginning with a relation as
+        # `# = 1`; StarMath requires a left operand. An empty group supplies
+        # that syntactic operand without adding a visible mathematical symbol.
+        compatible_formula = re.sub(r'([#{]\s*)(?=(?:=|≤|≥|≠|≈|<|>)\s)', r'\1{} ', imported_formula)
+        compatibility_changes = []
+        if compatible_formula != imported_formula:
+            compatibility_changes.append('Empty StarMath operand before a leading matrix-cell relation')
+            model.Formula = compatible_formula
         if math_font:
             model.setPropertyValues(font_properties, tuple(math_font for _ in font_properties))
             # StarMath's imported per-face sizes can survive a BaseFontHeight
@@ -60,11 +69,12 @@ try:
             # Updating ExtendedControl synchronously can deadlock Writer; do not
             # request it or impose a separately measured frame size.
             size_pt = source_properties.get('size_pt', imported_height)
-            model.Formula = 'size ' + str(size_pt) + ' {' + imported_formula + '}'
+            model.Formula = 'size ' + str(size_pt) + ' {' + compatible_formula + '}'
         formula_fonts.append({'index': index, 'requested': math_font, 'formula': model.Formula,
             'source_order_candidate': source_properties, 'imported_base_height_pt': imported_height,
             'base_font_height_pt': model.BaseFontHeight,
             'imported_formula': imported_formula, 'explicit_size_pt': size_pt if math_font else None,
+            'compatibility_changes': compatibility_changes,
             'object_width_pt': item.Size.Width * 72 / 2540, 'object_height_pt': item.Size.Height * 72 / 2540,
             'actual': {name: model.getPropertyValue(name) for name in font_properties}})
     for iteration in range(3):

@@ -154,6 +154,10 @@ def test_practical_math_preserves_author_alignment(document, tmp_path):
     assert root.find('.//' + M + 'm') is not None or root.find('.//' + M + 'eqArr') is not None
     assert '&' not in root.xpath('//m:t/text()', namespaces=NS)
     report = render(output, tmp_path / 'alignment-proof'); assert report['automatic_pass'], report['issues']
+    import pdfplumber
+    with pdfplumber.open(tmp_path / 'alignment-proof/result.pdf') as pdf:
+        text = ''.join(p.extract_text() or '' for p in pdf.pages)
+    assert text.count('=') == 2, 'Each aligned relation must survive the compatibility PDF'
 
 
 def test_practical_math_never_splits_nested_atoms(document, tmp_path):
@@ -264,6 +268,7 @@ def test_generic_layout_gallery(tmp_path, variant):
         text = ''.join(p.extract_text() or '' for p in pdf.pages)
         assert all('REGION' + str(i) in text for i in range(8))
         assert '123' in text and '456' in text and '(A1)' in text and '(L1)' in text
+        assert text.count('=') >= 3, 'Aligned relations and the long formula must retain visible equals signs'
     package = Package(output)
     assert package.xml('word/footnotes.xml').find('.//' + W + 't') is not None
     assert not any('split-fraction' in str(e['changes']) for e in composition['equations'])
