@@ -60,12 +60,19 @@ try:
             # A font change recalculates StarMath's intrinsic area. Writer can
             # retain a stale imported frame size and scale the whole formula to
             # a few points. Use the native area rather than measuring glyphs here.
-            if control.getMapUnit(1) != uno.getConstantByName('com.sun.star.embed.EmbedMapUnits.ONE_100TH_MM'):
-                raise RuntimeError('FORMULA_VISUAL_AREA_UNIT_UNSUPPORTED')
-            item.setSize(control.getVisualAreaSize(1))
+            area = control.getVisualAreaSize(1); unit = control.getMapUnit(1)
+            # XVisualObject reports its own EmbedMapUnits, while XShape uses
+            # hundredths of a millimetre. Formula objects need not use unit 0.
+            mm100 = {0: 1, 1: 10, 2: 100, 3: 1000, 4: 2.54, 5: 25.4,
+                6: 254, 7: 2540, 8: 2540 / 72, 9: 2540 / 1440}
+            if unit not in mm100: raise RuntimeError('FORMULA_VISUAL_AREA_UNIT_UNSUPPORTED: ' + str(unit))
+            size = uno.createUnoStruct('com.sun.star.awt.Size')
+            size.Width = round(area.Width * mm100[unit]); size.Height = round(area.Height * mm100[unit])
+            item.setSize(size)
         formula_fonts.append({'index': index, 'requested': math_font, 'formula': model.Formula,
             'source_order_candidate': source_properties, 'imported_base_height_pt': imported_height,
             'base_font_height_pt': model.BaseFontHeight,
+            'visual_area_map_unit': unit if math_font else None,
             'object_width_pt': item.Size.Width * 72 / 2540, 'object_height_pt': item.Size.Height * 72 / 2540,
             'actual': {name: model.getPropertyValue(name) for name in font_properties}})
     for iteration in range(3):

@@ -146,6 +146,8 @@ def merge(table, props):
                 row.remove(cell)
         if r1 > r0:
             _set(tcpr, 'vMerge', {'val': 'restart' if index == 0 else 'continue'})
+    from .ooxml import order_properties
+    order_properties(table)
     return {'merged': [r0, r1, c0, c1]}
 
 

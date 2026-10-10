@@ -171,6 +171,14 @@ def transplant(source, refreshed):
     original = source.xml('word/document.xml')
     names = {n.get(W + 'name') for n in original.iter(W + 'bookmarkStart')}
     next_bookmark = max([int(n.get(W + 'id', '0')) for n in original.iter(W + 'bookmarkStart')] + [0]) + 1
+    sequence_targets = defaultdict(list)
+    for field in fields(original):
+        match = re.match(r'^SEQ\s+("[^"]+"|\S+)', normalized(field['instruction']))
+        if match:
+            start = field.get('simple', field.get('begin'))
+            paragraph = next((p for p in start.iterancestors() if p.tag == W + 'p'), None)
+            if paragraph is not None: sequence_targets[match[1].strip('"')].append(paragraph)
+    anchor_mapping = {}
     for part in parts(source):
         for record in fields(source.xml(part)):
             code = normalized(record['instruction']); kind = code.split(' ', 1)[0]
@@ -194,12 +202,22 @@ def transplant(source, refreshed):
                         else: node.getparent().remove(node)
                     anchor = node.get(W + 'anchor')
                     if anchor and anchor not in names:
+                        if anchor in anchor_mapping:
+                            node.set(W + 'anchor', anchor_mapping[anchor]); continue
                         markers = refreshed.xml('word/document.xml').xpath('//w:bookmarkStart[@w:name=$name]', namespaces=NS, name=anchor)
                         paragraphs = [a for a in markers[0].iterancestors() if a.tag == W + 'p'] if markers else []
                         text = ''.join(paragraphs[0].xpath('.//w:t/text()', namespaces=NS)) if paragraphs else ''
                         targets = [p for p in original.iter(W + 'p') if ''.join(p.xpath('.//w:t/text()', namespaces=NS)) == text] if text else []
+                        sequence = re.fullmatch(r'(.+)!(\d+)\|sequence', anchor, flags=re.I)
+                        if sequence:
+                            values = sequence_targets[sequence[1].upper()]; ordinal = int(sequence[2])
+                            targets = [values[ordinal]] if ordinal < len(values) else []
                         if len(targets) != 1: raise WordError('FIELD_CACHE_ANCHOR_UNRESOLVED', anchor)
+                        existing = [n.get(W + 'name') for n in targets[0].findall(W + 'bookmarkStart') if n.get(W + 'name', '').startswith('_WMSCache')]
+                        if existing:
+                            anchor_mapping[anchor] = existing[0]; node.set(W + 'anchor', existing[0]); continue
                         new_anchor = '_WMSCache' + str(next_bookmark)
+                        anchor_mapping[anchor] = new_anchor
                         node.set(W + 'anchor', new_anchor)
                         start = E.Element(W + 'bookmarkStart'); start.set(W + 'id', str(next_bookmark)); start.set(W + 'name', new_anchor)
                         end = E.Element(W + 'bookmarkEnd'); end.set(W + 'id', str(next_bookmark)); next_bookmark += 1
