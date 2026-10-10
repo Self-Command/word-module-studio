@@ -15,7 +15,16 @@ OfficeCLI contracts under `core/third_party/officecli/help/docx`. Mathematical a
 extension with `formula`, `mode`, optional `number`; Pandoc owns conversion. Extensions expose
 typed operations, never arbitrary XML, shell or scripting supplied by a manuscript.
 
-Cloud task stages: inspect/edit/compose/template-build/render/verify/visual-receipt/package.
+Core layout extensions: M19 `theme` with `properties`; M19 `embed_fonts` with font
+family/file/index/variant and an explicit redistributable declaration; M03 or M13 `frame`
+with SDK FrameProperties attributes; M10 `format` with `layout: autofit|fixed`,
+`preferred_width_pct` and `allow_row_split`; M08 `refresh_fields` with no other parameters.
+M09 accepts `policy: practical|safe_wrap|fail` and `break_strategy: outer_array|native`.
+The practical default never recursively breaks nested atoms; estimates are diagnostics.
+`field_cache.refresh(source, output, proof_folder)` also exposes independent cache refresh.
+
+Cloud task stages: inspect/edit/compose/template-build/template-probe/template-register/render/
+refresh-fields/verify/merge/extract/visual-receipt/package.
 Local transport requires GitHub CLI authentication and a task repository with the dispatch
 workflow installed. Each file is listed with role and SHA-256. Personal input is excluded from
 installation assets. See core/schemas for the authoritative contracts.

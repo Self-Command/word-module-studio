@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "id": "generic-core-layout",
+  "version": "1",
+  "fonts": {"latin":"Liberation Serif","cjk":"Noto Serif CJK SC","math":"TeX Gyre Pagella Math","rtl":"Noto Sans Arabic"},
+  "regions": [{"id":"body","page":{"width_twips":11906,"height_twips":16838,"margins_twips":[1247,1247,1247,1247]},"columns":2,"gap_twips":340,"header":"Generic document","footer":"Page {{PAGE}} of {{NUMPAGES}}","native":{"marginHeader":500,"vAlign":"top"}}],
+  "styles": {"Normal":{"size_pt":10,"native":{"widowControl":true,"kinsoku":true,"keepLines":false}},"Heading1":{"size_pt":12,"bold":true,"keep_next":true},"Caption":{"size_pt":9}},
+  "captions": {"figure":"below","table":"above"},
+  "theme": {"theme.font.minor.latin":"Liberation Serif","theme.color.accent1":"227788"},
+  "typography": {"kinsoku":true,"autoHyphenation":true,"docGrid.type":"lines","docGrid.linePitch":300},
+  "table_policy": {"layout":"autofit","preferred_width_pct":95,"allow_row_split":false,"header_rows":1,"three_line":true},
+  "font_embedding": {"enabled":true,"redistributable":true,"roles":["latin"]},
+  "equations": {"long_formula":"practical","operator_position":"before","continuation_indent_twips":300}
+}

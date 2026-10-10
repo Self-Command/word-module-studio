@@ -19,3 +19,13 @@ number layout tables remain different roles. English abstract placement is compo
 
 A template registry does not certify official journal compliance. The consumer supplies and
 approves academic sources, section names and publication requirements.
+
+Optional composable configuration: `theme`, document `typography`, per-style `native`
+and `based_on`, per-region `native`, `table_policy`, slot `frames`, `font_embedding`,
+and `equations` (practical policy, operator position and continuation indentation).
+Existing specs remain valid. Native properties are validated against the pinned OfficeCLI
+contracts; frames and font parts use the Open XML SDK. See `core/examples/core-layout.json`.
+LayoutContext includes owning sections, native cell/textbox content widths, resolved theme
+fonts, pagination values and effective-format provenance. Before actual pagination, unequal
+columns without a renderer position use the narrowest valid width conservatively. The proof
+report records actual renderer column assignment and unresolved cases needing page review.

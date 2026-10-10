@@ -1,0 +1,35 @@
+name: Core layout release
+on:
+  workflow_dispatch:
+    inputs:
+      acceptance:
+        description: Tracked acceptance manifest path
+        type: string
+        required: true
+permissions:
+  contents: write
+  actions: read
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@06da6279cdbca41027908073e81a4544dc79c06b
+        with:
+          python-version: '3.12.8'
+      - run: python -m pip install -r requirements.lock
+      - run: python ci/release_core.py --acceptance "$WMS_ACCEPTANCE"
+        env:
+          WMS_ACCEPTANCE: ${{ inputs.acceptance }}
+          GH_TOKEN: ${{ github.token }}
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: core-layout-release-${{ github.run_id }}
+          path: |
+            build/core-acceptance-report.json
+            build/release/
+      - run: gh release create v0.1.0 build/release/word-module-studio-0.1.0.zip build/release/distribution-report.json build/core-acceptance-report.json --title "Word Module Studio 0.1.0 — core layout" --notes-file docs/release-notes.md --target "$GITHUB_SHA"
+        env:
+          GH_TOKEN: ${{ github.token }}

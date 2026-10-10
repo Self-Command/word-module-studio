@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "word-module-studio"
-version = "0.1.0rc1"
+version = "0.1.0"
 description = "Composable cloud-only DOCX operations and verified template execution"
 requires-python = ">=3.12"
 license = "Apache-2.0"

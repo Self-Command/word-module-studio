@@ -102,8 +102,12 @@ try:
     for index in range(draw.Count):
         shape = draw.getByIndex(index)
         record = {'index': index, 'kind': shape.ShapeType,
-            'width_pt': shape.Size.Width * 72 / 2540, 'height_pt': shape.Size.Height * 72 / 2540,
-            'x_pt': shape.Position.X * 72 / 2540, 'y_pt': shape.Position.Y * 72 / 2540}
+            'width_pt': shape.Size.Width * 72 / 2540, 'height_pt': shape.Size.Height * 72 / 2540}
+        try:
+            position = shape.getPosition()
+            record.update(x_pt=position.X * 72 / 2540, y_pt=position.Y * 72 / 2540)
+        except Exception:
+            record['position_requires_visual_review'] = True
         try:
             cursor.gotoRange(shape.Anchor, False); record['page'] = cursor.Page
         except Exception: record['page'] = None

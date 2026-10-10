@@ -35,6 +35,9 @@ def test_effective_style_theme_and_explicit_false(document, tmp_path):
     assert context.fonts['ascii'] == 'Liberation Sans'
     assert not context.pagination['keepNext']
     assert context.effective_format['sources']['font.asciiTheme'] == 'LayoutBase'
+    package.save()
+    proof = render(output, tmp_path / 'theme-proof')
+    assert any('LiberationSans' in name.replace('-', '') for name in proof['actual_fonts']), proof['actual_fonts']
     E.SubElement(base, W + 'basedOn').set(W + 'val', 'LayoutLeaf')
     with pytest.raises(WordError, match='STYLE_INHERITANCE_CYCLE'): LayoutContext.resolve(package, target)
 

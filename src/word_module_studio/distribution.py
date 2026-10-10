@@ -12,7 +12,7 @@ CORE = ('src', 'schemas', 'sdk', 'ci', 'consumers', 'third_party', 'docs', 'exam
         'pyproject.toml', 'requirements.lock', 'requirements-resolved.lock', 'pins.json', 'LICENSE', 'THIRD_PARTY_NOTICES.md', 'README.md', 'README.zh-CN.md')
 
 
-def build_package(folder):
+def build_package(folder, *, acceptance=None):
     require_actions()
     folder = Path(folder).resolve(); folder.mkdir(parents=True, exist_ok=True)
     stage = folder / 'package' / 'word-module-studio'
@@ -28,7 +28,10 @@ def build_package(folder):
         else: shutil.copyfile(source, target)
     files = {str(p.relative_to(stage)).replace('\\', '/'): digest(p) for p in sorted(stage.rglob('*')) if p.is_file()}
     manifest = {'schema_version': 1, 'version': __version__, 'engine_commit': os.environ.get('GITHUB_SHA'),
-        'run_id': os.environ['GITHUB_RUN_ID'], 'release_status': 'candidate', 'files': files}
+        'run_id': os.environ['GITHUB_RUN_ID'], 'release_status': 'core-layout-accepted' if acceptance else 'candidate', 'files': files}
+    if acceptance:
+        if not acceptance.get('delivery_accepted') or not acceptance.get('proofs'): raise WordError('CORE_ACCEPTANCE_REQUIRED')
+        manifest['acceptance'] = acceptance
     write_json(stage / 'package-manifest.json', manifest)
     archive = folder / ('word-module-studio-' + __version__ + '.zip')
     with zipfile.ZipFile(archive, 'w', compression=zipfile.ZIP_DEFLATED) as output:

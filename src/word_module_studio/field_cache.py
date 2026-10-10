@@ -209,6 +209,7 @@ def refresh(source, output, folder):
     from .render import render
     from .verify import relationships
     source, output, folder = Path(source), Path(output), Path(folder)
+    if source.resolve() == output.resolve(): raise WordError('FIELD_REFRESH_REQUIRES_DISTINCT_OUTPUT')
     output.parent.mkdir(parents=True, exist_ok=True); folder.mkdir(parents=True, exist_ok=True)
     original = Package(source); baseline = without_cache(original); histories, records = [], []
     with tempfile.TemporaryDirectory(dir=output.parent) as temporary:
@@ -229,8 +230,10 @@ def refresh(source, output, folder):
             if part not in touched and final.parts.get(part) != data: raise WordError('FIELD_REFRESH_CHANGED_UNRELATED_PART', part)
         integrity = relationships(work)
         sdk = json.loads(run(['dotnet', '.tools/sdk/WordSdk.dll', 'validate', work]))
-        shutil.copyfile(work, output)
-    final_proof = render(output, folder / 'final')
+        staged = Path(temporary) / output.name
+        shutil.copyfile(work, staged)
+        final_proof = render(staged, folder / 'final')
+        shutil.copyfile(staged, output)
     result = {'schema_version': 1, 'automatic_pass': final_proof['automatic_pass'], 'visual_review_complete': False,
         'delivery_accepted': False, 'source_sha256': digest(source), 'output_sha256': digest(output),
         'fields_updated': records, 'cache_convergence_passes': len(histories), 'relationships': integrity, 'sdk': sdk, 'proof': final_proof}
