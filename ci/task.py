@@ -86,6 +86,10 @@ def execute_task(root, folder, *, task_id, engine_commit):
         from word_module_studio.distribution import build_package
         result = build_package(folder)
     else: raise WordError('TASK_STAGE_UNSUPPORTED', stage)
+    if stage in ('edit', 'compose', 'merge', 'extract'):
+        from word_module_studio.render import render
+        result['proof'] = render(output, folder / 'proof')
+        result['automatic_pass'] = result.get('automatic_pass', True) and result['proof']['automatic_pass']
     identity = {'task_id': task_id, 'engine_commit': engine_commit, 'run_id': os.environ['GITHUB_RUN_ID'],
         'input_commit': os.environ.get('WMS_INPUT_COMMIT'), 'stage': stage, 'input_files': task['files'], 'result': result}
     write_json(folder / 'task-report.json', identity)

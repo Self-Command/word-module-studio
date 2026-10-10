@@ -40,8 +40,7 @@ def render(source, folder):
             with pdfplumber.open(pass_file) as document:
                 signature = [(page.width, page.height, [(c['text'], round(c['x0'], 2), round(c['top'], 2)) for c in page.chars]) for page in document.pages]
             fingerprints.append(hashlib.sha256(json.dumps(signature, ensure_ascii=False).encode()).hexdigest())
-            if len(fingerprints) > 1 and fingerprints[-1] == fingerprints[-2]: break
-        else: raise WordError('FIELD_PAGINATION_NOT_CONVERGED')
+        if fingerprints[-1] != fingerprints[-2]: raise WordError('FIELD_PAGINATION_NOT_CONVERGED')
     run(['pdftoppm', '-png', '-r', '110', pdf, folder / 'page'], timeout=180)
     pages = sorted(folder.glob('page-*.png'), key=lambda p: int(p.stem.rsplit('-', 1)[-1]))
     if not pages: raise WordError('PAGE_PREVIEWS_MISSING')

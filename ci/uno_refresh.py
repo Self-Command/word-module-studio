@@ -6,6 +6,7 @@ import sys
 import time
 import uno
 import zipfile
+import shutil
 from xml.etree import ElementTree
 from com.sun.star.beans import PropertyValue
 
@@ -83,7 +84,7 @@ try:
             rows.append({'diagnostic': 'Merged table row positions need manual review: ' + str(exc)})
         layout['tables'].append({'name': name, 'rows': rows})
     output.with_suffix('.layout.json').write_text(json.dumps(layout, ensure_ascii=False, indent=2))
-    document.storeToURL(uno.systemPathToFileUrl(str(output)), (prop('FilterName', 'writer_pdf_Export'), prop('Overwrite', True)))
+    shutil.copyfile(pass_file, output)
     # Compatibility copy is diagnostic only: never replace the original editable DOCX.
     refreshed = output.with_suffix('.refreshed.docx')
     document.storeToURL(uno.systemPathToFileUrl(str(refreshed)), (prop('FilterName', 'Office Open XML Text'), prop('Overwrite', True)))
