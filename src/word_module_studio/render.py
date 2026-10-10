@@ -51,7 +51,8 @@ def render(source, folder):
         'visual_review_complete': False, 'delivery_accepted': False, 'renderer': 'LibreOffice 26.8.1 compatibility proof; not Microsoft Word native rendering',
         'run_id': os.environ['GITHUB_RUN_ID'], 'input_sha256': digest(source), 'output_sha256': digest(pdf),
         'pages': [{'file': p.name, 'sha256': digest(p)} for p in pages], 'convergence': fingerprints,
-        'issues': issues, 'actual_fonts': pdf_fonts(pdf)}
+        'issues': issues, 'actual_fonts': pdf_fonts(pdf),
+        'math_font_application': json.loads(pdf.with_suffix('.layout.json').read_text()).get('formula_fonts', [])}
     write_json(folder / 'render-report.json', report)
     return report
 

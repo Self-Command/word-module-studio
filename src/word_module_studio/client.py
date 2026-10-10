@@ -1,4 +1,8 @@
 """The only local entry points: explicit-file submission, status and fetch."""
+import sys
+# Direct invocation must not expose the package's math.py as the stdlib math
+# module while argparse/pathlib initialise. Module invocation needs no change.
+if __name__ == '__main__' and sys.path: sys.path.pop(0)
 import argparse
 import base64
 import hashlib

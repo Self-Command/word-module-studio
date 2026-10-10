@@ -5,6 +5,8 @@ from pathlib import Path
 import sys
 import time
 import uno
+import zipfile
+from xml.etree import ElementTree
 from com.sun.star.beans import PropertyValue
 
 if os.environ.get('GITHUB_ACTIONS') != 'true' or not os.environ.get('GITHUB_RUN_ID'): raise RuntimeError('CLOUD_ONLY')
@@ -30,10 +32,29 @@ document = desktop.loadComponentFromURL(uno.systemPathToFileUrl(str(source)), '_
      prop('MacroExecutionMode', uno.getConstantByName('com.sun.star.document.MacroExecMode.NEVER_EXECUTE'))))
 if document is None: raise RuntimeError('RENDERER_LOAD_FAILED')
 try:
+    # The DOCX mathFont is otherwise lost when Writer imports OMML into
+    # StarMath. Apply its explicit family to the compatibility proof only.
+    math_font = None
+    with zipfile.ZipFile(source) as package:
+        settings = ElementTree.fromstring(package.read('word/settings.xml'))
+        namespace = '{http://schemas.openxmlformats.org/officeDocument/2006/math}'
+        node = settings.find(namespace + 'mathPr/' + namespace + 'mathFont')
+        if node is not None: math_font = node.get(namespace + 'val')
+    formula_fonts = []
+    embedded = document.getEmbeddedObjects()
+    for index in range(embedded.Count):
+        item = embedded.getByIndex(index); model = item.Model
+        if not model.supportsService('com.sun.star.formula.FormulaProperties'): continue
+        if math_font:
+            for name in ('FontNameVariables', 'FontNameFunctions', 'FontNameNumbers', 'FontNameText'):
+                model.setPropertyValue(name, math_font)
+            item.ExtendedControlOverEmbeddedObject.update()
+        formula_fonts.append({'index': index, 'requested': math_font,
+            'actual': {name: model.getPropertyValue(name) for name in ('FontNameVariables', 'FontNameFunctions', 'FontNameNumbers', 'FontNameText')}})
     document.TextFields.refresh()
     for index in range(document.DocumentIndexes.Count): document.DocumentIndexes.getByIndex(index).update()
     document.TextFields.refresh()
-    layout = {'paragraphs': [], 'tables': []}
+    layout = {'paragraphs': [], 'tables': [], 'formula_fonts': formula_fonts}
     cursor = document.CurrentController.ViewCursor
     enumeration = document.Text.createEnumeration()
     while enumeration.hasMoreElements():

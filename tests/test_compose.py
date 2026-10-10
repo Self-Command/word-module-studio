@@ -35,3 +35,14 @@ def test_markdown_injection_and_missing_images_fail(tmp_path):
     with pytest.raises(WordError, match='IMAGE_RESOURCE_MISSING'): compose(source, template, tmp_path / 'bad.docx')
     source.write_text('![layout](absent.png){width=200mm}', encoding='utf-8')
     with pytest.raises(WordError): compose(source, template, tmp_path / 'bad.docx')
+def test_legacy_fill_escapes_semantic_data_and_preserves_registered_geometry(tmp_path):
+    from word_module_studio.legacy import fill
+    from word_module_studio.templates import build
+    from word_module_studio.package import Package, NS
+    from test_templates import spec
+    manifest = build(spec(2), tmp_path / 'legacy-master')
+    output = tmp_path / 'legacy.docx'
+    fill(manifest, output, {'front': 'Ada & <review>', 'body': 'Retained body'})
+    text = ''.join(Package(output).xml('word/document.xml').xpath('//w:t/text()', namespaces=NS))
+    assert 'Ada & <review>' in text and 'Retained body' in text
+
