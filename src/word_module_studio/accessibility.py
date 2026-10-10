@@ -20,7 +20,8 @@ def inspect(path):
     for table in root.iter(W + 'tbl'):
         first = table.find(W + 'tr')
         equation = table.find('w:tblPr/w:tblCaption', namespaces=NS)
-        if first is not None and equation is None and first.find('w:trPr/w:tblHeader', namespaces=NS) is None:
+        is_equation = equation is not None and equation.get(W + 'val') == 'word-module-studio-equation-layout'
+        if first is not None and not is_equation and first.find('w:trPr/w:tblHeader', namespaces=NS) is None:
             issues.append({'code': 'TABLE_HEADER_SEMANTICS_MISSING'})
     defaults = package.xml('word/styles.xml').find('w:docDefaults/w:rPrDefault/w:rPr/w:lang', namespaces=NS)
     return {'module': 'M18', 'issues': issues, 'default_language': defaults.get(W + 'val') if defaults is not None else None,

@@ -48,14 +48,15 @@ def execute_task(root, folder, *, task_id, engine_commit):
     stage = task['stage']
     if stage == 'inspect':
         from word_module_studio.capabilities import catalog
-        result = {'snapshot': snapshot(one('document')), 'capabilities': catalog()}
+        from word_module_studio.accessibility import inspect
+        result = {'snapshot': snapshot(one('document')), 'capabilities': catalog(), 'accessibility': inspect(one('document'))}
     elif stage == 'edit':
         from word_module_studio.engine import execute
         request = value('batch')
         result = execute(request, one('document'), output, template=template() if request['mode'] == 'locked_template' else None)
     elif stage == 'compose':
         from word_module_studio.compose import compose
-        result = compose(one('markdown'), template(), output, resources=inputs.get('image', []), data=value('data') if inputs.get('data') else None)
+        result = compose(one('markdown'), template(), output, resources=[*inputs.get('image', []), *inputs.get('bibliography', [])], data=value('data') if inputs.get('data') else None)
     elif stage == 'template-build': result = template()
     elif stage == 'render':
         from word_module_studio.render import render
@@ -66,6 +67,8 @@ def execute_task(root, folder, *, task_id, engine_commit):
         from word_module_studio.runtime import run
         result = {'sdk': json.loads(run(['dotnet', '.tools/sdk/WordSdk.dll', 'validate', one('document')])),
             'relationships': relationships(one('document')), 'snapshot': snapshot(one('document'))}
+        from word_module_studio.accessibility import inspect
+        result['accessibility'] = inspect(one('document'))
     elif stage == 'merge':
         from word_module_studio.merge import merge
         documents = inputs.get('document', [])

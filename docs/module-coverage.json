@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "version": "0.1.0rc1",
+  "automatic_acceptance": "pending-final-run",
+  "visual_acceptance": "pending-page-review",
+  "modules": [
+    {"id":"M01","tests":["tests/test_operations.py","tests/test_task.py"],"handler":"package.py / engine.py"},
+    {"id":"M02","tests":["tests/test_native_modules.py","tests/test_advanced.py"],"handler":"backend.py / text.py"},
+    {"id":"M03","tests":["tests/test_native_modules.py","tests/test_advanced.py"],"handler":"backend.py / templates.py"},
+    {"id":"M04","tests":["tests/test_native_modules.py","tests/test_advanced.py","tests/test_compose.py"],"handler":"numbering.py / content_import.py"},
+    {"id":"M05","tests":["tests/test_native_modules.py","tests/test_templates.py","tests/test_render.py"],"handler":"backend.py / SDK / context.py"},
+    {"id":"M06","tests":["tests/test_native_modules.py","tests/test_advanced.py","tests/test_render.py"],"handler":"headers.py"},
+    {"id":"M07","tests":["tests/test_native_modules.py","tests/test_advanced.py"],"handler":"backend.py / captions.py / verify.py"},
+    {"id":"M08","tests":["tests/test_native_modules.py","tests/test_advanced.py"],"handler":"backend.py / render.py / uno_refresh.py"},
+    {"id":"M09","tests":["tests/test_native_modules.py","tests/test_templates.py","tests/test_consumer.py","tests/test_render.py"],"handler":"math.py / migration"},
+    {"id":"M10","tests":["tests/test_native_modules.py","tests/test_advanced.py","tests/test_render.py"],"handler":"tables.py / backend.py"},
+    {"id":"M11","tests":["tests/test_native_modules.py","tests/test_advanced.py","tests/test_public_paper.py"],"handler":"backend.py / content_import.py / compose.py"},
+    {"id":"M12","tests":["tests/test_native_modules.py","tests/test_advanced.py"],"handler":"backend.py / SDK"},
+    {"id":"M13","tests":["tests/test_native_modules.py","tests/test_advanced.py"],"handler":"shapes.py / backend.py"},
+    {"id":"M14","tests":["tests/test_native_modules.py","tests/test_advanced.py","tests/test_merge.py"],"handler":"backend.py / SDK / merge_parts.py"},
+    {"id":"M15","tests":["tests/test_native_modules.py","tests/test_advanced.py","tests/test_merge.py"],"handler":"backend.py / verify.py / merge_parts.py"},
+    {"id":"M16","tests":["tests/test_native_modules.py","tests/test_advanced.py"],"handler":"controls.py / backend.py"},
+    {"id":"M17","tests":["tests/test_merge.py"],"handler":"merge.py / merge_parts.py"},
+    {"id":"M18","tests":["tests/test_native_modules.py","tests/test_advanced.py","tests/test_task.py"],"handler":"backend.py / accessibility.py"},
+    {"id":"M19","tests":["tests/test_templates.py","tests/test_consumer.py","tests/test_distribution.py"],"handler":"templates.py"},
+    {"id":"M20","tests":["tests/test_render.py","tests/test_public_paper.py","tests/test_distribution.py"],"handler":"render.py / verify.py / distribution.py"}
+  ]
+}

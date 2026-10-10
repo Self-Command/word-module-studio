@@ -78,6 +78,9 @@ def check_properties(module, kind, action, props):
 
 def catalog():
     require_actions()
+    coverage = json.loads((ROOT / 'docs/module-coverage.json').read_text())
+    evidence = {item['id']: item for item in coverage['modules']}
     return {"schema_version": 1, "modules": [{"id": key, "name": value[0], "elements": value[1],
         "implementation": "officecli-contract-adapter" if value[1] else "native-extension",
-        "automatic_acceptance": "pending", "visual_acceptance": "pending"} for key, value in MODULES.items()]}
+        **evidence[key], "automatic_acceptance": coverage['automatic_acceptance'],
+        "visual_acceptance": coverage['visual_acceptance']} for key, value in MODULES.items()]}

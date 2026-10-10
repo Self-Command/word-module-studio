@@ -130,7 +130,15 @@ def wrap(root, width_pt, font_size_pt=10, array_padding_pt=0, metrics=None):
                 # Transparent single-child argument wrappers add no physical
                 # width. Subtracting 8 pt at every nesting level eventually
                 # broke short function arguments that already fit the column.
-                child_budget = max(45,budget if linear_overflow else budget-other)
+                if linear_overflow:
+                    # A legal break moves whole segments, including a leading
+                    # operator and punctuation. Reserve neighbours in the
+                    # child's own segment, rather than either all siblings or
+                    # none; otherwise '= {nested array}.' still exceeds its row.
+                    neighbours = [sum(measure(token) for token in segment if tree(token) != tree(child))
+                                  for segment in segments_of(element) if any(tree(token) == tree(child) for token in segment)]
+                    other = max(neighbours, default=0)
+                child_budget = max(45, budget - other)
             visit(child, path+[index], max(45, child_budget))
         if name not in containers or measure(element) <= budget: return
         # Pandoc renders a newly stacked OMML row as a one-column TeX array.
