@@ -38,7 +38,7 @@ def apply(package, target, props):
     for width in widths: E.SubElement(grid, W + 'gridCol').set(W + 'w', str(width))
     headers = props.get('header_rows', 1)
     rows = table.findall(W + 'tr')
-    if headers < 0 or headers >= len(rows): raise WordError('INVALID_HEADER_ROWS')
+    if headers < 0 or headers > len(rows): raise WordError('INVALID_HEADER_ROWS')
     if props.get('three_line'):
         borders = _set(table_props, 'tblBorders')
         for side in ('top', 'left', 'bottom', 'right', 'insideH', 'insideV'):
@@ -63,6 +63,11 @@ def apply(package, target, props):
     from .ooxml import order_properties
     order_properties(table)
     if props.get('split_rows'): return split(table, props, headers)
+    if props.get('title'):
+        if not props.get('number'): raise WordError('CAPTION_NUMBER_REQUIRED')
+        title = caption('Table', props['title'], props['number'], position=props.get('caption_position', 'below'))
+        if props.get('caption_position', 'below') == 'above': table.addprevious(title)
+        else: table.addnext(title)
     return {'widths_twips': widths, 'rows': len(rows), 'header_rows': headers, 'three_line': props.get('three_line', False)}
 
 

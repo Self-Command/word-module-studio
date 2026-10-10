@@ -15,7 +15,7 @@ def caption(sequence, title, number, *, prefix=None, continuation=False, bookmar
     E.SubElement(ppr, W + 'keepLines')
     E.SubElement(ppr, W + 'keepNext').set(W + 'val', '1' if position == 'above' else '0')
     if bookmark:
-        marker = E.SubElement(p, W + 'bookmarkStart'); marker.set(W + 'id', str(number + 5000)); marker.set(W + 'name', bookmark)
+        marker = E.SubElement(p, W + 'bookmarkStart'); marker.set(W + 'id', str(number + {'Figure': 5000, 'Table': 10000, 'Equation': 15000}[sequence])); marker.set(W + 'name', bookmark)
     E.SubElement(E.SubElement(p, W + 'r'), W + 't').text = (prefix or sequence) + ' '
     field = E.SubElement(p, W + 'fldSimple')
     instruction = ' SEQ ' + sequence + (' \\c ' if continuation else ' \\* ARABIC ')
@@ -25,7 +25,7 @@ def caption(sequence, title, number, *, prefix=None, continuation=False, bookmar
     text.set('{http://www.w3.org/XML/1998/namespace}space', 'preserve')
     text.text = ' ' + title + (' (continued)' if continuation else '')
     if bookmark:
-        E.SubElement(p, W + 'bookmarkEnd').set(W + 'id', str(number + 5000))
+        E.SubElement(p, W + 'bookmarkEnd').set(W + 'id', str(number + {'Figure': 5000, 'Table': 10000, 'Equation': 15000}[sequence]))
     from .ooxml import order_properties
     order_properties(p)
     return p

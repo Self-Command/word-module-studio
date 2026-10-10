@@ -28,7 +28,7 @@ def convert(formula, mode='display'):
         return deepcopy(matches[0])
 
 
-def apply(package, item, props):
+def apply(package, item, props, *, metrics=None):
     require_actions()
     allowed = {'formula', 'mode', 'number', 'number_width_twips', 'size_pt', 'wrap', 'operation'}
     if set(props) - allowed: raise WordError('MATH_PROPERTY_UNSUPPORTED')
@@ -41,9 +41,9 @@ def apply(package, item, props):
     budget = (min(context.column_widths_twips) - number_width) / 20 - 8
     if budget <= 0: raise WordError('EQUATION_NUMBER_REGION_TOO_WIDE')
     original = tree(formula)
-    changes = wrap(formula, budget, size) if props.get('wrap', True) else []
+    changes = wrap(formula, budget, size, metrics=metrics) if props.get('wrap', True) else []
     if tree(restore(formula, changes)) != original: raise WordError('FORMULA_RECOVERY_FAILED')
-    if math_width_pt(formula, size) > budget + 0.1: raise WordError('FORMULA_CANNOT_FIT', str(props.get('number', 'unlabelled')))
+    if math_width_pt(formula, size, metrics) > budget + 0.1: raise WordError('FORMULA_CANNOT_FIT', str(props.get('number', 'unlabelled')))
     if mode == 'inline':
         if target.tag != W + 'p': raise WordError('INLINE_MATH_REQUIRES_PARAGRAPH')
         target.append(formula)

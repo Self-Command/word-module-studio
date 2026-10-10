@@ -20,12 +20,12 @@ def registered_metrics(family,filename,index,fingerprint):
 
 def configure(profile):
     require_actions()
-    from .fonts import resolve_faces
-    faces=profile.get("font_faces") or resolve_faces(profile["fonts"])
+    from ..templates import check_fonts
+    found = check_fonts(profile['fonts'])
     # Font identity comes from the frozen mother policy. The returned advances
     # improve estimates only; actual renderer overflow checks remain decisive.
     result={}
     for role in ("math","cjk"):
-        face=faces[role]["upright"]
-        result[role]=registered_metrics(profile["fonts"][role],face["file"],face["index"],face["sha256"])
+        face=found[role]
+        result[role]=registered_metrics(profile["fonts"][role],Path(face["file"]).name,face["index"],face["sha256"])
     return result

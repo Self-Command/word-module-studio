@@ -10,7 +10,13 @@ from .package import Package, W, NS, ID
 from .verify import relationships
 
 
-class RegionComposer(Composer):
+class NativeComposer(Composer):
+    def add_footnotes(self, source, element):
+        from .merge_parts import auxiliary
+        auxiliary(self, source, element)
+
+
+class RegionComposer(NativeComposer):
     def __init__(self, document):
         super().__init__(document, preserve_styles=True)
         self.region_relations = {}
@@ -36,14 +42,13 @@ def merge(master, additions, output, *, header_policy):
     require_actions()
     if header_policy not in ('master', 'source_regions'): raise WordError('MERGE_HEADER_POLICY_REQUIRED')
     destination = Document(master)
-    composer = Composer(destination, preserve_styles=True) if header_policy == 'master' else RegionComposer(destination)
+    composer = NativeComposer(destination, preserve_styles=True) if header_policy == 'master' else RegionComposer(destination)
     before_text = []
     for source_path in additions:
         package = Package(source_path)
-        # These require joint ID/anchor remapping, not a silent upstream drop.
-        if any(n in package.parts for n in ('word/endnotes.xml', 'word/comments.xml')):
-            raise WordError('MERGE_AUXILIARY_PART_NOT_READY', str(source_path))
         source = Document(source_path)
+        from .merge_parts import prepare_identifiers, metadata
+        prepare_identifiers(destination, source, 'merge' + str(len(before_text) + 1))
         for element in source.element.iter():
             for attribute in list(element.attrib):
                 if attribute.startswith('{' + NS['wms'] + '}'): del element.attrib[attribute]
@@ -64,6 +69,7 @@ def merge(master, additions, output, *, header_policy):
             destination.element.body.replace(previous, deepcopy(incoming))
             destination.element.body.remove(inserted)
         else: composer.append(source, remove_property_fields=False)
+        metadata(composer, source)
     composer.save(output)
     result = Package(output)
     joined = ''.join(result.xml('word/document.xml').xpath('//w:t/text()', namespaces=NS))
