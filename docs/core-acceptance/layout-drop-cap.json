@@ -6,7 +6,7 @@
       "sha256": "04606cb444d523b9307d6cd694cf767a3c31463cc5b70b447776f157998c6704"
     }
   ],
-  "output_sha256": "5026556cbe6c0de708b5068878e82cba00bde1dbf437629daaf7949d3b0e3487",
+  "output_sha256": "50223c183309f868b71524a2f1664fe5c725d6da76b9d9643d3a1ede222dec66",
   "checklist": [
     {
       "result": "pass",
@@ -118,7 +118,7 @@
     "BAAAAA+Carlito",
     "CAAAAA+Carlito"
   ],
-  "run_id": "38064409279",
+  "run_id": "38069365621",
   "page_reviews": [
     {
       "observations": "Large D occupies the first three lines, with the remaining paragraph wrapping around it before returning to full width. Complete paragraph and second text are retained; full PNG inspected.",
@@ -126,8 +126,8 @@
       "status": "pass"
     }
   ],
-  "input_sha256": "b7b8437326cd3a339a8c4549071194eac562bf34db20ceb7a9d8908adb12fe5b",
-  "engine_commit": "2ee18d51df26f8e0fbc175bf4e0f3b7988430b99",
+  "input_sha256": "ef68156733bf0bd24df6c26a8bc4eddb88efec01398c28659b2593ce42b43bea",
+  "engine_commit": "d12f9056b14cff32944b4692db7afa94e4664747",
   "findings": [],
   "reviewer": "Codex: direct review of original cloud pages; all current page hashes and PDF font families match, with current artifact identities rebound",
   "review_provenance": {

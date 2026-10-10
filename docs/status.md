@@ -1,10 +1,10 @@
 # Core layout acceptance
 
-Version 0.1.1 publishes the standalone generic Word skill and its tested core layout scope. Engine commit
-`2ee18d51df26f8e0fbc175bf4e0f3b7988430b99` passed all six jobs in
-[run 38064409279](https://github.com/Self-Command/word-module-studio/actions/runs/38064409279):
-core 39, advanced 20, composition 9, layout 26, rendering 5 and distribution 2,
-for 101 regression tests. This is evidence for the listed scenarios, not every Word behavior.
+Version 0.1.2 publishes the standalone generic Word skill and its tested core layout scope. Engine commit
+`d12f9056b14cff32944b4692db7afa94e4664747` passed all six jobs in
+[run 38069365621](https://github.com/Self-Command/word-module-studio/actions/runs/38069365621):
+core 39, advanced 20, composition 12, layout 26, rendering 5 and distribution 2,
+for 104 regression tests. This is evidence for the listed scenarios, not every Word behavior.
 
 Direct review covered 26 generic proofs and all 49 pages: single/double/triple and unequal
 columns, landscape pages, Chinese/Latin/RTL content, effective fonts and theme inheritance,
@@ -13,7 +13,7 @@ native frames/drop caps, textboxes/shapes, native notes, source-section merging,
 fractions/cases, author alignment, long outer continuation lines and refreshed TOC/caption
 index/alphabetical index after additions and deletions.
 
-For 0.1.1, every current page SHA-256 and observed PDF font family exactly matches the
+For 0.1.2, every current page SHA-256 and observed PDF font family exactly matches the
 original directly reviewed run 38059546545. Receipts retain that inspection provenance and
 bind the new run's input and PDF identities; the release gate verifies the current page files.
 
@@ -34,6 +34,12 @@ historical evidence and is not used as completion of these additions.
 The qualification runs referenced here execute in GitHub Actions. Users can choose local
 Python, an optional local Docker environment, or Actions; the document API has no Actions
 requirement. Local and Actions tasks share the same inspection and acceptance rules.
+The separate [local runtime qualification](https://github.com/Self-Command/word-module-studio/actions/runs/38069365595)
+uses the same accepted engine in a Linux x64 container with network access disabled,
+no GitHub credentials and no Actions environment variables. It verifies dependency checks,
+inspection, editing, preservation of originals, confirmed changed text and actual PDF/PNG
+generation. A direct view of its one-page edited proof confirms complete, unclipped text.
+The local container is optional; other native platforms require their own qualification.
 The original editable DOCX is retained; UNO exports are
 diagnostic, and only supported field caches are transplanted into a distinct delivery copy.
 

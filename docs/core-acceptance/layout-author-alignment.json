@@ -6,7 +6,7 @@
       "sha256": "47e1b68de4552d57816e7715cd13142a1792866c9d6f5673a41b5e85ee3aa24c"
     }
   ],
-  "output_sha256": "562791097094e627fcb6977001f456a044081b5c446da871536bd2ea3f8c4fb7",
+  "output_sha256": "85b3c77e36cfc998f5c30358d28a2a100cc9eed1a0b81078347583d476465ecb",
   "checklist": [
     {
       "result": "pass",
@@ -120,7 +120,7 @@
     "DAAAAA+OpenSymbol",
     "EAAAAA+LiberationSerif"
   ],
-  "run_id": "38064409279",
+  "run_id": "38069365621",
   "page_reviews": [
     {
       "observations": "Both author-aligned rows x+y=1 and x-y=0 retain their equals signs, column alignment and the centered A1 label. No error glyph or mathematical symbol is missing; full PNG inspected.",
@@ -128,8 +128,8 @@
       "status": "pass"
     }
   ],
-  "input_sha256": "e6e6a691821294894c3f83accf1b247a6b6039b6a3aba646115ce2ba44d1cb44",
-  "engine_commit": "2ee18d51df26f8e0fbc175bf4e0f3b7988430b99",
+  "input_sha256": "d98cb5a6acbe5131c9c01928582eb4a2d0c2e3eb6274f8c9dfe4d60cbf232a3d",
+  "engine_commit": "d12f9056b14cff32944b4692db7afa94e4664747",
   "findings": [],
   "reviewer": "Codex: direct review of original cloud pages; all current page hashes and PDF font families match, with current artifact identities rebound",
   "review_provenance": {

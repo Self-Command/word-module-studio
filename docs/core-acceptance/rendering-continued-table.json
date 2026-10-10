@@ -14,7 +14,7 @@
       "sha256": "34d321fcd793c7cab03290bde299a71cb5a5b0b3fb3db260991c0730aba04520"
     }
   ],
-  "output_sha256": "a75f94a85ac3e187c14fb384f27871a0952f2e60bf82f2cce454322cceb5c089",
+  "output_sha256": "8e8da4a3cc446fa6e8d7fc20e204da75cd9cfe7be90ff0499e1a8becc32716f8",
   "checklist": [
     {
       "result": "pass",
@@ -127,7 +127,7 @@
     "CAAAAA+LiberationSerif",
     "DAAAAA+LiberationSerif"
   ],
-  "run_id": "38064409279",
+  "run_id": "38069365621",
   "page_reviews": [
     {
       "observations": "Both columns retain ROW0 through ROW26; header repeats on each segment; first title and continued title appear below their respective tables; borders and column boundaries remain clear.",
@@ -145,8 +145,8 @@
       "status": "pass"
     }
   ],
-  "input_sha256": "977f595d3b08f82603798dc3cb136db748ea0cccacf51d4d4c2bc0c375d3f4c0",
-  "engine_commit": "2ee18d51df26f8e0fbc175bf4e0f3b7988430b99",
+  "input_sha256": "48b70db223304d4724ecefcbe459fd913bec2f03bf8d2ca81519bd02b5accabb",
+  "engine_commit": "d12f9056b14cff32944b4692db7afa94e4664747",
   "findings": [],
   "reviewer": "Codex: direct review of original cloud pages; all current page hashes and PDF font families match, with current artifact identities rebound",
   "review_provenance": {

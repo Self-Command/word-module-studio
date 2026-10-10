@@ -6,7 +6,7 @@
       "sha256": "511cf5416447f5c6613b94c81b116b752b10d54ec2bd77170dad29b96167bd1f"
     }
   ],
-  "output_sha256": "91b4dc6ba497d14e90346fb99a53769f7cac23af3ab541747a2866804e019113",
+  "output_sha256": "34802a02db26c70717ca3891142f4d39181e841b7ee8d65d70e8988624ecd125",
   "checklist": [
     {
       "result": "pass",
@@ -119,7 +119,7 @@
     "CAAAAA+LiberationSerif",
     "DAAAAA+LiberationSerif"
   ],
-  "run_id": "38064409279",
+  "run_id": "38069365621",
   "page_reviews": [
     {
       "observations": "Floating picture retains its oval/triangle details and separates from the native framed Container anchor text. Merged native table data, retained second row, oval shape, Editable box content and native footnote are all visible without collision. Full PNG inspected.",
@@ -127,8 +127,8 @@
       "status": "pass"
     }
   ],
-  "input_sha256": "f5da3f42418fa81cec9243dc17b9f87614eaa63fe941ae5ccdedf3aa7f66b800",
-  "engine_commit": "2ee18d51df26f8e0fbc175bf4e0f3b7988430b99",
+  "input_sha256": "3171211212a8537a329ff8b691f1671c0e3da461e178567bce9927a6f62b7bbd",
+  "engine_commit": "d12f9056b14cff32944b4692db7afa94e4664747",
   "findings": [],
   "reviewer": "Codex: direct review of original cloud pages; all current page hashes and PDF font families match, with current artifact identities rebound",
   "review_provenance": {

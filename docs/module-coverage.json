@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "version": "0.1.1",
+  "version": "0.1.2",
   "automatic_acceptance": "pass-scoped-core-layout",
   "visual_acceptance": "pass-scoped-print-proofs",
   "modules": [
@@ -325,7 +325,20 @@
     }
   ],
   "acceptance_manifest": "docs/core-acceptance.json",
-  "run_id": "38064409279",
-  "engine_commit": "2ee18d51df26f8e0fbc175bf4e0f3b7988430b99",
-  "scope": "standalone generic DOCX modules; application-specific projects are not included"
+  "run_id": "38069365621",
+  "engine_commit": "d12f9056b14cff32944b4692db7afa94e4664747",
+  "scope": "standalone generic DOCX modules; application-specific projects are not included",
+  "execution_modes": [
+    "local",
+    "actions"
+  ],
+  "local_runtime_qualification": {
+    "run_id": "38069365595",
+    "engine_commit": "d12f9056b14cff32944b4692db7afa94e4664747",
+    "platform": "Linux x64 optional local container",
+    "network_disabled": true,
+    "github_credentials_required": false,
+    "actions_environment_present": false,
+    "scope": "Dependency diagnostics, CLI inspection and edit, preserved original, changed text verification and real PDF/PNG proof."
+  }
 }

@@ -6,7 +6,7 @@
       "sha256": "ba9d2ea959e78818d5ea5db5d2d4f7344cd1e88dab0b4aee54efb8f0472057bf"
     }
   ],
-  "output_sha256": "9a2746b8310d0a3e51fbe279286f47e9ea0a3675868cd21295d7f69bf2611fac",
+  "output_sha256": "0ad82451cbcf8069aa4ee2fdd0ecbcbbb38291665ae37dd85c1058e4616ce96e",
   "checklist": [
     {
       "result": "pass",
@@ -119,7 +119,7 @@
     "CAAAAA+Carlito",
     "DAAAAA+Carlito-Bold"
   ],
-  "run_id": "38064409279",
+  "run_id": "38069365621",
   "page_reviews": [
     {
       "observations": "Horizontal bars retain A=1, B=3, C=2, readable axes, chart title and Series legend.",
@@ -127,8 +127,8 @@
       "status": "pass"
     }
   ],
-  "input_sha256": "e0653acdf305cc554c4e533b71e1ab7be851c19473360df2f550a7b2f579266e",
-  "engine_commit": "2ee18d51df26f8e0fbc175bf4e0f3b7988430b99",
+  "input_sha256": "da00df53f8b2495143384b406010f9cf634ccc4955f8dd6411a1e5593c432d25",
+  "engine_commit": "d12f9056b14cff32944b4692db7afa94e4664747",
   "findings": [],
   "reviewer": "Codex: direct review of original cloud pages; all current page hashes and PDF font families match, with current artifact identities rebound",
   "review_provenance": {

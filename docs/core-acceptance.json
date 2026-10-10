@@ -1,15 +1,16 @@
 {
   "schema_version": 1,
-  "run_id": "38064409279",
+  "run_id": "38069365621",
   "limitations": [
-    "Acceptance is bounded to these generic core documents and 101 regression scenarios; it does not certify every Word feature or arbitrary document.",
+    "Acceptance is bounded to these generic core documents and 104 regression scenarios; it does not certify every Word feature or arbitrary document.",
     "LibreOffice 26.8.1 compatibility proof only; Microsoft Word native rendering is not tested. Native OMML operator breaks are ignored by this renderer; compatible outer arrays are the default.",
     "Existing-document fonts may be substituted. Actual PDF families are recorded per receipt; fontconfig candidates are advisory and are not claimed to equal the renderer font choice.",
     "Actual font embedding is structurally tested from font data; these PDFs do not establish that Word loads the embedded face.",
     "Comments, revisions, controls and unknown parts have structural retention evidence; their interactive Word UI presentation is not visually certified.",
-    "Application-specific templates and business workflows are outside this generic core acceptance."
+    "Application-specific templates and business workflows are outside this generic core acceptance.",
+    "Local execution is qualified for the optional Linux x64 container, with no network, GitHub credentials or Actions variables. Other native platforms require their own dependency and rendering qualification."
   ],
-  "engine_commit": "2ee18d51df26f8e0fbc175bf4e0f3b7988430b99",
+  "engine_commit": "d12f9056b14cff32944b4692db7afa94e4664747",
   "proofs": [
     {
       "path": "test-work/test_real_cloud_pagination_1_F0/proof",
@@ -150,5 +151,20 @@
     "all_current_page_sha256_match_original": true,
     "all_observed_pdf_font_families_match_original": true,
     "method": "Carry forward original direct inspection only for byte-identical page images; bind the receipts to the new input and PDF identities."
+  },
+  "local_runtime_run_id": "38069365595",
+  "local_runtime_review": {
+    "qualification_run_id": "38069365595",
+    "run_id": "local-72762939b09b49c6b30e609f0544f223",
+    "output_sha256": "0a50d5ef2d366af980acdb7ed92454998d1aaa03f17234cacfbb6207da12b608",
+    "pages": [
+      {
+        "file": "page-1.png",
+        "sha256": "2cfac418cd8d38235ab419be3b1bb4c76eaede2195682a33f923b91399990ebd"
+      }
+    ],
+    "reviewer": "Codex: direct inspection of the actual local-runtime page image",
+    "observation": "One-page local edit shows complete Local execution verified text at the intended margin, with no clipping or unexpected blank page; remaining whitespace is intentional in the isolated sample.",
+    "scope": "A local execution sample, separate from the 26 generic print proofs; no Microsoft Word native qualification."
   }
 }

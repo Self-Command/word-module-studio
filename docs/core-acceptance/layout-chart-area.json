@@ -6,7 +6,7 @@
       "sha256": "cfc63ac65d7ae8b10a0094f1b750023f35e98b0e0bf8a0c680f804115fd15e21"
     }
   ],
-  "output_sha256": "14275ea92659b68469313b69d1e5426b67ac9a49ad42a647a2b864b7585e27e1",
+  "output_sha256": "b43c70376e9dd55a5858f69732363d9e5b80ca824fc73b355bafeaad971e358f",
   "checklist": [
     {
       "result": "pass",
@@ -119,7 +119,7 @@
     "CAAAAA+Carlito",
     "DAAAAA+Carlito-Bold"
   ],
-  "run_id": "38064409279",
+  "run_id": "38069365621",
   "page_reviews": [
     {
       "observations": "Area chart retains categories A/B/C and values 1/3/2, title and Series legend; boundary and nearby first/second text do not obscure data.",
@@ -127,8 +127,8 @@
       "status": "pass"
     }
   ],
-  "input_sha256": "b5da42e6bf817a1416fc8bded440a3cd36a1e1897b5a9475f97908c12d3b763d",
-  "engine_commit": "2ee18d51df26f8e0fbc175bf4e0f3b7988430b99",
+  "input_sha256": "78fbd2a1381d46cf17965b8589c50c70d9531e00c2e8b03bd77c45f230c3c9a6",
+  "engine_commit": "d12f9056b14cff32944b4692db7afa94e4664747",
   "findings": [],
   "reviewer": "Codex: direct review of original cloud pages; all current page hashes and PDF font families match, with current artifact identities rebound",
   "review_provenance": {

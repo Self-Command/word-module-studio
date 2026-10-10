@@ -14,7 +14,7 @@
       "sha256": "91b823104ba4a6d5de001a11d041786fcd5cc18d82477b2971114081d6586b2e"
     }
   ],
-  "output_sha256": "99ff4fcba14d1ffabf200ad3c2eb713fd4001a3653e2dfc207f2409877b77883",
+  "output_sha256": "91f65b8048427bbe93177c430d5f10d1c9aeedc29263b85fd46c96d64cafb47f",
   "checklist": [
     {
       "result": "pass",
@@ -127,7 +127,7 @@
     "CAAAAA+LiberationSerif",
     "DAAAAA+LiberationSerif-Bold"
   ],
-  "run_id": "38064409279",
+  "run_id": "38069365621",
   "page_reviews": [
     {
       "observations": "TOC contains Index proof and Retained chapter on page 1 and Added chapter on page 3. Deleted chapter is absent. Figure 1 Caption evidence points to page 2.",
@@ -145,8 +145,8 @@
       "status": "pass"
     }
   ],
-  "input_sha256": "6364b8d5608c432d8d09ef59c1fdcd9bebd45400e25b0e140b6ac44fcc645700",
-  "engine_commit": "2ee18d51df26f8e0fbc175bf4e0f3b7988430b99",
+  "input_sha256": "735c222a10c55b4f59ff59d7fff975a3d1b3e00d90be88938265ba0a604d0968",
+  "engine_commit": "d12f9056b14cff32944b4692db7afa94e4664747",
   "findings": [],
   "reviewer": "Codex: direct review of original cloud pages; all current page hashes and PDF font families match, with current artifact identities rebound",
   "review_provenance": {

@@ -22,7 +22,7 @@
           "docs/core-acceptance/layout-theme-inheritance.json",
           "docs/core-acceptance/layout-composition.json"
         ],
-        "run_id": "38064409279"
+        "run_id": "38069365621"
       },
       "visual_scope": "Only the selected generic documents and present objects; see individual page observations and status limitations."
     },
@@ -45,7 +45,7 @@
           "docs/core-acceptance/layout-theme-inheritance.json",
           "docs/core-acceptance/layout-composition.json"
         ],
-        "run_id": "38064409279"
+        "run_id": "38069365621"
       },
       "visual_scope": "Only the selected generic documents and present objects; see individual page observations and status limitations."
     },
@@ -74,7 +74,7 @@
           "docs/core-acceptance/layout-gallery-unequal.json",
           "docs/core-acceptance/composition-source-sections-and-notes.json"
         ],
-        "run_id": "38064409279"
+        "run_id": "38069365621"
       },
       "visual_scope": "Only the selected generic documents and present objects; see individual page observations and status limitations."
     },
@@ -98,7 +98,7 @@
           "docs/core-acceptance/layout-gallery-triple.json",
           "docs/core-acceptance/rendering-landscape.json"
         ],
-        "run_id": "38064409279"
+        "run_id": "38069365621"
       },
       "visual_scope": "Only the selected generic documents and present objects; see individual page observations and status limitations."
     },
@@ -121,7 +121,7 @@
           "docs/core-acceptance/layout-native-objects.json",
           "docs/core-acceptance/layout-drop-cap.json"
         ],
-        "run_id": "38064409279"
+        "run_id": "38069365621"
       },
       "visual_scope": "Only the selected generic documents and present objects; see individual page observations and status limitations."
     },
@@ -142,7 +142,7 @@
         "receipts": [
           "docs/core-acceptance/layout-composition.json"
         ],
-        "run_id": "38064409279"
+        "run_id": "38069365621"
       },
       "visual_scope": "Font family presence is observed in PDF. Actual embedded font bytes, deobfuscation, permissions and SDK structure are tested automatically; Word embedded-face loading is not tested."
     },
@@ -164,7 +164,7 @@
           "docs/core-acceptance/layout-composition.json",
           "docs/core-acceptance/layout-native-objects.json"
         ],
-        "run_id": "38064409279"
+        "run_id": "38069365621"
       },
       "visual_scope": "Only the selected generic documents and present objects; see individual page observations and status limitations."
     },
@@ -188,7 +188,7 @@
           "docs/core-acceptance/layout-indexes-before-edit.json",
           "docs/core-acceptance/layout-indexes-after-edit.json"
         ],
-        "run_id": "38064409279"
+        "run_id": "38069365621"
       },
       "visual_scope": "Only the selected generic documents and present objects; see individual page observations and status limitations."
     },
@@ -216,7 +216,7 @@
           "docs/core-acceptance/layout-gallery-unequal.json",
           "docs/core-acceptance/rendering-single.json"
         ],
-        "run_id": "38064409279"
+        "run_id": "38069365621"
       },
       "visual_scope": "Only the selected generic documents and present objects; see individual page observations and status limitations."
     },
@@ -240,19 +240,24 @@
           "docs/core-acceptance/layout-gallery-unequal.json",
           "docs/core-acceptance/rendering-continued-table.json"
         ],
-        "run_id": "38064409279"
+        "run_id": "38069365621"
       },
       "visual_scope": "Only the selected generic documents and present objects; see individual page observations and status limitations."
     }
   ],
-  "version": "0.1.1",
+  "version": "0.1.2",
   "acceptance": {
     "scope": "generic-core-layout; LibreOffice compatibility; Word native not tested",
     "manifest": "docs/core-acceptance.json",
     "proof_count": 26,
-    "test_count": 101,
-    "run_id": "38064409279",
-    "engine_commit": "2ee18d51df26f8e0fbc175bf4e0f3b7988430b99",
-    "page_count": 49
+    "test_count": 104,
+    "run_id": "38069365621",
+    "engine_commit": "d12f9056b14cff32944b4692db7afa94e4664747",
+    "page_count": 49,
+    "execution_modes": [
+      "local",
+      "actions"
+    ],
+    "local_runtime_run_id": "38069365595"
   }
 }

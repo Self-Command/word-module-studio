@@ -6,7 +6,7 @@
       "sha256": "83cea0f5e099862f057b83937ad754decc24bb5ee9fca2a6efc0447d5d7050de"
     }
   ],
-  "output_sha256": "bad240c5108be89bbc1e86be56110b93968ad8b4d7675b197d032f436c39fdf7",
+  "output_sha256": "617f8308e08f6bbb93e082e5a90bbc43d0a87d9de8ca724ea28a1f3c1f89954c",
   "checklist": [
     {
       "result": "pass",
@@ -119,7 +119,7 @@
     "CAAAAA+Carlito",
     "DAAAAA+Carlito-Bold"
   ],
-  "run_id": "38064409279",
+  "run_id": "38069365621",
   "page_reviews": [
     {
       "observations": "Line chart shows the three 1/3/2 values at A/B/C, complete title and Series legend, with no missing data point.",
@@ -127,8 +127,8 @@
       "status": "pass"
     }
   ],
-  "input_sha256": "896423197312a52b64777facef4b98c363b1da61e8f902ae43716afad87bdc86",
-  "engine_commit": "2ee18d51df26f8e0fbc175bf4e0f3b7988430b99",
+  "input_sha256": "2a61aec7f38ff6c1bef341fff4ec8440d722c3755c77a0e6279a645ed54eeb54",
+  "engine_commit": "d12f9056b14cff32944b4692db7afa94e4664747",
   "findings": [],
   "reviewer": "Codex: direct review of original cloud pages; all current page hashes and PDF font families match, with current artifact identities rebound",
   "review_provenance": {

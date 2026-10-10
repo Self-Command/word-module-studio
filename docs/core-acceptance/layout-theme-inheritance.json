@@ -6,7 +6,7 @@
       "sha256": "611ec5316d4d1b9fc0f8631f740e42bb6c2ac9a6dbf74d78e78066a471426721"
     }
   ],
-  "output_sha256": "1b5e151a08e4fce41dca58f5740bca4b55a7a5ea70dc9c722b21a63de30440a3",
+  "output_sha256": "fceb5da1771ed922eb851ec06b2ac4f1923a43a65563618370ea9b708c5ee27e",
   "checklist": [
     {
       "result": "pass",
@@ -118,7 +118,7 @@
     "BAAAAA+LiberationSans",
     "CAAAAA+Carlito"
   ],
-  "run_id": "38064409279",
+  "run_id": "38069365621",
   "page_reviews": [
     {
       "observations": "First and second text remain complete. The inherited Liberation Sans first paragraph and retained renderer-substituted second paragraph are recorded separately in the actual PDF font manifest.",
@@ -126,8 +126,8 @@
       "status": "pass"
     }
   ],
-  "input_sha256": "4bbb6e52117e3d394d018b0bb73abce38f5ee0178f0764dc63894f191ff9c60b",
-  "engine_commit": "2ee18d51df26f8e0fbc175bf4e0f3b7988430b99",
+  "input_sha256": "5c3bedaa7e4675683089dc9dadc2572633a81a39742e74560eb0ad2c0881039a",
+  "engine_commit": "d12f9056b14cff32944b4692db7afa94e4664747",
   "findings": [],
   "reviewer": "Codex: direct review of original cloud pages; all current page hashes and PDF font families match, with current artifact identities rebound",
   "review_provenance": {

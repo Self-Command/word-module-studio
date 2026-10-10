@@ -6,7 +6,7 @@
       "sha256": "f27406f654e0fcc22c3eb15c9e08758919b6d2405c225caef66c44d1a334c727"
     }
   ],
-  "output_sha256": "20d49e8a1936dbbc09d5b62ce76f49691efe6defdbe58845086943ec316f877c",
+  "output_sha256": "4691f87709d8b2ff39e22f657117403b5f4bdcdadd57c403199eab26f595314b",
   "checklist": [
     {
       "result": "pass",
@@ -119,7 +119,7 @@
     "CAAAAA+Carlito",
     "DAAAAA+Carlito-Bold"
   ],
-  "run_id": "38064409279",
+  "run_id": "38069365621",
   "page_reviews": [
     {
       "observations": "Scatter chart contains all three numeric coordinates (1,1), (2,3), (3,2), visible markers, axes, title and Series legend.",
@@ -127,8 +127,8 @@
       "status": "pass"
     }
   ],
-  "input_sha256": "4fa5ce81b6dbd999028f23372c134648ec97f4822506c2bc28a1ac979b286338",
-  "engine_commit": "2ee18d51df26f8e0fbc175bf4e0f3b7988430b99",
+  "input_sha256": "902b500a294b6bb300477f618f840e8de19f976d1ee7b7bc844bd4671114a2a1",
+  "engine_commit": "d12f9056b14cff32944b4692db7afa94e4664747",
   "findings": [],
   "reviewer": "Codex: direct review of original cloud pages; all current page hashes and PDF font families match, with current artifact identities rebound",
   "review_provenance": {

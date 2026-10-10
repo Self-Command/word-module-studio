@@ -24,7 +24,7 @@ These are **unmodified page images from real generic regression documents**, ren
 | **Editable chart with workbook data** | **Continued table across columns** |
 | [<img src="docs/gallery/editable-chart.png" width="400" alt="Native scatter chart with three numeric points">](docs/gallery/editable-chart.png) | [<img src="docs/gallery/continued-table.png" width="400" alt="Continued table retains rows, repeated headers and caption">](docs/gallery/continued-table.png) |
 
-All eight images have [source pages and SHA-256 fingerprints](docs/gallery/provenance.json) from [cloud run 38059546545](https://github.com/Self-Command/word-module-studio/actions/runs/38059546545). That layout baseline passed **100 regression tests, 26 generic proofs and all 49 pages of direct review**. The standalone 0.1.1 source passes **101 tests in all six suites** in [run 38064409279](https://github.com/Self-Command/word-module-studio/actions/runs/38064409279), including the publication inventory and exclusion of unlisted installation files. This is evidence for those scenarios, not every Word feature or arbitrary input.
+All eight images have [source pages and SHA-256 fingerprints](docs/gallery/provenance.json) from [cloud run 38059546545](https://github.com/Self-Command/word-module-studio/actions/runs/38059546545). That layout baseline passed **100 regression tests, 26 generic proofs and all 49 pages of direct review**. The standalone 0.1.2 source passes **104 tests in all six suites** in [run 38069365621](https://github.com/Self-Command/word-module-studio/actions/runs/38069365621), including the publication inventory and exclusion of unlisted installation files. This is evidence for those scenarios, not every Word feature or arbitrary input.
 
 ## Features
 
@@ -71,6 +71,8 @@ The ZIP contains the runtime, schemas, task workflow, documentation and related 
 | Optional GitHub Actions | GitHub task repository, `gh` authentication and Actions permissions | Your selected public or private task repository |
 
 Installing the skill does not require GitHub. Missing local dependencies produce diagnostics; the client does not install software, upload documents or switch to Actions automatically.
+
+[Local runtime qualification](https://github.com/Self-Command/word-module-studio/actions/runs/38069365595) verifies inspection, editing, original-file preservation and real PDF/PNG output in the included Linux x64 container with network access disabled, no GitHub credentials and no Actions environment variables.
 
 ### Local Python
 

@@ -10,7 +10,7 @@
       "sha256": "24f2ae9c856e33052bb8f820c4af94d8f0713f2c631a7c1a17ace7de591626e9"
     }
   ],
-  "output_sha256": "df3af89b3901629ffafd5ce9596970d463750c31c8cbb7301db8236db3997ee7",
+  "output_sha256": "cb46ddeab36c76de7bfc5c6e0f07413e4f80ccc1b168df3723b8c2f622889acc",
   "checklist": [
     {
       "result": "pass",
@@ -123,7 +123,7 @@
     "CAAAAA+LiberationSerif",
     "DAAAAA+LiberationSerif-Bold"
   ],
-  "run_id": "38064409279",
+  "run_id": "38069365621",
   "page_reviews": [
     {
       "observations": "Initial TOC contains Index proof and Retained chapter on page 1 and Deleted chapter on page 2; Figure 1 Caption evidence points to page 2.",
@@ -136,8 +136,8 @@
       "status": "pass"
     }
   ],
-  "input_sha256": "9b716b31ca005cf956d18a19e751941b5b76e2b9a4dff5bf6e7af5dc9dbdd120",
-  "engine_commit": "2ee18d51df26f8e0fbc175bf4e0f3b7988430b99",
+  "input_sha256": "a31091c343e19245d1d4d65f7c733ec7237382a7b76d19cb1e76fac9843cda3f",
+  "engine_commit": "d12f9056b14cff32944b4692db7afa94e4664747",
   "findings": [],
   "reviewer": "Codex: direct review of original cloud pages; all current page hashes and PDF font families match, with current artifact identities rebound",
   "review_provenance": {

@@ -18,7 +18,7 @@
       "sha256": "60733c592bc8cee8459aca2c9a61ebe1a876cc92d7d95db447648d3bfa103a7b"
     }
   ],
-  "output_sha256": "3737b362f1f20915c74a5e244bb75497e768e16d443269734c6860fa411a9acb",
+  "output_sha256": "b978881f37940dfab085d490b009424dffee2c2c94eaa2287412e4975e447829",
   "checklist": [
     {
       "result": "pass",
@@ -134,7 +134,7 @@
     "FAAAAA+OpenSymbol",
     "GAAAAA+LiberationSerif"
   ],
-  "run_id": "38064409279",
+  "run_id": "38069365621",
   "page_reviews": [
     {
       "observations": "Front section contains Module composition proof; sparse cover is intentional; footer reads Page 1 of 4.",
@@ -157,8 +157,8 @@
       "status": "pass"
     }
   ],
-  "input_sha256": "7e637747503a3c968c9fb474c0a94c3395b55521ffc275fb4230b0f45311b8f2",
-  "engine_commit": "2ee18d51df26f8e0fbc175bf4e0f3b7988430b99",
+  "input_sha256": "96a99b5ab96055c46e964597208137ea3c6a158c8402f67cbe27a12af3080b3f",
+  "engine_commit": "d12f9056b14cff32944b4692db7afa94e4664747",
   "findings": [],
   "reviewer": "Codex: direct review of original cloud pages; all current page hashes and PDF font families match, with current artifact identities rebound",
   "review_provenance": {

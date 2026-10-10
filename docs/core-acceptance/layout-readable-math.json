@@ -6,7 +6,7 @@
       "sha256": "309f9075c39f99c36c3c9656dc714d2efeea2aa9dbc70cfb75b5678124d1a544"
     }
   ],
-  "output_sha256": "b58afcbf458a8928b2354aa1a712f832a79336a676fcb431d28e920e50fd324d",
+  "output_sha256": "aca6a93cf8a889b2ecb4a63009ab96d652118011923024223acd761add1d11e8",
   "checklist": [
     {
       "result": "pass",
@@ -120,7 +120,7 @@
     "DAAAAA+TeXGyrePagellaMath-Regular",
     "EAAAAA+OpenSymbol"
   ],
-  "run_id": "38064409279",
+  "run_id": "38069365621",
   "page_reviews": [
     {
       "observations": "Readable math and body-size reference precede the fraction x=(1+y squared)/(1+z). Numerator, denominator, equals sign and R1 label are complete and readable at the source size; full PNG inspected.",
@@ -128,8 +128,8 @@
       "status": "pass"
     }
   ],
-  "input_sha256": "e60c902f4cb8e1c0f17093aa1d695fd3751a2ead6458a4fc1321aa799a4950e0",
-  "engine_commit": "2ee18d51df26f8e0fbc175bf4e0f3b7988430b99",
+  "input_sha256": "2d27901a81c4bbdbb5bd3a20d85ab6f4998d19ba7903f6f390f42f5d7e7378aa",
+  "engine_commit": "d12f9056b14cff32944b4692db7afa94e4664747",
   "findings": [],
   "reviewer": "Codex: direct review of original cloud pages; all current page hashes and PDF font families match, with current artifact identities rebound",
   "review_provenance": {

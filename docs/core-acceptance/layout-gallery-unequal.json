@@ -10,7 +10,7 @@
       "sha256": "b97adaf152b0fe6b84fcb0798aeae9c29396b0019779e4dda8d991de8a06979e"
     }
   ],
-  "output_sha256": "ef6905ec92425e37f726b38568aca5236153831a4babaad18d929f115e92bd63",
+  "output_sha256": "98d7e2e991aae4fdbc9c83693e80ddfaf05aa7fba86184db2c82cf90db01d54c",
   "checklist": [
     {
       "result": "pass",
@@ -128,7 +128,7 @@
     "HAAAAA+LiberationSerif",
     "IAAAAA+LiberationSerif"
   ],
-  "run_id": "38064409279",
+  "run_id": "38069365621",
   "page_reviews": [
     {
       "observations": "unequal geometry is visible, including unequal widths where configured. Complete Chinese and joined RTL Arabic text precede numbered observations 1 and 2. REGION paragraphs stay inside their columns; header and Page 1 / 2 footer are retained.",
@@ -141,8 +141,8 @@
       "status": "pass"
     }
   ],
-  "input_sha256": "060c8dd4a62b33bb4768cc73f6ee399126a2fd29e5a6e1f17dc16622cae08ec9",
-  "engine_commit": "2ee18d51df26f8e0fbc175bf4e0f3b7988430b99",
+  "input_sha256": "506d7fd7e3ac53b04f49fec3cc1c5cfff3e354cb8c6aa12ba9a212247f796340",
+  "engine_commit": "d12f9056b14cff32944b4692db7afa94e4664747",
   "findings": [],
   "reviewer": "Codex: direct review of original cloud pages; all current page hashes and PDF font families match, with current artifact identities rebound",
   "review_provenance": {
