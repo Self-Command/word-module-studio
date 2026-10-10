@@ -37,6 +37,14 @@ def apply(package, item, props, *, metrics=None):
     formula = convert(props['formula'], mode)
     context = LayoutContext.resolve(package, item)
     size = props.get('size_pt', 10)
+    for math_run in formula.iter(M + 'r'):
+        properties = math_run.find(W + 'rPr')
+        if properties is None:
+            properties = E.Element(W + 'rPr')
+            math_run.insert(1 if math_run.find(M + 'rPr') is not None else 0, properties)
+        old_size = properties.find(W + 'sz')
+        if old_size is not None: properties.remove(old_size)
+        E.SubElement(properties, W + 'sz').set(W + 'val', str(round(size * 2)))
     number_width = props.get('number_width_twips', 600) if props.get('number') else 0
     budget = (min(context.column_widths_twips) - number_width) / 20 - 8
     if budget <= 0: raise WordError('EQUATION_NUMBER_REGION_TOO_WIDE')

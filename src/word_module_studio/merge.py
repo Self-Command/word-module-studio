@@ -16,11 +16,16 @@ class NativeComposer(Composer):
         auxiliary(self, source, element)
 
     def renumber_docpr_ids(self):
+        self._renumber_drawing('{http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing}docPr')
+
+    def renumber_nvpicpr_ids(self):
+        self._renumber_drawing('{http://schemas.openxmlformats.org/drawingml/2006/picture}cNvPr')
+
+    def _renumber_drawing(self, tag):
         # Upstream relationship copier returns generic Parts for copied headers.
         # Handle both generic and typed native XML parts without losing images.
         from docx.oxml import parse_xml
         from .merge_parts import save_root
-        tag = '{http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing}docPr'
         roots = [(None, self.doc.element)]
         for rel in self.doc.part.rels.values():
             if not rel.is_external and rel.reltype in (RT.HEADER, RT.FOOTER):

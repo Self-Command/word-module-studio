@@ -35,6 +35,28 @@ def relationships(path):
 def preservation(before, after, operations):
     require_actions()
     initial, final = semantic(before), semantic(after)
+    from .package import ID
+    old_package, new_package = Package(before), Package(after)
+    old_objects = old_package.objects(); new_objects = {o['id']: o for o in new_package.objects()}
+    authorized = set()
+    for operation in operations:
+        props = operation.get('props', {})
+        changes_content = operation['action'] == 'remove' or operation['action'] == 'extension' and operation['module'] in ('M02', 'M10', 'M13', 'M16') or any(
+            key in props for key in ('text', 'find', 'replace', 'data', 'formula', 'revision.action'))
+        if not changes_content: continue
+        target = old_package.locate(operation['target'])
+        nodes = set(target['element'].iter())
+        authorized.update(o['id'] for o in old_objects if o['element'] in nodes)
+        if operation['module'] == 'M13' and props.get('operation') == 'group':
+            for identifier in props.get('objects', []):
+                host = old_package.locate(identifier)['element']
+                authorized.update(o['id'] for o in old_objects if o['element'] in set(host.iter()))
+    untouched_runs = 0
+    for old in old_objects:
+        if old['kind'] != 'run' or old['id'] in authorized: continue
+        new = new_objects.get(old['id'])
+        if new is None or new['text'] != old['text']: raise WordError('UNDECLARED_RUN_CONTENT_CHANGE', old['id'])
+        untouched_runs += 1
     text_changes = any(o['action'] in ('add', 'remove', 'extension') or any(k in o.get('props', {}) for k in ('text', 'data', 'formula', 'revision.type', 'revision.action')) for o in operations)
     if not text_changes:
         for part in initial:
@@ -44,5 +66,6 @@ def preservation(before, after, operations):
         initial_math = [m for v in initial.values() for m in v['math']]
         final_math = [m for v in final.values() for m in v['math']]
         if initial_math != final_math: raise WordError('UNDECLARED_MATH_CHANGE')
-    return {'format_only_exact': not text_changes, 'mathematical_objects_before': sum(len(v['math']) for v in initial.values()),
+    return {'format_only_exact': not text_changes, 'untouched_runs_verified': untouched_runs,
+        'mathematical_objects_before': sum(len(v['math']) for v in initial.values()),
         'mathematical_objects_after': sum(len(v['math']) for v in final.values())}

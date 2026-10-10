@@ -18,9 +18,23 @@ def expand_semantic_tex(ast,output):
         kind=node.get("t")
         if kind not in ("RawInline","RawBlock"):return node
         format,source=node["c"]
+        if format == 'html' and re.fullmatch(r'<!--.*?-->', source, re.S):
+            records.append({'source': source, 'kind': kind, 'reason': 'Non-displayed Markdown comment', 'replacement': []})
+            return []
         if format not in ("tex","latex"):raise StudioError("UNSUPPORTED_RAW_OBJECT: "+format)
         rewritten=None;reason=None
         match=re.fullmatch(r"\\(title|author|footnotetext)\s*\{(.*)\}\s*",source,re.S)
+        url = re.fullmatch(r'\\url\{([^{}]+)\}', source)
+        reference = re.fullmatch(r'\\(ref|label)\{([^{}]+)\}', source)
+        if url:
+            replacement = [{'t': 'Link', 'c': [['', [], []], [{'t': 'Str', 'c': url[1]}], [url[1], '']]}]
+            records.append({'source': source, 'kind': kind, 'reason': 'Semantic hyperlink', 'replacement': replacement})
+            return replacement
+        if reference:
+            replacement = ([{'t': 'Link', 'c': [['', [], []], [{'t': 'Str', 'c': reference[2]}], ['#' + reference[2], '']]}]
+                if reference[1] == 'ref' else [{'t': 'Span', 'c': [[reference[2], [], []], []]}])
+            records.append({'source': source, 'kind': kind, 'reason': 'Semantic native reference or label', 'replacement': replacement})
+            return replacement
         if match:
             command,content=match.groups()
             if command=="title":rewritten=r"\section*{"+content+"}";reason="semantic title as first heading"

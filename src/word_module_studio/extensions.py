@@ -27,6 +27,11 @@ def apply(package, target, module, props):
         from .shapes import apply as shape_apply
         return shape_apply(package, target, props)
     if module == 'M05' and operation == 'unequal_columns':
+        from .context import LayoutContext
+        context = LayoutContext.resolve(package, target)
+        widths, gap = props.get('widths_twips', []), props.get('gap_twips', 0)
+        if not widths or sum(widths) + (len(widths) - 1) * gap > context.width_twips:
+            raise WordError('COLUMNS_CANNOT_FIT')
         package.save()
         result = _sdk(package.path, target['id'], module, props)
         refreshed = type(package)(package.path)

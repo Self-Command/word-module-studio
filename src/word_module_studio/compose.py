@@ -23,6 +23,7 @@ def parse(path, resources, folder):
     ast = expand_semantic_tex(ast, folder)
     permitted = {Path(p).resolve() for p in resources}
     equations = []
+    ignored_layout = []
     def visit(value):
         if isinstance(value, dict):
             if value.get('t') in ('RawInline', 'RawBlock'): raise WordError('CONTENT_RAW_OBJECT_FORBIDDEN')
@@ -36,7 +37,12 @@ def parse(path, resources, folder):
             if value.get('t') in ('Image', 'Header', 'Div', 'Span', 'CodeBlock', 'Table'):
                 attr = value['c'][1] if value['t'] == 'Header' else value['c'][0]
                 if isinstance(attr, list) and len(attr) == 3:
-                    if attr[1] or attr[2]: raise WordError('CONTENT_LAYOUT_ATTRIBUTE_FORBIDDEN', str(attr))
+                    if value['t'] == 'Image' and not attr[1] and all(key in ('width', 'height') for key, _ in attr[2]):
+                        if attr[2]: ignored_layout.append({'kind': 'image', 'attributes': attr[2], 'reason': 'Registered region controls physical size'})
+                        attr[2] = []
+                    elif value['t'] == 'CodeBlock' and not attr[2] and len(attr[1]) <= 1:
+                        pass  # Language identifier is semantic content, not a document style.
+                    elif attr[1] or attr[2]: raise WordError('CONTENT_LAYOUT_ATTRIBUTE_FORBIDDEN', str(attr))
             return {key: visit(child) for key, child in value.items()}
         if isinstance(value, list):
             result = []
@@ -59,6 +65,19 @@ def parse(path, resources, folder):
             return result
         return value
     ast = visit(ast)
+    bibliography = ast.get('meta', {}).get('bibliography')
+    if bibliography:
+        def literal(value):
+            if isinstance(value, dict):
+                if value.get('t') in ('MetaString', 'Str'): return value['c']
+                return literal(value.get('c', []))
+            if isinstance(value, list): return ''.join(literal(child) for child in value)
+            return ''
+        name = literal(bibliography)
+        file = (path.parent / name).resolve()
+        if file not in permitted or not file.is_file(): raise WordError('BIBLIOGRAPHY_RESOURCE_MISSING', name)
+        ast['meta']['bibliography'] = {'t': 'MetaString', 'c': str(file)}
+    write_json(folder / 'source-layout-ledger.json', ignored_layout)
     write_json(folder / 'content.ast.json', ast)
     write_json(folder / 'equations.source.json', equations)
     return ast, equations
@@ -107,7 +126,7 @@ def compose(markdown, manifest, output, *, region=None, resources=(), data=None)
     diagnostics = output.parent / (output.stem + '-source'); diagnostics.mkdir(exist_ok=True)
     ast, equations = parse(markdown, resources, diagnostics)
     native = diagnostics / 'content.native.docx'
-    run(['pandoc', '-f', 'json', '-t', 'docx', '-o', native], input_text=json.dumps(ast), reject_warnings=True)
+    run(['pandoc', '-f', 'json', '-t', 'docx', '-o', native, *(['--citeproc'] if ast.get('meta', {}).get('bibliography') else [])], input_text=json.dumps(ast), reject_warnings=True)
     source, destination = Document(native), Document(manifest['master'])
     slot = next((n for n in destination.element.body.iter(W + 'sdt')
         if n.find('w:sdtPr/w:tag', namespaces=NS) is not None
@@ -126,7 +145,8 @@ def compose(markdown, manifest, output, *, region=None, resources=(), data=None)
     package = Package(output)
     from .controls import apply as fill
     # Remaining regions accept semantic variables supplied explicitly by the caller.
-    values = {r['id']: '' for r in spec['regions']}; values.update(data or {})
+    values = {r['id']: '' for r in spec['regions']}
+    values.update({slot['key']: '' for r in spec['regions'] for slot in r.get('slots', [])}); values.update(data or {})
     fill(package, {'element': package.xml('word/document.xml')}, {'operation': 'fill', 'data': values})
     from .migration.math_metrics import configure
     metrics = configure({'fonts': spec['fonts']})

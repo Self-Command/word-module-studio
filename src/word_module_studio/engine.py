@@ -41,6 +41,10 @@ def execute(batch, input_path, output_path, *, template=None):
             package = Package(work)
             action, module = operation["action"], operation["module"]
             props = operation.get("props", {})
+            selected_fonts = {key: value for key, value in props.items() if key.lower() in ('font', 'font.ascii', 'font.eastasia', 'font.cs', 'font.hansi')}
+            if selected_fonts:
+                from .templates import check_fonts
+                check_fonts(selected_fonts)
             target = package.locate(operation["target"])
             kind = operation.get("kind") if action == "add" else target["kind"]
             from .capabilities import MODULES

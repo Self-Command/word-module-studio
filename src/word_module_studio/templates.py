@@ -34,6 +34,13 @@ def build(spec, folder):
     require_actions()
     validate('template-spec', spec)
     if len({r['id'] for r in spec['regions']}) != len(spec['regions']): raise WordError('DUPLICATE_REGION')
+    for region in spec['regions']:
+        top, right, bottom, left = region['page']['margins_twips']
+        width = region['page']['width_twips'] - left - right
+        if width <= (region['columns'] - 1) * region['gap_twips'] or region['page']['height_twips'] <= top + bottom:
+            raise WordError('INVALID_REGION_GEOMETRY', region['id'])
+        if region.get('column_widths_twips') and sum(region['column_widths_twips']) + (region['columns'] - 1) * region['gap_twips'] > width:
+            raise WordError('COLUMNS_CANNOT_FIT', region['id'])
     fonts = check_fonts(spec['fonts'])
     folder = Path(folder)
     identity = canonical_spec(spec)
@@ -79,9 +86,11 @@ def build(spec, folder):
         child(props, 'tag', {'val': 'region.' + region['id']})
         child(props, 'alias', {'val': region['id']})
         content = child(control, 'sdtContent')
-        p = child(content, 'p')
-        child(child(p, 'pPr'), 'pStyle', {'val': 'Normal'})
-        child(child(p, 'r'), 't').text = '{{' + region['id'] + '}}'
+        for slot in region.get('slots', [{'key': region['id'], 'style': 'Normal'}]):
+            if slot['style'] not in spec['styles']: raise WordError('SLOT_STYLE_MISSING', slot['style'])
+            p = child(content, 'p')
+            child(child(p, 'pPr'), 'pStyle', {'val': slot['style']})
+            child(child(p, 'r'), 't').text = '{{' + slot['key'] + '}}'
         if index == len(spec['regions']) - 1: section = child(body, 'sectPr')
         else:
             marker = child(body, 'p')
