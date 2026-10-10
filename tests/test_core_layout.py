@@ -234,6 +234,10 @@ def test_toc_and_caption_index_refresh_after_edit(tmp_path):
     text = next(r['result_text'] for r in report['fields_updated'] if '\\o' in r['instruction'])
     assert 'Deleted chapter' not in text and 'Added chapter' in text and 'Retained chapter' in text
     assert report['automatic_pass'], report['proof']['issues']
+    import pdfplumber
+    with pdfplumber.open(tmp_path / 'final-proof/final/final.pdf') as pdf:
+        lines = [line for p in pdf.pages for line in (p.extract_text() or '').splitlines()]
+    assert any('Retained topic' in line and line.rstrip().endswith('2') for line in lines), 'A simple index entry must share its line with its page number'
 
 
 @pytest.mark.parametrize('variant', ['single', 'double', 'triple', 'unequal', 'landscape'])

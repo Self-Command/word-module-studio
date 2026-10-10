@@ -44,6 +44,24 @@ try:
         node = settings.find(namespace + 'mathPr/' + namespace + 'mathFont')
         if node is not None: math_font = node.get(namespace + 'val')
     formula_fonts = []
+    index_mark_changes = []
+    # Writer can import a simple XE entry as a primary key plus an empty child.
+    # Repair that import mapping only when the exact source XE has no hierarchy.
+    with zipfile.ZipFile(source) as package:
+        source_xml = ElementTree.fromstring(package.read('word/document.xml'))
+    wns = '{http://schemas.openxmlformats.org/wordprocessingml/2006/main}'
+    simple_entries = set()
+    for paragraph in source_xml.iter(wns + 'p'):
+        instruction = ''.join(n.text or '' for n in paragraph.iter(wns + 'instrText'))
+        for match in re.finditer(r'\bXE\s+"([^"\\]+)"', instruction, flags=re.I):
+            if ':' not in match[1]: simple_entries.add(match[1])
+    for index in range(document.DocumentIndexes.Count):
+        native_index = document.DocumentIndexes.getByIndex(index)
+        if native_index.getServiceName() != 'com.sun.star.text.DocumentIndex': continue
+        for mark in native_index.DocumentIndexMarks:
+            if mark.PrimaryKey in simple_entries and not mark.SecondaryKey and not mark.AlternativeText:
+                entry = mark.PrimaryKey; mark.AlternativeText = entry; mark.PrimaryKey = ''
+                index_mark_changes.append({'entry': entry, 'operation': 'Restore simple source XE entry from empty imported child'})
     embedded = document.getEmbeddedObjects()
     font_properties = ('FontNameVariables', 'FontNameFunctions', 'FontNameNumbers', 'FontNameText',
         'CustomFontNameSerif', 'CustomFontNameSans', 'CustomFontNameFixed')
@@ -86,7 +104,8 @@ try:
     document.TextFields.refresh()
     for index in range(document.DocumentIndexes.Count): document.DocumentIndexes.getByIndex(index).update()
     document.TextFields.refresh()
-    layout = {'paragraphs': [], 'tables': [], 'frames': [], 'shapes': [], 'formula_fonts': formula_fonts}
+    layout = {'paragraphs': [], 'tables': [], 'frames': [], 'shapes': [], 'formula_fonts': formula_fonts,
+        'index_mark_changes': index_mark_changes}
     cursor = document.CurrentController.ViewCursor
     enumeration = document.Text.createEnumeration()
     while enumeration.hasMoreElements():

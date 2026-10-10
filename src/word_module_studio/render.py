@@ -66,7 +66,7 @@ def render(source, folder):
         'pages': [{'file': p.name, 'sha256': digest(p)} for p in pages], 'convergence': fingerprints,
         'issues': issues, 'container_proof': containers, 'actual_fonts': pdf_fonts(pdf),
         'font_resolution': font_resolution(source),
-        'math_font_application': layout.get('formula_fonts', [])}
+        'math_font_application': layout.get('formula_fonts', []), 'index_mark_application': layout.get('index_mark_changes', [])}
     write_json(folder / 'render-report.json', report)
     return report
 
