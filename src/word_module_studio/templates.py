@@ -64,6 +64,8 @@ def build(spec, folder):
         fonts_node = style.element.get_or_add_rPr().get_or_add_rFonts()
         fonts_node.set(qn('w:eastAsia'), spec['fonts']['cjk'])
         fonts_node.set(qn('w:cs'), spec['fonts'].get('rtl', spec['fonts']['latin']))
+        for key in list(fonts_node.attrib):
+            if key.lower().endswith('theme'): del fonts_node.attrib[key]
         pformat = style.paragraph_format
         pformat.space_before = Pt(rule.get('space_before_pt', 0))
         pformat.space_after = Pt(rule.get('space_after_pt', 0))
@@ -109,7 +111,9 @@ def build(spec, folder):
                     if piece in ('{{PAGE}}', '{{NUMPAGES}}'):
                         field = child(paragraph, 'fldSimple', {'instr': piece[2:-2]})
                         child(child(field, 'r'), 't').text = '1'
-                    elif piece: child(child(paragraph, 'r'), 't').text = piece
+                    elif piece:
+                        text = child(child(paragraph, 'r'), 't'); text.text = piece
+                        text.set('{http://www.w3.org/XML/1998/namespace}space', 'preserve')
                 package.parts[part] = E.tostring(header, encoding='UTF-8', xml_declaration=True)
                 rels = package.xml('word/_rels/document.xml.rels')
                 identifiers = {node.get('Id') for node in rels}; suffix = 1
@@ -132,6 +136,20 @@ def build(spec, folder):
             cols.set(W + 'equalWidth', '0')
             for width in region['column_widths_twips']: child(cols, 'col', {'w': width, 'space': region['gap_twips']})
     settings = package.xml('word/settings.xml')
+    styles_root = package.xml('word/styles.xml')
+    defaults = styles_root.find(W + 'docDefaults')
+    if defaults is None: defaults = E.Element(W + 'docDefaults'); styles_root.insert(0, defaults)
+    rdefault = defaults.find(W + 'rPrDefault')
+    if rdefault is None: rdefault = child(defaults, 'rPrDefault')
+    rprops = rdefault.find(W + 'rPr')
+    if rprops is None: rprops = child(rdefault, 'rPr')
+    old = rprops.find(W + 'rFonts')
+    if old is not None: rprops.remove(old)
+    child(rprops, 'rFonts', {'ascii': spec['fonts']['latin'], 'hAnsi': spec['fonts']['latin'], 'eastAsia': spec['fonts']['cjk'], 'cs': spec['fonts'].get('rtl', spec['fonts']['latin'])})
+    if spec.get('document_language'):
+        old = rprops.find(W + 'lang')
+        if old is not None: rprops.remove(old)
+        child(rprops, 'lang', {'val': spec['document_language']})
     math = settings.find('m:mathPr', namespaces=NS)
     if math is None: math = E.SubElement(settings, '{' + NS['m'] + '}mathPr')
     math_font = math.find('m:mathFont', namespaces=NS)
@@ -139,6 +157,7 @@ def build(spec, folder):
     math_font.set('{' + NS['m'] + '}val', spec['fonts']['math'])
     from .ooxml import order_properties
     order_properties(root)
+    order_properties(styles_root)
     package.save()
     manifest = {'schema_version': 1, 'id': spec['id'], 'version': spec['version'], 'spec': spec,
         'spec_sha256': identity, 'master': str((folder / 'master.docx').resolve()),

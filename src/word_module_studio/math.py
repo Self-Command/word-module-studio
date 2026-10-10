@@ -37,6 +37,8 @@ def apply(package, item, props, *, metrics=None):
     formula = convert(props['formula'], mode)
     context = LayoutContext.resolve(package, item)
     size = props.get('size_pt', 10)
+    math_font = package.xml('word/settings.xml').find('m:mathPr/m:mathFont', namespaces=NS)
+    family = math_font.get(M + 'val') if math_font is not None else None
     for math_run in formula.iter(M + 'r'):
         properties = math_run.find(W + 'rPr')
         if properties is None:
@@ -45,6 +47,11 @@ def apply(package, item, props, *, metrics=None):
         old_size = properties.find(W + 'sz')
         if old_size is not None: properties.remove(old_size)
         E.SubElement(properties, W + 'sz').set(W + 'val', str(round(size * 2)))
+        if family:
+            old_fonts = properties.find(W + 'rFonts')
+            if old_fonts is not None: properties.remove(old_fonts)
+            fonts = E.Element(W + 'rFonts'); fonts.set(W + 'ascii', family); fonts.set(W + 'hAnsi', family)
+            properties.insert(0, fonts)
     number_width = props.get('number_width_twips', 600) if props.get('number') else 0
     budget = (min(context.column_widths_twips) - number_width) / 20 - 8
     if budget <= 0: raise WordError('EQUATION_NUMBER_REGION_TOO_WIDE')

@@ -26,7 +26,9 @@ def apply(package, target, props):
         if piece.startswith('{{'):
             field = E.SubElement(paragraph, W + 'fldSimple'); field.set(W + 'instr', piece[2:-2])
             E.SubElement(E.SubElement(field, W + 'r'), W + 't').text = '1'
-        elif piece: E.SubElement(E.SubElement(paragraph, W + 'r'), W + 't').text = piece
+        elif piece:
+            text = E.SubElement(E.SubElement(paragraph, W + 'r'), W + 't'); text.text = piece
+            text.set('{http://www.w3.org/XML/1998/namespace}space', 'preserve')
     part = f'word/{kind}{index}.xml'; package.parts[part] = E.tostring(root, xml_declaration=True, encoding='UTF-8')
     rels = package.xml('word/_rels/document.xml.rels'); ids = {n.get('Id') for n in rels}; number = 1
     while 'rId' + str(number) in ids: number += 1
