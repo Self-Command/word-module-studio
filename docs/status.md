@@ -1,6 +1,9 @@
 # Implementation status
 
-Candidate: 0.1.0-rc.1. W0 qualification is being implemented. W1–W6 pending.
+Candidate: 0.1.0rc1. Existing module scenarios passed 85 cloud tests in run 38046199170.
+Core layout completion is now in progress: themes and effective format, ownership,
+CJK typography, native frames, actual font embedding, table policies, field caches,
+practical mathematics and independent page acceptance. Paper template suites are paused.
 No module is marked visually accepted or released merely because it exists in a registry.
 
 Migration baseline: reference-paper-studio engine ede3e05309d86f256a8cc0d4121d71df185e36ab;

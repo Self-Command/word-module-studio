@@ -14,6 +14,9 @@ def apply(package, target, module, props):
         from .math import apply as math_apply
         return math_apply(package, target, props)
     operation = props.get('operation')
+    if module == 'M03' and operation == 'frame' or module == 'M19' and operation in ('theme', 'embed_fonts'):
+        from .typography import apply as typography_apply
+        return typography_apply(package, target, module, props)
     if module == 'M02':
         from .text import apply as text_apply
         return text_apply(package, target, props)

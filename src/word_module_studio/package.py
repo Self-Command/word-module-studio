@@ -149,9 +149,13 @@ def snapshot(path):
     objects = []
     for item in package.objects():
         record = {k: v for k, v in item.items() if k != 'element'}
-        if item['part'] == 'word/document.xml' and item['kind'] in ('paragraph', 'table', 'equation', 'picture', 'chart', 'shape', 'textbox', 'sdt'):
-            context = LayoutContext.resolve(package, item)
-            record.update(layout_context=asdict(context), style=context.style_id, region=context.region)
+        if item['kind'] in ('paragraph', 'table', 'equation', 'picture', 'chart', 'shape', 'textbox', 'sdt') and item['part'].startswith(('word/document', 'word/header', 'word/footer', 'word/footnotes', 'word/endnotes')):
+            try:
+                context = LayoutContext.resolve(package, item)
+                record.update(layout_context=asdict(context), style=context.style_id, region=context.region)
+            except WordError as error:
+                if not str(error).startswith('LAYOUT_OWNERSHIP_UNRESOLVED'): raise
+                record.update(layout_context=None, layout_diagnostic=str(error))
         objects.append(record)
     known = {o["part"] for o in objects} | {'word/settings.xml', 'word/fontTable.xml', 'word/webSettings.xml'}
     return {"schema_version": 1, "sha256": digest(path), "objects": objects,

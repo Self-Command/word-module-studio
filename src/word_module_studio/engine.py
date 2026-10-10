@@ -91,6 +91,8 @@ def execute(batch, input_path, output_path, *, template=None):
             preserved = [p for p in preserved if not p.startswith(('word/charts/', 'word/embeddings/'))]
         if 'M15' in modules:
             preserved = [p for p in preserved if not p.startswith(('word/commentsExtended', 'word/commentsIds', 'word/people'))]
+        if 'M19' in modules:
+            preserved = [p for p in preserved if not p.startswith(('word/theme/', 'word/fonts/', 'word/fontTable'))]
         for part in preserved:
             if source["parts"][part] != final["parts"].get(part):
                 original_package, final_package = Package(input_path), Package(work)

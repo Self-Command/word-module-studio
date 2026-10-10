@@ -64,6 +64,11 @@ if (args[0] == "apply") {
             CopyNoteRelationships(source, destination);
             destination.Footnotes.Save(); main.DeletePart(source);
         } else throw new ArgumentException("INVALID_NOTE_CONVERSION");
+    } else if (operation == "frame" || operation == "embed_fonts" || operation == "theme") {
+        var result = LayoutFeatures.Apply(document, requestRoot.GetProperty("target").GetString(), properties);
+        document.MainDocumentPart!.Document.Save();
+        Console.WriteLine(JsonSerializer.Serialize(result));
+        return 0;
     } else throw new ArgumentException("SDK_EXTENSION_UNSUPPORTED");
     document.MainDocumentPart!.Document.Save();
     Console.WriteLine(JsonSerializer.Serialize(new { operation, applied = true }));

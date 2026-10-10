@@ -216,7 +216,8 @@ def compose(markdown, manifest, output, *, region=None, resources=(), data=None)
             used_numbers.add(number)
         ledger.append(equation_apply(package, marker, {'formula': equation['formula'], 'number': number, 'mode': 'display',
             'size_pt': size, 'number_width_twips': spec.get('equations', {}).get('number_width_twips', 600),
-            'wrap': spec.get('equations', {}).get('long_formula', 'safe_wrap') == 'safe_wrap',
+            'wrap': spec.get('equations', {}).get('long_formula', 'practical') != 'fail',
+            'policy': spec.get('equations', {}).get('long_formula', 'practical'),
             'bookmarks': [record['bookmark'] for record in json.loads((diagnostics / 'references.source.json').read_text())['objects']
                           if record['sequence'] == 'Equation' and record['label'] in equation.get('labels', [])]}, metrics=metrics))
         marker['element'].getparent().remove(marker['element'])
@@ -231,7 +232,7 @@ def compose(markdown, manifest, output, *, region=None, resources=(), data=None)
         if title: previous.getparent().remove(previous)
         metadata_caption = table['element'].find('w:tblPr/w:tblCaption', namespaces=NS)
         if title is None and metadata_caption is not None: title = metadata_caption.get(W + 'val')
-        table_apply(package, table, {'operation': 'format', 'header_rows': 1, 'three_line': True,
+        table_apply(package, table, {'operation': 'format', 'header_rows': 1, 'three_line': True, **spec.get('table_policy', {}),
             **({'title': title, 'number': index, 'caption_position': spec['captions']['table']} if title else {})})
         if source_caption is not None:
             generated = table['element'].getprevious() if spec['captions']['table'] == 'above' else table['element'].getnext()

@@ -160,6 +160,38 @@ def build(spec, folder):
     order_properties(root)
     order_properties(styles_root)
     package.save()
+    from .typography import native_properties, apply as typography_apply, DOCUMENT_PROPERTIES, SECTION_PROPERTIES
+    if spec.get('typography'):
+        if set(spec['typography']) - DOCUMENT_PROPERTIES: raise WordError('TEMPLATE_TYPOGRAPHY_UNSUPPORTED')
+        native_properties(package, '/', 'document', spec['typography'])
+    for name, rule in spec['styles'].items():
+        if rule.get('native'): native_properties(package, '/styles/' + name, 'style', rule['native'])
+    for index, region in enumerate(spec['regions'], 1):
+        if region.get('native'):
+            if set(region['native']) - SECTION_PROPERTIES: raise WordError('TEMPLATE_SECTION_PROPERTY_UNSUPPORTED')
+            native_properties(package, '/section[' + str(index) + ']', 'section', region['native'])
+    if spec.get('theme'):
+        target = next(o for o in package.objects() if o['kind'] == 'document')
+        typography_apply(package, target, 'M19', {'operation': 'theme', 'properties': spec['theme']})
+    package.objects(stamp=True); package.save()
+    for frame in spec.get('frames', []):
+        target = next((o for o in package.objects() if o['kind'] == 'paragraph' and o['text'] == '{{' + frame['slot'] + '}}'), None)
+        if target is None: raise WordError('FRAME_SLOT_MISSING', frame['slot'])
+        typography_apply(package, target, 'M03', {'operation': 'frame', 'attributes': frame['attributes']})
+    embedding = spec.get('font_embedding', {})
+    if embedding.get('enabled'):
+        target = next(o for o in package.objects() if o['kind'] == 'document')
+        roles = embedding.get('roles', list(fonts))
+        typography_apply(package, target, 'M19', {'operation': 'embed_fonts', 'fonts': [
+            {**{key: fonts[role][key] for key in ('family', 'file', 'index')}, 'redistributable': embedding['redistributable']} for role in roles]})
+    math = package.xml('word/settings.xml').find('m:mathPr', namespaces=NS)
+    for name, value in (('brkBin', spec.get('equations', {}).get('operator_position')), ('wrapIndent', spec.get('equations', {}).get('continuation_indent_twips'))):
+        if value is not None:
+            node = math.find('m:' + name, namespaces=NS)
+            if node is None: node = E.SubElement(math, '{' + NS['m'] + '}' + name)
+            node.set('{' + NS['m'] + '}val', str(value))
+    order_properties(package.xml('word/document.xml')); order_properties(package.xml('word/styles.xml'))
+    package.save()
     manifest = {'schema_version': 1, 'id': spec['id'], 'version': spec['version'], 'spec': spec,
         'spec_sha256': identity, 'master': str((folder / 'master.docx').resolve()),
         'master_sha256': digest(folder / 'master.docx'), 'fonts': fonts,

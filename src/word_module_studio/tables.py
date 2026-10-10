@@ -22,7 +22,7 @@ def apply(package, target, props):
     operation = props.get('operation', 'format')
     if operation == 'paginate': return paginate(package, target, props)
     if operation == 'merge': return merge(table, props)
-    allowed = {'operation', 'widths_twips', 'three_line', 'header_rows', 'split_rows', 'title', 'number', 'caption_position'}
+    allowed = {'operation', 'widths_twips', 'three_line', 'header_rows', 'split_rows', 'title', 'number', 'caption_position', 'layout', 'preferred_width_pct', 'allow_row_split'}
     if set(props) - allowed: raise WordError('TABLE_PROPERTY_UNSUPPORTED')
     context = LayoutContext.resolve(package, target)
     budget = context.available_width_twips
@@ -33,8 +33,12 @@ def apply(package, target, props):
     if len(widths) != columns or min(widths) <= 0 or sum(widths) > budget: raise WordError('TABLE_CANNOT_FIT', target['id'])
     table_props = table.find(W + 'tblPr')
     if table_props is None: table_props = E.Element(W + 'tblPr'); table.insert(0, table_props)
-    _set(table_props, 'tblW', {'w': sum(widths), 'type': 'dxa'})
-    _set(table_props, 'tblLayout', {'type': 'fixed'})
+    layout = props.get('layout', 'fixed')
+    if layout not in ('fixed', 'autofit'): raise WordError('INVALID_TABLE_LAYOUT')
+    percentage = props.get('preferred_width_pct', 100)
+    if not 0 < percentage <= 100: raise WordError('TABLE_CANNOT_FIT', target['id'])
+    _set(table_props, 'tblW', {'w': sum(widths), 'type': 'dxa'} if layout == 'fixed' else {'w': round(percentage * 50), 'type': 'pct'})
+    _set(table_props, 'tblLayout', {'type': 'fixed' if layout == 'fixed' else 'autofit'})
     grid.clear()
     for width in widths: E.SubElement(grid, W + 'gridCol').set(W + 'w', str(width))
     headers = props.get('header_rows', 1)
@@ -47,7 +51,7 @@ def apply(package, target, props):
     for index, row in enumerate(rows):
         row_props = row.find(W + 'trPr')
         if row_props is None: row_props = E.Element(W + 'trPr'); row.insert(0, row_props)
-        _set(row_props, 'cantSplit')
+        _set(row_props, 'cantSplit', {'val': '0' if props.get('allow_row_split', False) else '1'})
         if index < headers: _set(row_props, 'tblHeader')
         position = 0
         for cell in row.findall(W + 'tc'):
