@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "stage": "inspect",
+  "files": [
+    {
+      "path": "input.docx",
+      "role": "document",
+      "sha256": "f17010c035607c9c3b85a760ec477d2a2e4e3d343294b00e033e015721949b44"
+    }
+  ],
+  "task_id": "task-a2eec7513eae46bc",
+  "engine_commit": "fbdb828dcec0df4b90cb43465718f76075c07f8f"
+}
