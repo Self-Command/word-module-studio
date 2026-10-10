@@ -51,28 +51,20 @@ try:
         if not model.supportsService('com.sun.star.formula.FormulaProperties'): continue
         source_properties = source_math[len(formula_fonts)] if len(formula_fonts) < len(source_math) else {}
         imported_height = model.BaseFontHeight
+        imported_formula = model.Formula
         if math_font:
-            if source_properties: model.BaseFontHeight = max(1, round(source_properties['size_pt']))
-            for name in font_properties:
-                model.setPropertyValue(name, math_font)
-            control = item.ExtendedControlOverEmbeddedObject
-            control.update()
-            # A font change recalculates StarMath's intrinsic area. Writer can
-            # retain a stale imported frame size and scale the whole formula to
-            # a few points. Use the native area rather than measuring glyphs here.
-            area = control.getVisualAreaSize(1); unit = control.getMapUnit(1)
-            # XVisualObject reports its own EmbedMapUnits, while XShape uses
-            # hundredths of a millimetre. Formula objects need not use unit 0.
-            mm100 = {0: 1, 1: 10, 2: 100, 3: 1000, 4: 2.54, 5: 25.4,
-                6: 254, 7: 2540, 8: 2540 / 72, 9: 2540 / 1440}
-            if unit not in mm100: raise RuntimeError('FORMULA_VISUAL_AREA_UNIT_UNSUPPORTED: ' + str(unit))
-            size = uno.createUnoStruct('com.sun.star.awt.Size')
-            size.Width = round(area.Width * mm100[unit]); size.Height = round(area.Height * mm100[unit])
-            item.setSize(size)
+            model.setPropertyValues(font_properties, tuple(math_font for _ in font_properties))
+            # StarMath's imported per-face sizes can survive a BaseFontHeight
+            # change. Its native size command expresses the source point size
+            # explicitly and recalculates the visual area in SmModel itself.
+            # Updating ExtendedControl synchronously can deadlock Writer; do not
+            # request it or impose a separately measured frame size.
+            size_pt = source_properties.get('size_pt', imported_height)
+            model.Formula = 'size ' + str(size_pt) + ' {' + imported_formula + '}'
         formula_fonts.append({'index': index, 'requested': math_font, 'formula': model.Formula,
             'source_order_candidate': source_properties, 'imported_base_height_pt': imported_height,
             'base_font_height_pt': model.BaseFontHeight,
-            'visual_area_map_unit': unit if math_font else None,
+            'imported_formula': imported_formula, 'explicit_size_pt': size_pt if math_font else None,
             'object_width_pt': item.Size.Width * 72 / 2540, 'object_height_pt': item.Size.Height * 72 / 2540,
             'actual': {name: model.getPropertyValue(name) for name in font_properties}})
     for iteration in range(3):
@@ -98,9 +90,11 @@ try:
                 'top_pt': style.TopMargin * 72 / 2540, 'bottom_pt': style.BottomMargin * 72 / 2540,
                 'columns': [{'width': c.Width, 'left_pt': c.LeftMargin * 72 / 2540,
                     'right_pt': c.RightMargin * 72 / 2540} for c in columns]}
+            drop_cap = item.DropCapFormat
             layout['paragraphs'].append({'text': item.String, 'page': cursor.Page,
                 'x_pt': cursor.Position.X * 72 / 2540 + page['left_pt'],
-                'y_pt': cursor.Position.Y * 72 / 2540 + page['top_pt'], 'page_geometry': page})
+                'y_pt': cursor.Position.Y * 72 / 2540 + page['top_pt'], 'page_geometry': page,
+                'drop_cap': {'lines': drop_cap.Lines, 'count': drop_cap.Count, 'distance_mm100': drop_cap.Distance}})
     for name in document.TextTables.ElementNames:
         table = document.TextTables.getByName(name)
         rows = []

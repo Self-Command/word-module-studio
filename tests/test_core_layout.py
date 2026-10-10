@@ -301,8 +301,9 @@ def test_core_object_gallery(tmp_path):
 
 
 def test_drop_cap_visual_gallery(document, tmp_path):
-    output = apply(document, tmp_path, 'M03', item(document, 'paragraph', 'first'), props={'text': 'Drop cap paragraph demonstrates a native frame with retained editable text.'})
-    output = apply(output, tmp_path, 'M03', item(output, 'paragraph', 'Drop cap paragraph demonstrates a native frame with retained editable text.'), action='extension',
+    paragraph = 'Drop cap paragraph demonstrates a native frame with retained editable text. ' + 'Its complete paragraph provides enough wrapped lines for the requested three-line initial. ' * 5
+    output = apply(document, tmp_path, 'M03', item(document, 'paragraph', 'first'), props={'text': paragraph})
+    output = apply(output, tmp_path, 'M03', item(output, 'paragraph', paragraph), action='extension',
         props={'operation': 'frame', 'attributes': {'dropCap': 'drop', 'lines': 3, 'hSpace': 120, 'wrap': 'around'}}, name='drop-cap')
     report = render(output, tmp_path / 'proof'); assert report['automatic_pass'], report['issues']
     import pdfplumber
