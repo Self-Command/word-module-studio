@@ -24,7 +24,7 @@ def apply(package, target, props):
     allowed = {'operation', 'widths_twips', 'three_line', 'header_rows', 'split_rows', 'title', 'number', 'caption_position'}
     if set(props) - allowed: raise WordError('TABLE_PROPERTY_UNSUPPORTED')
     context = LayoutContext.resolve(package, target)
-    budget = min(context.column_widths_twips)
+    budget = context.available_width_twips
     grid = table.find(W + 'tblGrid')
     if grid is None: raise WordError('TABLE_GRID_MISSING')
     columns = len(grid)

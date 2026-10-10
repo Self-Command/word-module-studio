@@ -53,7 +53,7 @@ def apply(package, item, props, *, metrics=None):
             fonts = E.Element(W + 'rFonts'); fonts.set(W + 'ascii', family); fonts.set(W + 'hAnsi', family)
             properties.insert(0, fonts)
     number_width = props.get('number_width_twips', 600) if props.get('number') else 0
-    budget = (min(context.column_widths_twips) - number_width) / 20 - 8
+    budget = (context.available_width_twips - number_width) / 20 - 8
     if budget <= 0: raise WordError('EQUATION_NUMBER_REGION_TOO_WIDE')
     original = tree(formula)
     changes = wrap(formula, budget, size, metrics=metrics) if props.get('wrap', True) else []
@@ -79,14 +79,14 @@ def apply(package, item, props, *, metrics=None):
             display = E.SubElement(p, M + 'oMathPara')
             display.append(formula)
         elif any(formula.iter(M + 'eqArr')) or len(list(formula.iter(M + 'mr'))) > 1:
-            table = _equation_table(formula, '(' + str(props['number']) + ')', min(context.column_widths_twips), number_width)
+            table = _equation_table(formula, '(' + str(props['number']) + ')', context.available_width_twips, number_width)
             _append(target, table)
             _number_bookmarks(package, table, props)
             return {'original_math': original, 'changes': changes, 'mode': mode, 'number': props['number'], 'layout': 'centered-multiline', 'budget_pt': budget}
         else:
             tabs = E.SubElement(ppr, W + 'tabs')
-            center = E.SubElement(tabs, W + 'tab'); center.set(W + 'val', 'center'); center.set(W + 'pos', str((min(context.column_widths_twips) - number_width) // 2))
-            right = E.SubElement(tabs, W + 'tab'); right.set(W + 'val', 'right'); right.set(W + 'pos', str(min(context.column_widths_twips)))
+            center = E.SubElement(tabs, W + 'tab'); center.set(W + 'val', 'center'); center.set(W + 'pos', str((context.available_width_twips - number_width) // 2))
+            right = E.SubElement(tabs, W + 'tab'); right.set(W + 'val', 'right'); right.set(W + 'pos', str(context.available_width_twips))
             E.SubElement(E.SubElement(p, W + 'r'), W + 'tab')
             p.append(formula)
             E.SubElement(E.SubElement(p, W + 'r'), W + 'tab')
@@ -94,6 +94,17 @@ def apply(package, item, props, *, metrics=None):
         _append(target, p)
         _number_bookmarks(package, p, props)
     return {'original_math': original, 'changes': changes, 'mode': mode, 'number': props.get('number'), 'budget_pt': budget}
+
+
+def fit_inline(package, element, size, metrics):
+    """Reversible fitting uses the owning cell's budget as well as the column."""
+    context = LayoutContext.resolve(package, {'element': element, 'part': 'word/document.xml'})
+    budget = context.available_width_twips / 20 - 4
+    original = tree(element)
+    changes = wrap(element, budget, size, metrics=metrics)
+    if tree(restore(element, changes)) != original: raise WordError('INLINE_MATH_RECOVERY_FAILED')
+    if math_width_pt(element, size, metrics) > budget + .1: raise WordError('INLINE_FORMULA_CANNOT_FIT', element.getroottree().getpath(element))
+    return {'element': element, 'original_math': original, 'changes': changes, 'budget_pt': budget}
 
 
 def _number_bookmarks(package, element, props):

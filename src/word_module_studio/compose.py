@@ -161,10 +161,24 @@ def compose(markdown, manifest, output, *, region=None, resources=(), data=None)
     output = Path(output); output.parent.mkdir(parents=True, exist_ok=True)
     diagnostics = output.parent / (output.stem + '-source'); diagnostics.mkdir(exist_ok=True)
     ast, equations = parse(markdown, resources, diagnostics)
+    promoted_title = None
+    if data and ast['blocks'] and ast['blocks'][0].get('t') == 'Header':
+        def title_text(value):
+            if isinstance(value, dict):
+                if value.get('t') == 'Str': return value['c']
+                if value.get('t') in ('Space', 'SoftBreak'): return ' '
+                return title_text(value.get('c', []))
+            if isinstance(value, list): return ''.join(title_text(child) for child in value)
+            return ''
+        title = title_text(ast['blocks'][0]['c'][2])
+        if title and title in [data.get(key) for key in ('title', 'title_zh', 'title_en')]:
+            promoted_title = title; ast['blocks'].pop(0)
     native = diagnostics / 'content.native.docx'
     run(['pandoc', '-f', 'json', '-t', 'docx', '-o', native, *(['--citeproc'] if ast.get('meta', {}).get('bibliography') else [])], input_text=json.dumps(ast), reject_warnings=True)
     source, destination = Document(native), Document(manifest['master'])
     expected_math = [deepcopy(m) for m in source.element.body.iter(M + 'oMath')]
+    inline_attribute = '{' + NS['wms'] + '}inline_source'
+    for index, math in enumerate(source.element.body.iter(M + 'oMath')): math.set(inline_attribute, str(index))
     slot = next((n for n in destination.element.body.iter(W + 'sdt')
         if n.find('w:sdtPr/w:tag', namespaces=NS) is not None
         and n.find('w:sdtPr/w:tag', namespaces=NS).get(W + 'val') == 'region.' + region), None)
@@ -239,13 +253,13 @@ def compose(markdown, manifest, output, *, region=None, resources=(), data=None)
             retain_inline(generated, caption)
     from .references import finish
     references = finish(package, json.loads((diagnostics / 'references.source.json').read_text()))
-    package.objects(stamp=True); package.save()
-    verify_locked(output, manifest)
-    from .verify import relationships
-    integrity = relationships(output)
-    sdk = json.loads(run(['dotnet', '.tools/sdk/WordSdk.dll', 'validate', output]))
+    from .math import fit_inline
+    inline_elements = [math for math in package.xml('word/document.xml').iter(M + 'oMath') if math.get(inline_attribute) is not None]
+    for math in inline_elements: del math.attrib[inline_attribute]
+    inline = [fit_inline(package, element, size, metrics) for element in inline_elements]
+    from .migration.math_layout import restore, tree
+    recovered = {id(record['element']): restore(record['element'], record['changes']) for record in inline}
     from collections import Counter
-    from .migration.math_layout import tree
     def key(math):
         value = deepcopy(math)
         for node in value.iter():
@@ -253,8 +267,18 @@ def compose(markdown, manifest, output, *, region=None, resources=(), data=None)
                 if name.startswith('{' + NS['wms'] + '}'): del node.attrib[name]
         return json.dumps(tree(value), ensure_ascii=False)
     required = Counter(key(math) for math in expected_math)
-    actual = Counter(key(math) for math in Package(output).xml('word/document.xml').iter(M + 'oMath'))
+    actual = Counter(key(recovered.get(id(math), math)) for math in package.xml('word/document.xml').iter(M + 'oMath'))
     if required - actual: raise WordError('INLINE_OR_CAPTION_MATH_CHANGED')
+    encoded_math = Counter(key(math) for math in package.xml('word/document.xml').iter(M + 'oMath'))
+    inline_ledger = [{k: v for k, v in record.items() if k != 'element'} for record in inline]
+    write_json(diagnostics / 'inline-math-layout-ledger.json', inline_ledger)
+    package.objects(stamp=True); package.save()
+    verify_locked(output, manifest)
+    from .verify import relationships
+    integrity = relationships(output)
+    sdk = json.loads(run(['dotnet', '.tools/sdk/WordSdk.dll', 'validate', output]))
+    actual = Counter(key(math) for math in Package(output).xml('word/document.xml').iter(M + 'oMath'))
+    if actual != encoded_math: raise WordError('SAVED_MATH_CHANGED')
     actual_text = ''.join(Package(output).xml('word/document.xml').xpath('//w:t/text()', namespaces=NS))
     for text in expected_text:
         if text and not text.startswith('__WMS_DISPLAY_'):
@@ -264,6 +288,7 @@ def compose(markdown, manifest, output, *, region=None, resources=(), data=None)
         'delivery_accepted': False, 'source_sha256': digest(markdown), 'output_sha256': digest(output),
         'template': {key: manifest[key] for key in ('id', 'version', 'spec_sha256', 'master_sha256')},
         'display_equations': len(equations), 'equations': ledger, 'references': references,
-        'inline_math_preserved': len(expected_math), 'relationships': integrity, 'sdk': sdk}
+        'inline_math_preserved': len(expected_math), 'inline_math_layout': inline_ledger,
+        'source_title_promoted': promoted_title, 'relationships': integrity, 'sdk': sdk}
     write_json(output.with_suffix('.compose.json'), report)
     return report

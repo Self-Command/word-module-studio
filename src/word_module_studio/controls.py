@@ -17,7 +17,13 @@ def apply(package, target, props):
     if set(props) - {'operation', 'data'}: raise WordError('CONTROL_PROPERTY_UNSUPPORTED')
     data = props['data']
     if not isinstance(data, dict): raise WordError('CONTROL_DATA_REQUIRED')
-    environment = SandboxedEnvironment(undefined=StrictUndefined, autoescape=False)
+    def semantic_value(value):
+        if isinstance(value, (list, tuple)):
+            if any(isinstance(item, (dict, list, tuple)) for item in value): raise WordError('CONTROL_STRUCTURED_VALUE_NEEDS_REPEAT')
+            return '; '.join(str(item) for item in value)
+        if isinstance(value, dict): raise WordError('CONTROL_STRUCTURED_VALUE_NEEDS_REPEAT')
+        return value
+    environment = SandboxedEnvironment(undefined=StrictUndefined, autoescape=False, finalize=semantic_value)
     root = target['element']
     count = 0
     for control in list(root.iter(W + 'sdt')):
