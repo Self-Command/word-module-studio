@@ -1,9 +1,6 @@
 import os
 import pytest
 
-if os.environ.get('GITHUB_ACTIONS') != 'true' or not os.environ.get('GITHUB_RUN_ID'):
-    raise RuntimeError('CLOUD_ONLY: tests require GitHub Actions')
-
 
 @pytest.fixture
 def document(tmp_path):

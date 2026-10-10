@@ -5,14 +5,14 @@ from lxml import etree as E
 from .package import M
 from .migration.math_layout import tree, restore
 from .migration.docx_layout import math_width_pt
-from .runtime import WordError, require_actions
+from .runtime import WordError, require_execution
 
 
 DEFAULT_STRATEGY = 'outer_array'  # Native m:brk is ignored by pinned LO: run 38052432267.
 
 
 def wrap(root, budget, size, metrics=None, *, strategy=DEFAULT_STRATEGY):
-    require_actions()
+    require_execution()
     if strategy not in ('native', 'outer_array'): raise WordError('INVALID_MATH_BREAK_STRATEGY')
     if math_width_pt(root, size, metrics) <= budget: return []
     # Existing author arrays/alignment are already a multi-line object and remain exact.

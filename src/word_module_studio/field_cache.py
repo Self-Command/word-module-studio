@@ -9,7 +9,7 @@ import shutil
 import tempfile
 from lxml import etree as E
 from .package import Package, W, M, NS
-from .runtime import require_actions, WordError, digest, run, write_json
+from .runtime import require_execution, WordError, digest, run, write_json
 
 SUPPORTED = {'PAGE', 'NUMPAGES', 'SECTION', 'SECTIONPAGES', 'SEQ', 'REF', 'PAGEREF', 'NOTEREF', 'TOC', 'INDEX', 'TOA', 'STYLEREF', 'DOCPROPERTY', 'DATE', 'TIME', 'AUTHOR', 'TITLE', 'FILENAME'}
 
@@ -241,7 +241,7 @@ def transplant(source, refreshed):
 
 
 def refresh(source, output, folder):
-    require_actions()
+    require_execution()
     from .render import render
     from .verify import relationships
     source, output, folder = Path(source), Path(output), Path(folder)

@@ -1,7 +1,7 @@
 """Versioned module handlers reuse upstream machine-readable contracts."""
 import json
 from pathlib import Path
-from .runtime import require_actions, WordError
+from .runtime import require_execution, WordError
 
 ROOT = Path(__file__).resolve().parents[2]
 MODULES = {
@@ -29,7 +29,7 @@ MODULES = {
 
 
 def contract(kind):
-    require_actions()
+    require_execution()
     base = ROOT / "third_party/officecli/help"
     path = base / "docx" / (kind + ".json")
     if not path.is_file(): raise WordError("UNSUPPORTED_ELEMENT", kind)
@@ -48,7 +48,7 @@ def contract(kind):
 
 
 def check_properties(module, kind, action, props):
-    require_actions()
+    require_execution()
     if module not in MODULES: raise WordError("UNKNOWN_MODULE", module)
     if kind not in MODULES[module][1]: raise WordError("MODULE_ELEMENT_MISMATCH", f"{module}/{kind}")
     data = contract(kind)
@@ -77,7 +77,7 @@ def check_properties(module, kind, action, props):
 
 
 def catalog():
-    require_actions()
+    require_execution()
     coverage = json.loads((ROOT / 'docs/module-coverage.json').read_text())
     evidence = {item['id']: item for item in coverage['modules']}
     features = json.loads((ROOT / 'docs/core-features.json').read_text())

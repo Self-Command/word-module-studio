@@ -5,7 +5,7 @@ from docx import Document
 from docx.oxml import OxmlElement
 from docx.opc.constants import RELATIONSHIP_TYPE as RT
 from docxcompose.composer import Composer
-from .runtime import require_actions, WordError, run, write_json, digest
+from .runtime import require_execution, WordError, run, write_json, digest
 from .package import Package, W, NS, ID
 from .verify import relationships
 
@@ -60,7 +60,7 @@ class RegionComposer(NativeComposer):
 
 
 def merge(master, additions, output, *, header_policy):
-    require_actions()
+    require_execution()
     if header_policy not in ('master', 'source_regions'): raise WordError('MERGE_HEADER_POLICY_REQUIRED')
     destination = Document(master)
     composer = NativeComposer(destination, preserve_styles=True) if header_policy == 'master' else RegionComposer(destination)
@@ -103,7 +103,7 @@ def merge(master, additions, output, *, header_policy):
 
 
 def extract(source, object_ids, output):
-    require_actions()
+    require_execution()
     package = Package(source)
     body = package.xml('word/document.xml').find(W + 'body')
     selected = [package.locate(identifier)['element'] for identifier in object_ids]

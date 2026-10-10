@@ -1,6 +1,6 @@
 # Explicit document tasks
 
-Choose a task repository you control, with `document-task.yml` on its default branch. Keep local inputs outside the skill/source repository. A manifest lists only files needed for one stage, relative to its own folder. The transport supplies task identity, engine commit and missing SHA-256 values before upload.
+Choose local execution or Actions. A manifest lists only files needed for one stage, relative to its own folder. Locally, use `client.py run --manifest task.json --output NEW_OUTPUT_FOLDER`; it fills missing file hashes and needs no GitHub account or engine commit. For Actions, choose a task repository with `document-task.yml` and use `submit`, which also supplies the pinned engine commit before upload. Keep task inputs outside the skill/source repository.
 
 ## Inspect and edit
 
@@ -84,4 +84,4 @@ compose("document.md", manifest, "build/document.docx", resources=["figure.png"]
 render("build/document.docx", "build/proof")
 ```
 
-Candidates are allowed for development probes. A successful probe does not register a template or accept its pages. Document execution remains cloud-only.
+Candidates are allowed for development probes. A successful probe does not register a template or accept its pages. Document execution is available locally or in Actions, with the same review requirements.

@@ -1,4 +1,4 @@
-from ..runtime import WordError, require_actions, run, digest, write_json
+from ..runtime import WordError, require_execution, run, digest, write_json
 
 
 class StudioError(WordError):

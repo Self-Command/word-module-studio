@@ -1,12 +1,12 @@
 """Read registered font advances in Actions; do not choose or modify fonts."""
 from pathlib import Path
 from functools import lru_cache
-from .runtime import require_actions,run,digest,StudioError
+from .runtime import require_execution,run,digest,StudioError
 
 
 @lru_cache(maxsize=16)
 def registered_metrics(family,filename,index,fingerprint):
-    require_actions()
+    require_execution()
     path=run(["fc-match","-f","%{file}",family+":style=Regular"]).strip()
     if Path(path).name!=filename or digest(path)!=fingerprint:
         raise StudioError("FONT_FACE_FINGERPRINT_MISMATCH: math metrics "+family)
@@ -19,7 +19,7 @@ def registered_metrics(family,filename,index,fingerprint):
 
 
 def configure(profile):
-    require_actions()
+    require_execution()
     from ..templates import check_fonts
     found = check_fonts(profile['fonts'])
     # Font identity comes from the frozen mother policy. The returned advances

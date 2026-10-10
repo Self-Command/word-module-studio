@@ -4,14 +4,14 @@ import os
 from pathlib import Path
 import shutil
 import zipfile
-from .runtime import require_actions, WordError, digest, write_json
+from .runtime import require_execution, execution_context, WordError, digest, write_json
 from . import __version__
 
 ROOT = Path(__file__).resolve().parents[2]
 
 def publication_manifest():
     """An explicit inventory prevents directory copies from collecting new inputs."""
-    require_actions()
+    require_execution()
     inventory = json.loads((ROOT / 'publication-manifest.json').read_text(encoding='utf-8-sig'))
     if inventory.get('schema_version') != 1: raise WordError('PUBLICATION_MANIFEST_INVALID')
     for group in ('repository_files', 'skill_files', 'core_files'):
@@ -35,7 +35,7 @@ def publication_manifest():
 
 
 def build_package(folder, *, acceptance=None):
-    require_actions()
+    require_execution()
     folder = Path(folder).resolve(); folder.mkdir(parents=True, exist_ok=True)
     stage = folder / 'package' / 'word-module-studio'
     if stage.exists(): raise WordError('PACKAGE_OUTPUT_ALREADY_EXISTS')
@@ -49,7 +49,7 @@ def build_package(folder, *, acceptance=None):
             shutil.copyfile(ROOT / name, target)
     files = {str(p.relative_to(stage)).replace('\\', '/'): digest(p) for p in sorted(stage.rglob('*')) if p.is_file()}
     manifest = {'schema_version': 1, 'version': __version__, 'engine_commit': os.environ.get('GITHUB_SHA'),
-        'run_id': os.environ['GITHUB_RUN_ID'], 'release_status': 'core-layout-accepted' if acceptance else 'candidate', 'files': files}
+        'run_id': execution_context()['run_id'], 'release_status': 'core-layout-accepted' if acceptance else 'candidate', 'files': files}
     if acceptance:
         if not acceptance.get('delivery_accepted') or not acceptance.get('proofs'): raise WordError('CORE_ACCEPTANCE_REQUIRED')
         manifest['acceptance'] = acceptance

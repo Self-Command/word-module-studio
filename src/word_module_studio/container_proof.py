@@ -6,11 +6,11 @@ from collections import defaultdict
 import pdfplumber
 from .package import Package, W, NS
 from .context import LayoutContext
-from .runtime import require_actions
+from .runtime import require_execution
 
 
 def check(source, pdf, layout):
-    require_actions()
+    require_execution()
     package = Package(source)
     paragraphs = defaultdict(list)
     for obj in package.objects():

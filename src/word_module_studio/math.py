@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 import tempfile
 from lxml import etree as E
-from .runtime import require_actions, WordError, run
+from .runtime import require_execution, WordError, run
 from .package import Package, M, W, NS
 from .context import LayoutContext
 from .migration.math_layout import tree, wrap, restore
@@ -13,7 +13,7 @@ from .migration.semantic_import import normalize_aligned
 
 
 def convert(formula, mode='display'):
-    require_actions()
+    require_execution()
     if mode not in ('inline', 'display'): raise WordError('INVALID_MATH_MODE')
     formula = normalize_aligned(formula)
     with tempfile.TemporaryDirectory() as temporary:
@@ -32,7 +32,7 @@ def convert(formula, mode='display'):
 
 
 def apply(package, item, props, *, metrics=None):
-    require_actions()
+    require_execution()
     allowed = {'formula', 'mode', 'number', 'number_width_twips', 'size_pt', 'wrap', 'operation', 'bookmarks', 'policy', 'break_strategy'}
     if set(props) - allowed: raise WordError('MATH_PROPERTY_UNSUPPORTED')
     target = item['element']
@@ -72,8 +72,8 @@ def apply(package, item, props, *, metrics=None):
     if tree(restore(formula, changes)) != original: raise WordError('FORMULA_RECOVERY_FAILED')
     measured = math_width_pt(formula, size, metrics)
     if measured > budget + 0.1:
-        from .runtime import write_json
-        diagnostics = Path('build/formula-overflows'); diagnostics.mkdir(parents=True, exist_ok=True)
+        from .runtime import artifact_folder, write_json
+        diagnostics = artifact_folder('formula-overflows'); diagnostics.mkdir(parents=True, exist_ok=True)
         name = __import__('hashlib').sha256(E.tostring(formula)).hexdigest()[:16]
         (diagnostics / (name + '.xml')).write_bytes(E.tostring(formula, pretty_print=True))
         write_json(diagnostics / (name + '.json'), {'number': props.get('number'), 'budget_pt': budget,

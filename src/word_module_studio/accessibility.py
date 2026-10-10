@@ -1,10 +1,10 @@
 """Structural accessibility evidence; does not claim assistive-tool certification."""
 from .package import Package, W, NS
-from .runtime import require_actions
+from .runtime import require_execution
 
 
 def inspect(path):
-    require_actions(); package = Package(path); issues = []
+    require_execution(); package = Package(path); issues = []
     root = package.xml('word/document.xml')
     for node in root.xpath('//*[local-name()="docPr"]'):
         if not (node.get('descr') or node.get('title')): issues.append({'code': 'IMAGE_ALT_MISSING', 'object': node.get('id')})

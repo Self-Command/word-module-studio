@@ -6,11 +6,11 @@ from lxml import etree as E
 from jinja2 import Environment, StrictUndefined
 from jinja2.sandbox import SandboxedEnvironment
 from .package import W, NS, ID
-from .runtime import require_actions, WordError
+from .runtime import require_execution, WordError
 
 
 def apply(package, target, props):
-    require_actions()
+    require_execution()
     if props.get('operation') == 'bind': return bind(package, target, props)
     if props.get('operation') == 'repeat_create': return repeat_create(package, target, props)
     if props.get('operation') != 'fill': raise WordError('CONTROL_OPERATION_UNSUPPORTED')

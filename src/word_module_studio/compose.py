@@ -7,7 +7,7 @@ import tempfile
 from urllib.parse import unquote, urlparse
 from lxml import etree as E
 from docx import Document
-from .runtime import require_actions, WordError, run, write_json, digest
+from .runtime import require_execution, WordError, run, write_json, digest
 from .package import Package, W, M, NS
 from .templates import check_identity, verify_locked
 from .content_import import import_resources, import_lists
@@ -155,7 +155,7 @@ class ContentComposer(NativeComposer):
 
 
 def compose(markdown, manifest, output, *, region=None, resources=(), data=None):
-    require_actions(); check_identity(manifest)
+    require_execution(); check_identity(manifest)
     spec = manifest['spec']; region = region or spec['regions'][-1]['id']
     if region not in {r['id'] for r in spec['regions']}: raise WordError('CONTENT_REGION_UNKNOWN', region)
     output = Path(output); output.parent.mkdir(parents=True, exist_ok=True)

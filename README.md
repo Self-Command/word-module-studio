@@ -4,7 +4,7 @@
 
 A standalone, general-purpose skill for creating, editing and checking **Word DOCX documents**. Use it through a Codex skill, explicit JSON tasks or a Python API. Ordinary edits and documents governed by a reusable template share the same engine.
 
-Pinned OfficeCLI, Open XML SDK, Pandoc and LibreOffice provide the document backend. **Document operations, tests, conversion and rendering run in GitHub Actions.** Your local machine submits explicit files, checks task status and downloads results. No additional model API is required.
+Pinned OfficeCLI, Open XML SDK, Pandoc and LibreOffice provide the document backend. **Choose local execution or GitHub Actions.** Local tasks need no GitHub account, repository, credentials or Actions environment variables. A local Docker environment is optional; users with configured native dependencies can call the same Python API directly. No additional model API is required.
 
 Use it for reports, manuals, proposals and other structured documents with editable text, equations, tables, charts and consistent layout. Application-specific content and business policies belong in the calling application.
 
@@ -58,11 +58,50 @@ See [module conditions and errors](docs/modules.md), [feature evidence](docs/cor
 1. Download the ZIP from the [latest release](https://github.com/Self-Command/word-module-studio/releases/latest).
 2. Extract its complete **`word-module-studio` folder** into `$CODEX_HOME/skills`, or `~/.codex/skills` when `CODEX_HOME` is unset. Keep `SKILL.md`, `references/`, `agents/` and `core/` together.
 3. Confirm that the skill is available in your Codex session. Before upgrading, retain a verified copy of the previous folder; restore it to roll back.
-4. Configure a task repository below. Installing the skill does not configure GitHub execution automatically.
+4. Choose your execution method below. A GitHub task repository is required only when you choose Actions.
 
 The ZIP contains the runtime, schemas, task workflow, documentation and related gallery images. It excludes test fixtures, tests, user documents and application adapters. The exact approved files are declared in [publication-manifest.json](publication-manifest.json).
 
-## Set up execution
+## Choose where to execute
+
+| Method | Requirements | Document location |
+| --- | --- | --- |
+| Local Python / CLI | Python dependencies; native backends for the operations you use | Your local task and output folders |
+| Optional local Docker | Docker with Linux containers; image build downloads the pinned dependencies | Local mounted folders; runtime can disable network access |
+| Optional GitHub Actions | GitHub task repository, `gh` authentication and Actions permissions | Your selected public or private task repository |
+
+Installing the skill does not require GitHub. Missing local dependencies produce diagnostics; the client does not install software, upload documents or switch to Actions automatically.
+
+### Local Python
+
+From the installed skill folder, install the pinned Python versions and check the dependencies:
+
+```powershell
+python -m pip install -r core/requirements-resolved.lock
+python core/src/word_module_studio/client.py doctor --profile inspect
+python core/src/word_module_studio/client.py run --manifest "PATH_TO_TASK/task.json" --output "PATH_TO_OUTPUT/inspect-001"
+```
+
+For direct Python API imports, also install the source package with `python -m pip install --no-deps -e core` in your chosen environment. The inspect manifest is shown below. Use `doctor` without `--profile inspect` before full editing and proof generation. Use a new or empty output folder per run. The runner stages only listed inputs into `.inputs`, leaves the originals intact, and writes `task-report.json` with `execution: local`, a `local-...` run ID, engine version and source fingerprint. A local task does not require a Git commit.
+
+Inspection requires the Python dependencies. Editing and full proof generation additionally need OfficeCLI, the built Open XML SDK helper, Pandoc, LibreOffice with UNO Python, Poppler and fontconfig. The pinned native setup is qualified on Linux x64. In Ubuntu 24.04 / WSL x64, from `core/`, use a Python virtual environment, then `bash ci/bootstrap.sh` and `bash ci/render-bootstrap.sh`; these commands download backends and install system packages, with `sudo` when needed. Other native platforms need their own dependency and rendering qualification. The optional local Linux container supplies the complete tested setup.
+
+Executables are discovered from `core/.tools` or `PATH`. Override individual paths with `WMS_OFFICECLI`, `WMS_DOTNET`, `WMS_PANDOC`, `WMS_LIBREOFFICE`, `WMS_UNO_PYTHON`, `WMS_SDK_DLL`, `WMS_PDFTOPPM`, `WMS_PDFFONTS` or `WMS_FC_MATCH`. A path is one executable, not a shell command. The UNO interpreter must be able to import `uno`.
+
+### Optional local Docker
+
+Build from the installed `core/` folder (or `.` in a source checkout). Docker is an option, not a prerequisite for the skill:
+
+```powershell
+docker build --platform linux/amd64 -t word-studio-local core
+$wordTaskPath = (Resolve-Path "PATH_TO_TASK").Path
+$wordOutputPath = (New-Item -ItemType Directory -Force "PATH_TO_OUTPUT").FullName
+docker run --rm --platform linux/amd64 --network none --mount "type=bind,source=$wordTaskPath,target=/input,readonly" --mount "type=bind,source=$wordOutputPath,target=/output" word-studio-local run --manifest /input/task.json --output /output/inspect-001
+```
+
+The image build downloads the dependencies once. The shown runtime command has network access disabled and does not need GitHub authentication. The task folder is mounted read-only; outputs stay in your local output folder. Subsequent edit/render tasks use the same manifests and command, with a fresh output subfolder. Explicit file paths inside operation properties must refer to available local files, or mounted paths when using Docker.
+
+## Optional GitHub Actions setup
 
 You need **Python 3.12+**, **GitHub CLI (`gh`)**, permission to write task branches and dispatch Actions, and an initialized task repository with Actions enabled. You can choose a private repository. Word and document-processing dependencies do not need to be installed locally; the workflow installs pinned cloud dependencies.
 
@@ -72,12 +111,12 @@ You need **Python 3.12+**, **GitHub CLI (`gh`)**, permission to write task branc
 4. Pin a full engine commit. Resolve the standalone release tag:
 
 ```powershell
-$wordEngineCommit = gh api repos/Self-Command/word-module-studio/git/ref/tags/v0.1.1 --jq ".object.sha"
+$wordEngineCommit = gh api repos/Self-Command/word-module-studio/git/ref/tags/v0.1.2 --jq ".object.sha"
 ```
 
 Retain the resulting 40-character SHA with the task; do not use a moving branch name. The installed transport is `core/src/word_module_studio/client.py`. In a source checkout, use `src/word_module_studio/client.py` instead.
 
-## First task: inspect an existing DOCX
+## Task manifest: inspect an existing DOCX
 
 Create a local task folder **outside the skill/source repository**. Put `input.docx` and this `task.json` inside it:
 
@@ -89,7 +128,7 @@ Create a local task folder **outside the skill/source repository**. Put `input.d
 }
 ```
 
-From the installed skill folder, submit using your manifest's full path:
+For Actions, submit from the installed skill folder using your manifest's full path. For local execution, use `run --manifest ... --output ...` above:
 
 ```powershell
 python core/src/word_module_studio/client.py submit --repo YOUR_NAME/word-tasks --manifest "PATH_TO_TASK/task.json" --engine-commit $wordEngineCommit
@@ -135,7 +174,7 @@ Submit through the same transport with this task manifest:
 }
 ```
 
-The client fills missing file hashes before upload. Inspect again if the input changes. Batches operate atomically on a copy; invalid targets, unsupported properties and stale inputs fail with diagnostics. `locked_template` additionally protects registered physical rules.
+Both execution methods fill missing file hashes before processing. Inspect again if the input changes. Batches operate atomically on a copy; invalid targets, unsupported properties and stale inputs fail with diagnostics. `locked_template` additionally protects registered physical rules.
 
 An agent can invoke the installed skill directly:
 
@@ -151,7 +190,7 @@ Choose an explicit font scheme for a formal new document. The [generic configura
 
 For a reusable template, run `template-build` → `template-probe` → page review and `visual-receipt` → `template-register`. Then use `compose` with Markdown, the registered manifest and unchanged DOCX master, plus explicitly listed data, images, bibliography or font resources. `font_scheme` must match the template. Candidate templates can be probed through the Python API inside Actions; a probe does not register them.
 
-The [task guide](examples/README.md) explains input roles and the template lifecycle. [TemplateSpec](schemas/template-spec.schema.json) is the authoritative configuration. Inside Actions:
+The [task guide](examples/README.md) explains input roles and the template lifecycle. [TemplateSpec](schemas/template-spec.schema.json) is the authoritative configuration. In either configured runtime:
 
 ```python
 from word_module_studio.templates import build
@@ -163,7 +202,7 @@ compose("document.md", manifest, "build/document.docx", resources=["figure.png"]
 render("build/document.docx", "build/proof")
 ```
 
-Document APIs reject local execution. Only submit/status/fetch run locally.
+The document APIs run locally or in Actions. The `run` command executes locally; `submit`, `status` and `fetch` are optional Actions transport commands.
 
 ## Outputs and review
 
@@ -175,7 +214,7 @@ Review every page before accepting delivery. A `visual-receipt` binds the origin
 
 This repository contains only the generic skill, engine, interfaces, workflows, generic Word regression inputs, evidence, examples and licenses. [Publication checks](ci/audit_publication.py) reject tracked files outside the reviewed inventory, verify README links and bind gallery images to accepted pages. Packaging copies explicit approved files rather than sweeping directories.
 
-Document inputs go to **your chosen task repository**, not automatically to this source repository. Only manifest-listed files are uploaded. Tasks create branches and Actions artifacts are retained for 30 days. Task commits remain until you manage their retention; they are not automatically deleted. Choose repository visibility before uploading confidential documents. Custom fonts are installed in the ephemeral runner and require appropriate usage and redistribution rights.
+Local execution reads explicit files and writes to your chosen output folder; it performs no upload. Only when you choose Actions do inputs go to **your chosen task repository**, rather than this source repository. Only manifest-listed files are uploaded. Tasks create branches and Actions artifacts are retained for 30 days. Task commits remain until you manage their retention; they are not automatically deleted. Choose repository visibility before uploading confidential documents. Custom-font previews use a temporary task-scoped fontconfig environment rather than permanently installing fonts in your profile. Font use and embedding require appropriate rights.
 
 ## Limitations
 
@@ -189,4 +228,4 @@ Document inputs go to **your chosen task repository**, not automatically to this
 
 Original code is **Apache-2.0**. Reused MIT helpers retain their licenses and provenance; dependencies keep their own licenses. See [LICENSE](LICENSE), [third-party notices](THIRD_PARTY_NOTICES.md) and [pins](pins.json).
 
-All development tests and document conversion/rendering/validation run in GitHub Actions. Local work is source editing, Git/transport operations and inspecting downloaded artifacts. Generic Word fixtures belong in the source repository for qualification and are excluded from the installation ZIP. Review and update the explicit inventory before publishing new scope.
+Our automated release qualification runs in GitHub Actions and includes actual local execution without Actions variables. With the dependencies installed, developers can also run the tests locally. Generic Word fixtures belong in the source repository for qualification and are excluded from the installation ZIP. Review and update the explicit inventory before publishing new scope.

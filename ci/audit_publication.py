@@ -17,7 +17,7 @@ FORBIDDEN_PARTS = {
     'consumer-policies', 'public-paper', 'model',
 }
 ROOT_FILES = {
-    '.gitignore', 'LICENSE', 'README.md', 'README.zh-CN.md', 'THIRD_PARTY_NOTICES.md',
+    '.gitignore', '.dockerignore', 'Dockerfile', 'LICENSE', 'README.md', 'README.zh-CN.md', 'THIRD_PARTY_NOTICES.md',
     'pins.json', 'pyproject.toml', 'publication-manifest.json',
     'requirements.lock', 'requirements-resolved.lock',
 }

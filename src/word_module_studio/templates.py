@@ -6,7 +6,7 @@ from pathlib import Path
 from lxml import etree as E
 from .contracts import validate
 from .package import Package, W, NS
-from .runtime import require_actions, WordError, digest, write_json, run
+from .runtime import require_execution, WordError, digest, write_json, run
 
 
 def canonical_spec(spec):
@@ -14,7 +14,7 @@ def canonical_spec(spec):
 
 
 def check_fonts(fonts):
-    require_actions()
+    require_execution()
     found = {}
     for role, family in fonts.items():
         match = run(['fc-match', '-f', '%{family}\n%{file}\n%{index}', family]).splitlines()
@@ -31,7 +31,7 @@ def child(parent, tag, attrs=None):
 
 
 def build(spec, folder):
-    require_actions()
+    require_execution()
     validate('template-spec', spec)
     if len({r['id'] for r in spec['regions']}) != len(spec['regions']): raise WordError('DUPLICATE_REGION')
     for region in spec['regions']:
@@ -201,7 +201,7 @@ def build(spec, folder):
 
 
 def check_identity(manifest):
-    require_actions()
+    require_execution()
     if manifest['id'] != manifest['spec']['id'] or manifest['version'] != manifest['spec']['version']: raise WordError('TEMPLATE_IDENTITY_MISMATCH')
     if canonical_spec(manifest['spec']) != manifest['spec_sha256']: raise WordError('TEMPLATE_SPEC_CHANGED')
     if digest(manifest['master']) != manifest['master_sha256']: raise WordError('TEMPLATE_MASTER_CHANGED')
@@ -212,7 +212,7 @@ def check_identity(manifest):
 
 def register(manifest, composition, visual, destination):
     """Register only the exact master used by an accepted composition proof."""
-    require_actions(); check_identity(manifest)
+    require_execution(); check_identity(manifest)
     if not composition.get('automatic_pass') or not visual.get('automatic_pass') or not visual.get('visual_review_complete') or not visual.get('delivery_accepted'):
         raise WordError('TEMPLATE_ACCEPTANCE_REQUIRED')
     identity = {key: manifest[key] for key in ('id', 'version', 'spec_sha256', 'master_sha256')}
@@ -247,5 +247,5 @@ def protected_structure(path):
 
 
 def verify_locked(path, manifest):
-    require_actions()
+    require_execution()
     if protected_structure(path) != protected_structure(manifest['master']): raise WordError('TEMPLATE_STRUCTURE_CHANGED')

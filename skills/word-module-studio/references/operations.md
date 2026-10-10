@@ -1,6 +1,6 @@
 # Operations
 
-Cloud API: `snapshot(path)`; `execute(batch, input_path, output_path, template=manifest)`.
+Shared local/Actions API: `snapshot(path)`; `execute(batch, input_path, output_path, template=manifest)`.
 Snapshot objects have IDs bound to the input fingerprint. Every batch declares schema version,
 mode, input hash and uniquely named module operations. Inputs stay untouched; invalid operations
 roll back the output transaction. Source-specific positions are translated inside the engine.

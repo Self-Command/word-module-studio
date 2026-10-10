@@ -3,7 +3,7 @@ from copy import deepcopy
 from lxml import etree as E
 from .package import W, NS, ID
 from .context import LayoutContext
-from .runtime import require_actions, WordError
+from .runtime import require_execution, WordError
 from .captions import caption
 
 
@@ -16,7 +16,7 @@ def _set(parent, name, attributes=None):
 
 
 def apply(package, target, props):
-    require_actions()
+    require_execution()
     table = target['element']
     if table.tag != W + 'tbl': raise WordError('TABLE_REQUIRED')
     operation = props.get('operation', 'format')

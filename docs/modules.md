@@ -37,7 +37,7 @@ geometry and checks the registered master/spec/font fingerprints.
 | M19 Template/fonts | `templates.build`, identity and protection checks | TemplateSpec, explicit font scheme and immutable master |
 | M20 Proof/review | `render`, `geometry`, `receipt`, SDK and semantic differences | PDF+PNG, run and file fingerprints; manual page observations required |
 
-Common failures: `CLOUD_ONLY`, `STALE_INPUT`, `INVALID_TARGET`, `UNSUPPORTED_PROPERTY`,
+Common failures: `DEPENDENCY_MISSING`, `STALE_INPUT`, `INVALID_TARGET`, `UNSUPPORTED_PROPERTY`,
 `MODULE_ELEMENT_MISMATCH`, `FONT_MISSING`, `BROKEN_RELATIONSHIP`, `BROKEN_REFERENCE`,
 `UNKNOWN_PART_CHANGED`, `UNDECLARED_RUN_CONTENT_CHANGE`, `FORMULA_CANNOT_FIT`,
 `TABLE_CANNOT_FIT`, `TABLE_SPLIT_CROSSES_MERGE`, `TEMPLATE_VERSION_REUSE`,

@@ -1,4 +1,4 @@
-"""The only local entry points: explicit-file submission, status and fetch."""
+"""Local execution and optional explicit-file GitHub Actions transport."""
 import sys
 # Direct invocation must not expose the package's math.py as the stdlib math
 # module while argparse/pathlib initialise. Module invocation needs no change.
@@ -55,13 +55,31 @@ def submit(repository, manifest_file, engine_commit):
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Cloud-only Word operations: submit/status/fetch')
+    parser = argparse.ArgumentParser(description='Word tasks: run locally or submit to GitHub Actions')
     commands = parser.add_subparsers(dest='command', required=True)
+    local = commands.add_parser('run', help='Execute locally without a GitHub account')
+    local.add_argument('--manifest', required=True); local.add_argument('--output', required=True)
+    check = commands.add_parser('doctor', help='Check local dependencies without installing or uploading')
+    check.add_argument('--profile', choices=('inspect', 'full'), default='full')
     send = commands.add_parser('submit'); send.add_argument('--repo', required=True); send.add_argument('--manifest', required=True); send.add_argument('--engine-commit', required=True)
     status = commands.add_parser('status'); status.add_argument('--repo', required=True); status.add_argument('--run-id', required=True)
     fetch = commands.add_parser('fetch'); fetch.add_argument('--repo', required=True); fetch.add_argument('--run-id', required=True); fetch.add_argument('--dir', required=True)
     args = parser.parse_args()
-    if args.command == 'submit': print(json.dumps(submit(args.repo, args.manifest, args.engine_commit), ensure_ascii=False, indent=2))
+    if args.command in ('run', 'doctor'):
+        # Direct source/installed-skill invocation must find sibling modules without shadowing stdlib math.
+        sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+        from word_module_studio.local import execute_local, doctor
+        if args.command == 'doctor':
+            result = doctor(args.profile); print(json.dumps(result, ensure_ascii=False, indent=2))
+            if not result['ready']: raise SystemExit(2)
+        else:
+            from word_module_studio.runtime import WordError
+            try: print(json.dumps(execute_local(args.manifest, args.output), ensure_ascii=False, indent=2))
+            except WordError as exc:
+                print(json.dumps({'error': str(exc)}, ensure_ascii=False), file=sys.stderr); raise SystemExit(2)
+            except ImportError as exc:
+                print(json.dumps({'error': 'DEPENDENCY_MISSING: ' + str(exc)}, ensure_ascii=False), file=sys.stderr); raise SystemExit(2)
+    elif args.command == 'submit': print(json.dumps(submit(args.repo, args.manifest, args.engine_commit), ensure_ascii=False, indent=2))
     elif args.command == 'status': print(gh(['run', 'view', args.run_id, '--repo', args.repo, '--json', 'status,conclusion,url,jobs']))
     else: print(gh(['run', 'download', args.run_id, '--repo', args.repo, '--dir', str(Path(args.dir).resolve())]))
 

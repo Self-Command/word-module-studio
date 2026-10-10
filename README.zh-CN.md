@@ -4,7 +4,7 @@
 
 独立、通用的 **Word DOCX 创建、编辑与复检技能**。可通过 Codex 技能、显式 JSON 任务或 Python API 调用。普通文档编辑和受模板约束的文档共用同一套内核。
 
-内核组合固定版本的 OfficeCLI、Open XML SDK、Pandoc 和 LibreOffice。**文档操作、测试、转换和渲染在 GitHub Actions 执行**；本地负责提交明确列出的文件、查询状态和下载结果。不需要额外模型 API。
+内核组合固定版本的 OfficeCLI、Open XML SDK、Pandoc 和 LibreOffice。**用户可选择本地执行或 GitHub Actions**。本地任务无需 GitHub 账号、仓库、凭证或 Actions 环境变量；可配置本机依赖直接运行，也可选择本地 Docker 环境。不需要额外模型 API。
 
 适用于报告、说明书、方案等需要可编辑文字、公式、表格、图表和统一排版的结构化文档。具体业务内容和规则由调用方提供。
 
@@ -58,11 +58,50 @@
 1. 从[最新发行页](https://github.com/Self-Command/word-module-studio/releases/latest)下载 ZIP。
 2. 将完整的 **`word-module-studio` 文件夹**放入 `$CODEX_HOME/skills`；未设置 `CODEX_HOME` 时使用 `~/.codex/skills`。保留 `SKILL.md`、`references/`、`agents/` 和 `core/`。
 3. 确认当前 Codex 会话可以发现技能。升级前保存已验证的旧文件夹，回退时恢复它。
-4. 按下面说明配置任务仓库。安装技能不会自动配置 GitHub 执行。
+4. 按下面说明选择执行方式；只有选择 Actions 时才需要任务仓库。
 
 ZIP 包含运行内核、契约、任务工作流、文档及相关效果图片，不含测试素材、测试代码、用户文档或业务适配器。批准发布的文件见 [publication-manifest.json](publication-manifest.json)。
 
-## 配置执行环境
+## 选择执行地点
+
+| 方式 | 需要什么 | 文档在哪里处理 |
+| --- | --- | --- |
+| 本地 Python／命令行 | Python 依赖，以及所用操作的本机后端 | 本地任务与输出文件夹 |
+| 可选的本地 Docker | 支持 Linux 容器的 Docker；构建镜像时下载固定依赖 | 本地挂载文件夹；运行时可禁用网络 |
+| 可选的 GitHub Actions | 自己的任务仓库、`gh` 登录与 Actions 权限 | 用户指定的公有或私有任务仓库 |
+
+安装技能不要求 GitHub。缺本地依赖时会报告缺项，不会自动安装软件、上传文档或切换到 Actions。
+
+### 本地 Python
+
+在安装后的技能文件夹中，安装固定版本的 Python 依赖并检查环境：
+
+```powershell
+python -m pip install -r core/requirements-resolved.lock
+python core/src/word_module_studio/client.py doctor --profile inspect
+python core/src/word_module_studio/client.py run --manifest "PATH_TO_TASK/task.json" --output "PATH_TO_OUTPUT/inspect-001"
+```
+
+若直接导入 Python API，可在选定环境中再运行 `python -m pip install --no-deps -e core`。检查任务的清单示例在下文。完整编辑和校样前使用不带 `--profile inspect` 的 `doctor`。每次选新的或空的输出文件夹；执行器只把清单文件暂存到 `.inputs`，保留原件，生成含 `execution: local`、`local-...` 运行标识、内核版本与源码指纹的 `task-report.json`。本地任务不要求 Git 提交。
+
+检查功能需要 Python 依赖。编辑与完整校样还需要 OfficeCLI、编译后的 Open XML SDK 辅助程序、Pandoc、带 UNO Python 的 LibreOffice、Poppler 与 fontconfig。固定的本机环境在 Linux x64 验证；Ubuntu 24.04／WSL x64 可在 `core/` 中先创建并激活 Python 虚拟环境，再运行 `bash ci/bootstrap.sh` 和 `bash ci/render-bootstrap.sh`，它们会下载后端和安装系统包，需要时使用 `sudo`。其他原生平台需自行验证依赖与渲染。下面的可选本地 Linux 容器提供完整配置。
+
+程序从 `core/.tools` 或 `PATH` 查找，也可用 `WMS_OFFICECLI`、`WMS_DOTNET`、`WMS_PANDOC`、`WMS_LIBREOFFICE`、`WMS_UNO_PYTHON`、`WMS_SDK_DLL`、`WMS_PDFTOPPM`、`WMS_PDFFONTS`、`WMS_FC_MATCH` 指定路径。路径表示单个程序，不能填 shell 命令。UNO Python 必须能够导入 `uno`。
+
+### 可选：本地 Docker
+
+安装后从 `core/` 构建；源码仓库使用 `.`。Docker 是一种本地环境选择，并非技能必需条件：
+
+```powershell
+docker build --platform linux/amd64 -t word-studio-local core
+$wordTaskPath = (Resolve-Path "PATH_TO_TASK").Path
+$wordOutputPath = (New-Item -ItemType Directory -Force "PATH_TO_OUTPUT").FullName
+docker run --rm --platform linux/amd64 --network none --mount "type=bind,source=$wordTaskPath,target=/input,readonly" --mount "type=bind,source=$wordOutputPath,target=/output" word-studio-local run --manifest /input/task.json --output /output/inspect-001
+```
+
+构建时下载一次依赖；上述运行命令禁用网络，无需 GitHub 登录。任务文件夹只读挂载，产物留在本地输出文件夹。编辑、渲染等任务沿用相同清单和命令，换新的输出子文件夹。操作属性中的显式文件路径要指向可访问的本地文件；Docker 模式使用对应的容器挂载路径。
+
+## 可选：配置 GitHub Actions
 
 需要 **Python 3.12+**、**GitHub CLI（`gh`）**、写任务分支和触发 Actions 的权限，以及已初始化且启用 Actions 的任务仓库。任务仓库可以是私有仓库。无需在本地安装 Word 或文档处理依赖；工作流会安装固定版本的云端依赖。
 
@@ -72,12 +111,12 @@ ZIP 包含运行内核、契约、任务工作流、文档及相关效果图片�
 4. 用完整提交 SHA 固定内核；可通过当前独立发行版标签解析：
 
 ```powershell
-$wordEngineCommit = gh api repos/Self-Command/word-module-studio/git/ref/tags/v0.1.1 --jq ".object.sha"
+$wordEngineCommit = gh api repos/Self-Command/word-module-studio/git/ref/tags/v0.1.2 --jq ".object.sha"
 ```
 
 将得到的 40 位 SHA 与任务一起保留，不要用会移动的分支名称。安装包入口是 `core/src/word_module_studio/client.py`；直接使用源码时改为 `src/word_module_studio/client.py`。
 
-## 第一个任务：检查已有 DOCX
+## 任务清单：检查已有 DOCX
 
 在**技能和源码仓库之外**创建本地任务文件夹，放入 `input.docx` 和以下 `task.json`：
 
@@ -96,14 +135,14 @@ python core/src/word_module_studio/client.py submit --repo YOUR_NAME/word-tasks 
 gh run list --repo YOUR_NAME/word-tasks --workflow document-task.yml --limit 5
 ```
 
-提交结果包含 `task_id` 和状态链接。找到标题为 `Word task TASK_ID` 的运行，取得数字运行 ID 后查询、下载：
+Actions 提交结果包含 `task_id` 和状态链接。找到标题为 `Word task TASK_ID` 的运行，取得数字运行 ID 后查询、下载：
 
 ```powershell
 python core/src/word_module_studio/client.py status --repo YOUR_NAME/word-tasks --run-id RUN_ID
 python core/src/word_module_studio/client.py fetch --repo YOUR_NAME/word-tasks --run-id RUN_ID --dir outputs
 ```
 
-下载的 `task-report.json` 包含 `result.snapshot.sha256`、对象 ID、能力目录和辅助检查结果。检查不会修改原文档。下载内容位于各自 artifact 子文件夹。
+本地或下载的 `task-report.json` 包含 `result.snapshot.sha256`、对象 ID、能力目录和辅助检查结果。检查不会修改原文档。下载内容位于各自 artifact 子文件夹。
 
 ## 修改已有文档
 
@@ -122,7 +161,7 @@ python core/src/word_module_studio/client.py fetch --repo YOUR_NAME/word-tasks -
 }
 ```
 
-使用以下清单，通过同一入口提交：
+使用以下清单，按所选执行方式运行：
 
 ```json
 {
@@ -149,7 +188,7 @@ python core/src/word_module_studio/client.py fetch --repo YOUR_NAME/word-tasks -
 
 正式新文档需明确字体方案。[通用组合配置](examples/core-layout.json)展示主题、中文与分页规则、分栏、AutoFit、字体嵌入和公式策略；示例值可按用户文档调整。
 
-模板采用 `template-build` → `template-probe` → 页面复检及 `visual-receipt` → `template-register`。随后用 `compose` 提交 Markdown、已登记清单和未修改的 DOCX 母版，并明确列出数据、图片、参考文献或字体。`font_scheme` 必须与模板一致。Actions 内的 Python API 可探测候选模板，但探测不等于登记。
+模板采用 `template-build` → `template-probe` → 页面复检及 `visual-receipt` → `template-register`。随后用 `compose` 提交 Markdown、已登记清单和未修改的 DOCX 母版，并明确列出数据、图片、参考文献或字体。`font_scheme` 必须与模板一致。所选环境中的 Python API 可探测候选模板，但探测不等于登记。
 
 [任务指南](examples/README.md)说明输入角色和模板流程，[TemplateSpec](schemas/template-spec.schema.json)是权威配置。Actions 内可调用：
 
@@ -163,7 +202,7 @@ compose("document.md", manifest, "build/document.docx", resources=["figure.png"]
 render("build/document.docx", "build/proof")
 ```
 
-文档 API 拒绝本地执行；本地只运行提交、查询和下载。
+文档 API 可在本地或 Actions 执行。`run` 是本地执行入口；`submit`、`status`、`fetch` 仅用于用户选择的 Actions 方式。
 
 ## 输出与复检
 
@@ -175,7 +214,7 @@ render("build/document.docx", "build/proof")
 
 本仓库只包含通用技能、内核、接口、工作流、通用 Word 回归输入、证据、示例和许可证。[发布检查](ci/audit_publication.py)拒绝明确清单之外的跟踪文件，检查 README 链接，并核对效果图片与已接受页面。打包按批准文件逐项复制。
 
-输入进入**自己选择的任务仓库**，不会自动进入本源码仓库。每次只上传清单文件，创建任务分支，Actions 产物保留 30 天。任务提交会一直保留，直到你自行管理，不会自动删除。上传敏感文档前先选择合适的仓库可见性。自定义字体安装在临时运行环境，需具备相应使用与再分发权限。
+本地执行读取明确文件、写入所选输出文件夹，不上传文档。只有选择 Actions 时，输入才进入**自己选择的任务仓库**，不会自动进入本源码仓库。每次只上传清单文件，创建任务分支，Actions 产物保留 30 天。任务提交会一直保留，直到你自行管理，不会自动删除。上传敏感文档前先选择合适的仓库可见性。自定义字体校样使用任务临时 fontconfig 环境，不永久安装到个人字体目录；字体使用与嵌入需具备相应权限。
 
 ## 已知限制
 
@@ -189,4 +228,4 @@ render("build/document.docx", "build/proof")
 
 原创源码采用 **Apache-2.0**；复用 MIT 工具保留许可证与来源，依赖使用各自许可证。见 [LICENSE](LICENSE)、[第三方说明](THIRD_PARTY_NOTICES.md)和[依赖锁定](pins.json)。
 
-开发测试、文档转换、渲染和程序验收均在 GitHub Actions。本地负责编辑源码、Git／传输及下载产物检查。源码包含用于验证的通用 Word 素材，安装 ZIP 排除它们。发布范围变化时，应先审阅并更新明确文件清单，再通过 CI 和发行检查。
+项目的自动发布复检在 GitHub Actions 执行，并验证不带 Actions 环境变量的真实本地执行路径。开发者配置好依赖后也可在本地运行测试。源码包含用于验证的通用 Word 素材，安装 ZIP 排除它们。发布范围变化时，应先审阅并更新明确文件清单，再通过 CI 和发行检查。

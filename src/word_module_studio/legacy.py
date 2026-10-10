@@ -1,11 +1,11 @@
 """Optional docxtpl compatibility fill with registered physical-rule verification."""
 from pathlib import Path
-from .runtime import require_actions, WordError, digest, write_json, run
+from .runtime import require_execution, WordError, digest, write_json, run
 from .templates import check_identity, verify_locked
 
 
 def fill(manifest, output, data):
-    require_actions(); check_identity(manifest)
+    require_execution(); check_identity(manifest)
     def semantic(value):
         if isinstance(value, dict): return all(isinstance(k, str) and semantic(v) for k, v in value.items())
         if isinstance(value, list): return all(semantic(v) for v in value)

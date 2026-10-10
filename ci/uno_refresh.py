@@ -11,8 +11,6 @@ import re
 from xml.etree import ElementTree
 from com.sun.star.beans import PropertyValue
 
-if os.environ.get('GITHUB_ACTIONS') != 'true' or not os.environ.get('GITHUB_RUN_ID'): raise RuntimeError('CLOUD_ONLY')
-
 
 def prop(name, value):
     result = PropertyValue(); result.Name = name; result.Value = value; return result

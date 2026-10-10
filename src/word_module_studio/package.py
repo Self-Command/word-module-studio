@@ -7,7 +7,7 @@ from pathlib import Path
 import re
 from zipfile import ZipFile, ZIP_DEFLATED
 from lxml import etree as E
-from .runtime import require_actions, WordError, digest
+from .runtime import require_execution, WordError, digest
 
 NS = {"w": "http://schemas.openxmlformats.org/wordprocessingml/2006/main",
       "m": "http://schemas.openxmlformats.org/officeDocument/2006/math",
@@ -29,7 +29,7 @@ KINDS.update({name: 'revision' for name in ('ins', 'del', 'moveFrom', 'moveTo', 
 
 class Package:
     def __init__(self, path):
-        require_actions()
+        require_execution()
         self.path = Path(path)
         with ZipFile(path) as z:
             if len(set(z.namelist())) != len(z.namelist()): raise WordError("DUPLICATE_PACKAGE_PART")
@@ -45,7 +45,7 @@ class Package:
         return self.roots[part]
 
     def save(self, path=None):
-        require_actions()
+        require_execution()
         for name, root in self.roots.items():
             if E.tostring(root, method='c14n') != self.original_trees[name]:
                 self.parts[name] = E.tostring(root, xml_declaration=True, encoding="UTF-8", standalone=True)
@@ -54,7 +54,7 @@ class Package:
             for name, data in self.parts.items(): z.writestr(name, data)
 
     def objects(self, stamp=False):
-        require_actions()
+        require_execution()
         objects = []
         used = {node.get(ID) for part in self.parts if part.startswith('word/') and part.endswith('.xml')
                 for node in self.xml(part).iter() if node.get(ID)}
@@ -142,7 +142,7 @@ def native_path(element, part, sections):
 
 
 def snapshot(path):
-    require_actions()
+    require_execution()
     package = Package(path)
     from dataclasses import asdict
     from .context import LayoutContext
@@ -164,7 +164,7 @@ def snapshot(path):
 
 
 def semantic(path):
-    require_actions()
+    require_execution()
     package = Package(path)
     result = {}
     for part in package.parts:

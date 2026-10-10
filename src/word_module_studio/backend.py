@@ -1,11 +1,11 @@
 """No shell evaluation, auto-install, best-effort batch or HTML acceptance."""
 import json
-from .runtime import require_actions, run, WordError
+from .runtime import require_execution, run, WordError
 
 
 class OfficeBackend:
     def invoke(self, command, document, path=None, *, kind=None, props=None, extra=None):
-        require_actions()
+        require_execution()
         args = ["officecli", command, document]
         if path is not None: args.append(path)
         if kind: args.extend(["--type", kind])

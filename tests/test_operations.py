@@ -43,10 +43,13 @@ def test_stale_input_rejected(document, tmp_path):
     with pytest.raises(WordError, match='STALE_INPUT'): execute(request, document, tmp_path / 'result.docx')
 
 
-def test_local_guard_before_any_business(monkeypatch, tmp_path):
+def test_document_apis_work_without_actions(monkeypatch, document, tmp_path):
     monkeypatch.delenv('GITHUB_ACTIONS')
-    with pytest.raises(WordError, match='CLOUD_ONLY'): snapshot(tmp_path / 'missing.docx')
-    with pytest.raises(WordError, match='CLOUD_ONLY'): execute({}, tmp_path / 'missing.docx', tmp_path / 'result.docx')
+    monkeypatch.delenv('GITHUB_RUN_ID')
+    snap = snapshot(document)
+    request = batch(document, [{'id': 'read', 'module': 'M01', 'action': 'get', 'target': snap['objects'][0]['id']}])
+    report = execute(request, document, tmp_path / 'local.docx')
+    assert report['automatic_pass'] and (tmp_path / 'local.docx').is_file()
 
 
 def test_contract_rejects_layout_profile(document, tmp_path):

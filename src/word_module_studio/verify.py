@@ -2,11 +2,11 @@
 import posixpath
 import re
 from .package import Package, NS, W, M, semantic
-from .runtime import require_actions, WordError
+from .runtime import require_execution, WordError
 
 
 def relationships(path):
-    require_actions()
+    require_execution()
     package = Package(path)
     checked = []
     for part in package.parts:
@@ -36,7 +36,7 @@ def relationships(path):
 
 
 def preservation(before, after, operations):
-    require_actions()
+    require_execution()
     initial, final = semantic(before), semantic(after)
     from .package import ID
     old_package, new_package = Package(before), Package(after)

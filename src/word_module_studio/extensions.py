@@ -5,11 +5,11 @@ from pathlib import Path
 import tempfile
 from lxml import etree as E
 from .package import W, NS, ID
-from .runtime import require_actions, WordError, run
+from .runtime import require_execution, artifact_folder, WordError, run
 
 
 def apply(package, target, module, props):
-    require_actions()
+    require_execution()
     if module == 'M09':
         from .math import apply as math_apply
         return math_apply(package, target, props)
@@ -60,7 +60,7 @@ def apply(package, target, module, props):
         from .field_cache import refresh
         package.save()
         with tempfile.TemporaryDirectory() as temporary:
-            result = refresh(package.path, Path(temporary) / 'refreshed.docx', Path('build/field-proofs') / target['id'])
+            result = refresh(package.path, Path(temporary) / 'refreshed.docx', artifact_folder('field-proofs') / target['id'])
             package.parts = type(package)(Path(temporary) / 'refreshed.docx').parts
             package.roots, package.original_trees = {}, {}
         return result

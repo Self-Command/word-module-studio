@@ -31,9 +31,9 @@ caps, table policies, field-result transplantation, practical OMML and container
 integrated and composable through the current contracts. The original 85-test run remains
 historical evidence and is not used as completion of these additions.
 
-All tests, conversion, rendering, validation and distribution checks execute in GitHub
-Actions. Local work is source editing, transport, artifact inspection and transcription of
-the completed visual review. The original editable DOCX is retained; UNO exports are
+The qualification runs referenced here execute in GitHub Actions. Users can choose local
+Python, an optional local Docker environment, or Actions; the document API has no Actions
+requirement. The current development session uses cloud verification for these changes. The original editable DOCX is retained; UNO exports are
 diagnostic, and only supported field caches are transplanted into a distinct delivery copy.
 
 LibreOffice 26.8.1 is the qualified compatibility renderer. Microsoft Word native rendering

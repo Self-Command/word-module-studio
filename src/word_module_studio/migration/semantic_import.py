@@ -7,11 +7,11 @@ Unknown commands and any raw layout object still fail closed.
 from pathlib import Path
 import json
 import re
-from .runtime import require_actions,run,StudioError,write_json
+from .runtime import require_execution,run,StudioError,write_json
 
 
 def expand_semantic_tex(ast,output):
-    require_actions()
+    require_execution()
     records=[]
     def expand(node):
         if not isinstance(node,dict):return node

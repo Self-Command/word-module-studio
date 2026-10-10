@@ -4,7 +4,7 @@ import shutil
 from pathlib import Path
 import tempfile
 from contextlib import contextmanager
-from .runtime import require_actions, WordError, digest, write_json, run
+from .runtime import require_execution, WordError, digest, write_json, run
 from .package import Package, snapshot, semantic
 from .backend import OfficeBackend
 from .capabilities import check_properties
@@ -17,7 +17,7 @@ PHYSICAL = {"font", "font.eastasia", "font.ascii", "size", "bold", "italic", "co
 
 
 def execute(batch, input_path, output_path, *, template=None):
-    require_actions()
+    require_execution()
     from .contracts import validate
     validate("operation-batch", batch)
     if len({o['id'] for o in batch['operations']}) != len(batch['operations']): raise WordError('DUPLICATE_OPERATION_ID')
@@ -120,7 +120,7 @@ def execute(batch, input_path, output_path, *, template=None):
 
 @contextmanager
 def transaction_work(output):
-    require_actions()
+    require_execution()
     with tempfile.TemporaryDirectory(dir=output.parent) as temporary:
         work = Path(temporary) / 'transaction.docx'
         try: yield work

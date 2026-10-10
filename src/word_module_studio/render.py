@@ -7,14 +7,14 @@ import socket
 import subprocess
 import tempfile
 import pdfplumber
-from .runtime import require_actions, WordError, run, write_json, digest
+from .runtime import require_execution, execution_context, tool, WordError, run, write_json, digest
 from .package import Package, NS, W, semantic
 
 ROOT = Path(__file__).resolve().parents[2]
 
 
 def render(source, folder):
-    require_actions()
+    require_execution()
     source, folder = Path(source).resolve(), Path(folder).resolve()
     folder.mkdir(parents=True, exist_ok=True)
     pdf = folder / (source.stem + '.pdf')
@@ -34,7 +34,7 @@ def render(source, folder):
         with socket.socket() as connection:
             connection.bind(('127.0.0.1', 0)); port = connection.getsockname()[1]
         profile = Path(temporary) / 'profile'
-        process = subprocess.Popen(['libreoffice', '-env:UserInstallation=' + profile.as_uri(), '--headless', '--norestore', '--nodefault',
+        process = subprocess.Popen([tool('libreoffice'), '-env:UserInstallation=' + profile.as_uri(), '--headless', '--norestore', '--nodefault',
             f'--accept=socket,host=127.0.0.1,port={port};urp;StarOffice.ServiceManager'], stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
         try:
             run(['/usr/bin/python3', ROOT / 'ci/uno_refresh.py', source, pdf, port, math_input], timeout=120)
@@ -61,8 +61,10 @@ def render(source, folder):
     containers = check(source, pdf, layout)
     issues.extend(containers['issues'])
     report = {'schema_version': 1, 'build_success': True, 'automatic_pass': not any(i['severity'] == 'error' for i in issues),
-        'visual_review_complete': False, 'delivery_accepted': False, 'renderer': 'LibreOffice 26.8.1 compatibility proof; not Microsoft Word native rendering',
-        'run_id': os.environ['GITHUB_RUN_ID'], 'input_sha256': digest(source), 'output_sha256': digest(pdf),
+        'visual_review_complete': False, 'delivery_accepted': False,
+        'renderer': run(['libreoffice', '--version']).strip() + ' compatibility proof; not Microsoft Word native rendering',
+        'execution': execution_context()['mode'], 'run_id': execution_context()['run_id'],
+        'input_sha256': digest(source), 'output_sha256': digest(pdf),
         'pages': [{'file': p.name, 'sha256': digest(p)} for p in pages], 'convergence': fingerprints,
         'issues': issues, 'container_proof': containers, 'actual_fonts': pdf_fonts(pdf),
         'font_resolution': font_resolution(source),
@@ -72,7 +74,7 @@ def render(source, folder):
 
 
 def geometry(pdf):
-    require_actions()
+    require_execution()
     issues = []
     with pdfplumber.open(pdf) as document:
         for index, page in enumerate(document.pages, 1):
@@ -96,7 +98,7 @@ def geometry(pdf):
 
 
 def pdf_fonts(pdf):
-    require_actions()
+    require_execution()
     with pdfplumber.open(pdf) as document:
         return sorted({c['fontname'] for page in document.pages for c in page.chars})
 
@@ -150,7 +152,7 @@ def font_resolution(source):
 
 
 def receipt(proof_folder, value):
-    require_actions()
+    require_execution()
     proof_folder = Path(proof_folder)
     report = json.loads((proof_folder / 'render-report.json').read_text())
     if value.get('run_id') != report['run_id'] or value.get('output_sha256') != report['output_sha256']:

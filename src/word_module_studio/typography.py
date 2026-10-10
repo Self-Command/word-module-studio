@@ -1,7 +1,7 @@
 """Adapters to pinned OfficeCLI format properties and SDK native layout objects."""
 from pathlib import Path
 import tempfile
-from .runtime import require_actions, WordError, run, digest
+from .runtime import require_execution, WordError, run, digest
 from .backend import OfficeBackend
 
 DOCUMENT_PROPERTIES = {'docGrid.type', 'docGrid.linePitch', 'docGrid.charSpace', 'charSpacingControl', 'autoHyphenation',
@@ -25,7 +25,7 @@ def native_properties(package, path, kind, properties):
 
 
 def apply(package, target, module, props):
-    require_actions()
+    require_execution()
     from .extensions import _sdk
     operation = props.get('operation')
     if operation == 'theme':

@@ -1,0 +1,23 @@
+name: Local runtime qualification
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  local-container:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - run: docker build --platform linux/amd64 -t word-studio-local .
+      - run: |
+          mkdir -p build/local-runtime
+          docker run --rm --network none --volume "$PWD/build/local-runtime:/work" --volume "$PWD/ci/local_smoke.py:/verification.py:ro" --entrypoint python word-studio-local /verification.py
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: local-runtime-${{ github.run_id }}
+          path: build/local-runtime/
+          retention-days: 30

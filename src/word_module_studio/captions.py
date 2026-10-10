@@ -3,11 +3,11 @@ import re
 from copy import deepcopy
 from lxml import etree as E
 from .package import W, NS
-from .runtime import require_actions, WordError
+from .runtime import require_execution, WordError
 
 
 def caption(sequence, title, number, *, prefix=None, continuation=False, bookmark=None, position='below'):
-    require_actions()
+    require_execution()
     if sequence not in ('Figure', 'Table', 'Equation'): raise WordError('INVALID_CAPTION_SEQUENCE')
     if not title.strip(): raise WordError('CAPTION_TITLE_REQUIRED')
     p = E.Element(W + 'p')
@@ -35,7 +35,7 @@ def caption(sequence, title, number, *, prefix=None, continuation=False, bookmar
 
 
 def apply(package, target, props):
-    require_actions()
+    require_execution()
     allowed = {'operation', 'sequence', 'title', 'number', 'prefix', 'position', 'bookmark', 'continuation'}
     if set(props) - allowed: raise WordError('CAPTION_PROPERTY_UNSUPPORTED')
     p = caption(props['sequence'], props['title'], props['number'], prefix=props.get('prefix'),

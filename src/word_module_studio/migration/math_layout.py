@@ -4,7 +4,7 @@ import re
 from lxml import etree
 from docx.oxml import OxmlElement
 from .docx_layout import M, W, math_width_pt
-from .runtime import StudioError, require_actions
+from .runtime import StudioError, require_execution
 
 
 def tree(element):
@@ -32,7 +32,7 @@ def restore(root, changes):
 
 
 def wrap(root, width_pt, font_size_pt=10, array_padding_pt=0, metrics=None):
-    require_actions()
+    require_execution()
     before = deepcopy(root); changes = []
     def measure(element):return math_width_pt(element,font_size_pt,metrics)
     # Pandoc represents TeX setminus by ASCII backslash. LibreOffice treats that

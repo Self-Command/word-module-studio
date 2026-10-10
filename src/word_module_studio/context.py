@@ -3,7 +3,7 @@ from dataclasses import dataclass
 import posixpath
 from lxml import etree as E
 from .package import W, NS
-from .runtime import require_actions, WordError
+from .runtime import require_execution, WordError
 
 R = '{' + NS['r'] + '}'
 A = '{http://schemas.openxmlformats.org/drawingml/2006/main}'
@@ -109,7 +109,7 @@ class LayoutContext:
 
     @classmethod
     def resolve(cls, package, item):
-        require_actions()
+        require_execution()
         sections = list(package.xml('word/document.xml').iter(W + 'sectPr'))
         if not sections: raise WordError('SECTION_GEOMETRY_MISSING')
         owners = owning_sections(package, item)
