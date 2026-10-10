@@ -25,7 +25,10 @@ def convert(formula, mode='display'):
         package = Package(native)
         matches = list(package.xml('word/document.xml').iter(M + 'oMath'))
         if len(matches) != 1: raise WordError('FORMULA_CONVERSION_FAILED', formula)
-        return deepcopy(matches[0])
+        result = deepcopy(matches[0])
+        from .math_alignment import adapt
+        adapt(result)
+        return result
 
 
 def apply(package, item, props, *, metrics=None):
@@ -79,7 +82,7 @@ def apply(package, item, props, *, metrics=None):
     formula_id = 'eq_' + __import__('hashlib').sha256((props['formula'] + ':' + str(props.get('number', ''))).encode()).hexdigest()[:16]
     formula.set('{' + NS['wms'] + '}formula', formula_id)
     adjustment = measured > budget + .1
-    result = {'formula_id': formula_id, 'original_math': original, 'changes': changes, 'mode': mode, 'number': props.get('number'),
+    result = {'formula_id': formula_id, 'source_formula': props['formula'], 'original_math': original, 'changes': changes, 'mode': mode, 'number': props.get('number'),
         'budget_pt': budget, 'estimated_width_pt': measured, 'policy': policy, 'break_strategy': strategy,
         'layout_status': 'needs_minor_adjustment' if adjustment else 'pass',
         'manual_adjustments': [{'formula_id': formula_id, 'reason': 'Estimated width needs real page review', 'suggestion': 'Adjust an outer operator break or continuation alignment; retain all mathematical content'}] if adjustment else [],

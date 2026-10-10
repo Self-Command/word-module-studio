@@ -53,6 +53,8 @@ try:
                 model.setPropertyValue(name, math_font)
             item.ExtendedControlOverEmbeddedObject.update()
         formula_fonts.append({'index': index, 'requested': math_font, 'formula': model.Formula,
+            'base_font_height_pt': model.BaseFontHeight,
+            'object_width_pt': item.Size.Width * 72 / 2540, 'object_height_pt': item.Size.Height * 72 / 2540,
             'actual': {name: model.getPropertyValue(name) for name in font_properties}})
     for iteration in range(3):
         document.TextFields.refresh()
@@ -78,15 +80,17 @@ try:
                 'columns': [{'width': c.Width, 'left_pt': c.LeftMargin * 72 / 2540,
                     'right_pt': c.RightMargin * 72 / 2540} for c in columns]}
             layout['paragraphs'].append({'text': item.String, 'page': cursor.Page,
-                'x_pt': cursor.Position.X * 72 / 2540, 'y_pt': cursor.Position.Y * 72 / 2540, 'page_geometry': page})
+                'x_pt': cursor.Position.X * 72 / 2540 + page['left_pt'],
+                'y_pt': cursor.Position.Y * 72 / 2540 + page['top_pt'], 'page_geometry': page})
     for name in document.TextTables.ElementNames:
         table = document.TextTables.getByName(name)
         rows = []
         try:
             for index in range(table.Rows.Count):
                 cell = table.getCellByPosition(0, index); cursor.gotoRange(cell.Start, False)
-                rows.append({'row': index, 'page': cursor.Page, 'x_pt': cursor.Position.X * 72 / 2540,
-                    'y_pt': cursor.Position.Y * 72 / 2540, 'text': cell.String})
+                style = document.StyleFamilies.getByName('PageStyles').getByName(cursor.PageStyleName)
+                rows.append({'row': index, 'page': cursor.Page, 'x_pt': (cursor.Position.X + style.LeftMargin) * 72 / 2540,
+                    'y_pt': (cursor.Position.Y + style.TopMargin) * 72 / 2540, 'text': cell.String})
         except Exception as exc:
             rows.append({'diagnostic': 'Merged table row positions need manual review: ' + str(exc)})
         layout['tables'].append({'name': name, 'rows': rows})

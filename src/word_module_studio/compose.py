@@ -176,6 +176,9 @@ def compose(markdown, manifest, output, *, region=None, resources=(), data=None)
     native = diagnostics / 'content.native.docx'
     run(['pandoc', '-f', 'json', '-t', 'docx', '-o', native, *(['--citeproc'] if ast.get('meta', {}).get('bibliography') else [])], input_text=json.dumps(ast), reject_warnings=True)
     source, destination = Document(native), Document(manifest['master'])
+    from .math_alignment import adapt
+    alignment_adapters = [record for math in source.element.body.iter(M + 'oMath') for record in adapt(math)]
+    write_json(diagnostics / 'alignment-conversion-adapters.json', alignment_adapters)
     expected_math = [deepcopy(m) for m in source.element.body.iter(M + 'oMath')]
     inline_attribute = '{' + NS['wms'] + '}inline_source'
     for index, math in enumerate(source.element.body.iter(M + 'oMath')): math.set(inline_attribute, str(index))

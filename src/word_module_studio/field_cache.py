@@ -35,7 +35,10 @@ def fields(root):
 
 
 def normalized(instruction):
-    return re.sub(r'\s+', ' ', re.sub(r'\\\*\s+MERGEFORMAT', '', instruction, flags=re.I)).strip().upper()
+    value = re.sub(r'\s+', ' ', re.sub(r'\\\*\s+MERGEFORMAT', '', instruction, flags=re.I)).strip().upper()
+    # Writer makes default decimal formatting explicit on exported sequence fields.
+    if value.startswith('SEQ '): value = re.sub(r'\s+\\\*\s+ARABIC\b', '', value)
+    return value
 
 
 def common(left, right):

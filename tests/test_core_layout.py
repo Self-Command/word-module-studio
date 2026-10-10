@@ -152,6 +152,7 @@ def test_practical_math_preserves_author_alignment(document, tmp_path):
     root = Package(output).xml('word/document.xml')
     assert ''.join(root.xpath('//m:t/text()', namespaces=NS)).count('=') == 2
     assert root.find('.//' + M + 'm') is not None or root.find('.//' + M + 'eqArr') is not None
+    assert '&' not in root.xpath('//m:t/text()', namespaces=NS)
     report = render(output, tmp_path / 'alignment-proof'); assert report['automatic_pass'], report['issues']
 
 
@@ -254,7 +255,7 @@ def test_generic_layout_gallery(tmp_path, variant):
         'Footnote target.[^note]\n\n[^note]: Retained footnote evidence.']
     markdown = tmp_path / 'layout.md'; markdown.write_text('\n\n'.join(paragraphs), encoding='utf-8')
     output = tmp_path / ('core-' + variant + '.docx'); composition = compose(markdown, manifest, output)
-    output = apply(output, tmp_path, 'M03', item(output, 'paragraph', 'مرحبا بالعالم'), props={'bidi': True, 'align': 'right'}, name='direction')
+    output = apply(output, tmp_path, 'M03', item(output, 'paragraph', 'مرحبا بالعالم'), props={'direction': 'rtl', 'align': 'right'}, name='direction')
     report = render(output, tmp_path / 'proof')
     assert report['automatic_pass'], report['issues']
     assert report['container_proof']['paragraphs']
