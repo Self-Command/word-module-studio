@@ -1,0 +1,164 @@
+{
+  "schema_version": 1,
+  "pages": [
+    {
+      "file": "page-1.png",
+      "sha256": "3bec695c8797b68260dda628258d7a65153b73d8b170101cd758af2b1c8af278"
+    },
+    {
+      "file": "page-2.png",
+      "sha256": "b83893b0ad64d8ff6ae202fe8da05f987599dc8045b1af296c0b757b912414f9"
+    },
+    {
+      "file": "page-3.png",
+      "sha256": "3e5d75a15774fb3b4ede69087ffd3c7539c1423947c5463a25c3af2c36fd983f"
+    },
+    {
+      "file": "page-4.png",
+      "sha256": "60733c592bc8cee8459aca2c9a61ebe1a876cc92d7d95db447648d3bfa103a7b"
+    }
+  ],
+  "output_sha256": "6a84754f551fdaf0e632fb721169ca566dc04af38649ab5f8fc1eea325c22cb8",
+  "checklist": [
+    {
+      "result": "pass",
+      "notes": "Page size, orientation, margins and content boundaries reviewed in the actual cloud page images.",
+      "id": "V01"
+    },
+    {
+      "result": "pass",
+      "notes": "Configured single/multiple columns and object positions reviewed; no text or object crosses its intended visible container.",
+      "id": "V02"
+    },
+    {
+      "result": "pass",
+      "notes": "Direct page inspection: Front section contains Module composition proof; sparse cover is intentional; footer reads Page 1 of 4. double body begins with Reusable modules and complete Chinese text; COLCHECK paragraphs flow within the configured columns; footer Page 2 of 4. double body continues across page and column boundaries without clipping or an empty page; footer Page 3 of 4. COLCHECK10 and COLCHECK11 precede full fraction E1 and two-case E2; signs, superscripts and conditions remain legible; equation labels align with their formula groups; table values 123 and 122 and Table 1 Observations are retained; footer Page 4 of 4. This page was also inspected at full PNG size.",
+      "id": "V03"
+    },
+    {
+      "result": "pass",
+      "notes": "No unintended blank page or clipped content; sparse isolated samples, explicit source breaks and final-page whitespace are intentional.",
+      "id": "V04"
+    },
+    {
+      "result": "pass",
+      "notes": "Direct page inspection: Front section contains Module composition proof; sparse cover is intentional; footer reads Page 1 of 4. double body begins with Reusable modules and complete Chinese text; COLCHECK paragraphs flow within the configured columns; footer Page 2 of 4. double body continues across page and column boundaries without clipping or an empty page; footer Page 3 of 4. COLCHECK10 and COLCHECK11 precede full fraction E1 and two-case E2; signs, superscripts and conditions remain legible; equation labels align with their formula groups; table values 123 and 122 and Table 1 Observations are retained; footer Page 4 of 4. This page was also inspected at full PNG size.",
+      "id": "V05"
+    },
+    {
+      "result": "pass",
+      "notes": "Actual PDF fonts: BAAAAA+LiberationSerif, CAAAAA+LiberationSerif-Bold, DAAAAA+NotoSerifCJKsc-Regular, EAAAAA+TeXGyrePagellaMath-Regular, FAAAAA+OpenSymbol, GAAAAA+LiberationSerif. Existing-document substitutions are accepted for this compatibility proof; source-family identity in Microsoft Word is not asserted.",
+      "id": "V06"
+    },
+    {
+      "result": "pass",
+      "notes": "Complete glyphs in the languages present; generic combination proofs also show joined RTL Arabic and complete Chinese text.",
+      "id": "V07"
+    },
+    {
+      "result": "pass",
+      "notes": "Front section contains Module composition proof; sparse cover is intentional; footer reads Page 1 of 4. double body begins with Reusable modules and complete Chinese text; COLCHECK paragraphs flow within the configured columns; footer Page 2 of 4. double body continues across page and column boundaries without clipping or an empty page; footer Page 3 of 4. COLCHECK10 and COLCHECK11 precede full fraction E1 and two-case E2; signs, superscripts and conditions remain legible; equation labels align with their formula groups; table values 123 and 122 and Table 1 Observations are retained; footer Page 4 of 4. This page was also inspected at full PNG size.",
+      "id": "V08"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This selected proof contains no inline mathematical expression; displayed equations are reviewed separately.",
+      "id": "V09"
+    },
+    {
+      "result": "pass",
+      "notes": "Direct page inspection: Front section contains Module composition proof; sparse cover is intentional; footer reads Page 1 of 4. double body begins with Reusable modules and complete Chinese text; COLCHECK paragraphs flow within the configured columns; footer Page 2 of 4. double body continues across page and column boundaries without clipping or an empty page; footer Page 3 of 4. COLCHECK10 and COLCHECK11 precede full fraction E1 and two-case E2; signs, superscripts and conditions remain legible; equation labels align with their formula groups; table values 123 and 122 and Table 1 Observations are retained; footer Page 4 of 4. This page was also inspected at full PNG size.",
+      "id": "V10"
+    },
+    {
+      "result": "pass",
+      "notes": "Direct page inspection: Front section contains Module composition proof; sparse cover is intentional; footer reads Page 1 of 4. double body begins with Reusable modules and complete Chinese text; COLCHECK paragraphs flow within the configured columns; footer Page 2 of 4. double body continues across page and column boundaries without clipping or an empty page; footer Page 3 of 4. COLCHECK10 and COLCHECK11 precede full fraction E1 and two-case E2; signs, superscripts and conditions remain legible; equation labels align with their formula groups; table values 123 and 122 and Table 1 Observations are retained; footer Page 4 of 4. This page was also inspected at full PNG size.",
+      "id": "V11"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V12"
+    },
+    {
+      "result": "pass",
+      "notes": "Direct page inspection: Front section contains Module composition proof; sparse cover is intentional; footer reads Page 1 of 4. double body begins with Reusable modules and complete Chinese text; COLCHECK paragraphs flow within the configured columns; footer Page 2 of 4. double body continues across page and column boundaries without clipping or an empty page; footer Page 3 of 4. COLCHECK10 and COLCHECK11 precede full fraction E1 and two-case E2; signs, superscripts and conditions remain legible; equation labels align with their formula groups; table values 123 and 122 and Table 1 Observations are retained; footer Page 4 of 4. This page was also inspected at full PNG size.",
+      "id": "V13"
+    },
+    {
+      "result": "pass",
+      "notes": "Direct page inspection: Front section contains Module composition proof; sparse cover is intentional; footer reads Page 1 of 4. double body begins with Reusable modules and complete Chinese text; COLCHECK paragraphs flow within the configured columns; footer Page 2 of 4. double body continues across page and column boundaries without clipping or an empty page; footer Page 3 of 4. COLCHECK10 and COLCHECK11 precede full fraction E1 and two-case E2; signs, superscripts and conditions remain legible; equation labels align with their formula groups; table values 123 and 122 and Table 1 Observations are retained; footer Page 4 of 4. This page was also inspected at full PNG size.",
+      "id": "V14"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V15"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V16"
+    },
+    {
+      "result": "pass",
+      "notes": "Direct page inspection: Front section contains Module composition proof; sparse cover is intentional; footer reads Page 1 of 4. double body begins with Reusable modules and complete Chinese text; COLCHECK paragraphs flow within the configured columns; footer Page 2 of 4. double body continues across page and column boundaries without clipping or an empty page; footer Page 3 of 4. COLCHECK10 and COLCHECK11 precede full fraction E1 and two-case E2; signs, superscripts and conditions remain legible; equation labels align with their formula groups; table values 123 and 122 and Table 1 Observations are retained; footer Page 4 of 4. This page was also inspected at full PNG size.",
+      "id": "V17"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V18"
+    },
+    {
+      "result": "pass",
+      "notes": "Direct page inspection: Front section contains Module composition proof; sparse cover is intentional; footer reads Page 1 of 4. double body begins with Reusable modules and complete Chinese text; COLCHECK paragraphs flow within the configured columns; footer Page 2 of 4. double body continues across page and column boundaries without clipping or an empty page; footer Page 3 of 4. COLCHECK10 and COLCHECK11 precede full fraction E1 and two-case E2; signs, superscripts and conditions remain legible; equation labels align with their formula groups; table values 123 and 122 and Table 1 Observations are retained; footer Page 4 of 4. This page was also inspected at full PNG size.",
+      "id": "V19"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V20"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "These print proofs do not expose annotation/control UI or unknown object UI. Structural cloud retention tests are separate evidence and are not a visual certification.",
+      "id": "V21"
+    }
+  ],
+  "observed_pdf_fonts": [
+    "BAAAAA+LiberationSerif",
+    "CAAAAA+LiberationSerif-Bold",
+    "DAAAAA+NotoSerifCJKsc-Regular",
+    "EAAAAA+TeXGyrePagellaMath-Regular",
+    "FAAAAA+OpenSymbol",
+    "GAAAAA+LiberationSerif"
+  ],
+  "run_id": "38059546545",
+  "page_reviews": [
+    {
+      "observations": "Front section contains Module composition proof; sparse cover is intentional; footer reads Page 1 of 4.",
+      "page": 1,
+      "status": "pass"
+    },
+    {
+      "observations": "double body begins with Reusable modules and complete Chinese text; COLCHECK paragraphs flow within the configured columns; footer Page 2 of 4.",
+      "page": 2,
+      "status": "pass"
+    },
+    {
+      "observations": "double body continues across page and column boundaries without clipping or an empty page; footer Page 3 of 4.",
+      "page": 3,
+      "status": "pass"
+    },
+    {
+      "observations": "COLCHECK10 and COLCHECK11 precede full fraction E1 and two-case E2; signs, superscripts and conditions remain legible; equation labels align with their formula groups; table values 123 and 122 and Table 1 Observations are retained; footer Page 4 of 4. This page was also inspected at full PNG size.",
+      "page": 4,
+      "status": "pass"
+    }
+  ],
+  "input_sha256": "3f2b417dc8c793f736b740e9edeb5f03480231c919b8d08560f957f09b7f3af8",
+  "engine_commit": "a8fb33e500512e2f42f9df9e3e8f3c1a7fffe90c",
+  "findings": [],
+  "reviewer": "Codex: direct inspection of every selected cloud-rendered page, with full-size inspection of detailed formulas and objects"
+}

@@ -1,0 +1,152 @@
+{
+  "schema_version": 1,
+  "pages": [
+    {
+      "file": "page-1.png",
+      "sha256": "e2d89640fbe86783897d580df19506758cfa43008e9f4c31f8ac9f89b1bed71f"
+    },
+    {
+      "file": "page-2.png",
+      "sha256": "22e302fbaa7c312a6b54593d3257384ec67ac17b17659f2fd1baea96be41ec32"
+    },
+    {
+      "file": "page-3.png",
+      "sha256": "34d321fcd793c7cab03290bde299a71cb5a5b0b3fb3db260991c0730aba04520"
+    }
+  ],
+  "output_sha256": "a3f4e7064b35e0b3e06f719efef4a6c5e6e87ab217e17816dea00622996b13d8",
+  "checklist": [
+    {
+      "result": "pass",
+      "notes": "Page size, orientation, margins and content boundaries reviewed in the actual cloud page images.",
+      "id": "V01"
+    },
+    {
+      "result": "pass",
+      "notes": "Configured single/multiple columns and object positions reviewed; no text or object crosses its intended visible container.",
+      "id": "V02"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V03"
+    },
+    {
+      "result": "pass",
+      "notes": "No unintended blank page or clipped content; sparse isolated samples, explicit source breaks and final-page whitespace are intentional.",
+      "id": "V04"
+    },
+    {
+      "result": "pass",
+      "notes": "Direct page inspection: Both columns retain ROW0 through ROW26; header repeats on each segment; first title and continued title appear below their respective tables; borders and column boundaries remain clear. ROW27 through ROW54 occupy two separate column segments; repeated headers and both continued captions are visible without collision. ROW55 through ROW64 finish in the left column with its repeated header and continued caption; the remaining page area is intentional final-page whitespace.",
+      "id": "V05"
+    },
+    {
+      "result": "pass",
+      "notes": "Actual PDF fonts: BAAAAA+LiberationSerif-Bold, CAAAAA+LiberationSerif, DAAAAA+LiberationSerif. Existing-document substitutions are accepted for this compatibility proof; source-family identity in Microsoft Word is not asserted.",
+      "id": "V06"
+    },
+    {
+      "result": "pass",
+      "notes": "Complete glyphs in the languages present; generic combination proofs also show joined RTL Arabic and complete Chinese text.",
+      "id": "V07"
+    },
+    {
+      "result": "pass",
+      "notes": "Both columns retain ROW0 through ROW26; header repeats on each segment; first title and continued title appear below their respective tables; borders and column boundaries remain clear. ROW27 through ROW54 occupy two separate column segments; repeated headers and both continued captions are visible without collision. ROW55 through ROW64 finish in the left column with its repeated header and continued caption; the remaining page area is intentional final-page whitespace.",
+      "id": "V08"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This selected proof contains no inline mathematical expression; displayed equations are reviewed separately.",
+      "id": "V09"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V10"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V11"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V12"
+    },
+    {
+      "result": "pass",
+      "notes": "Direct page inspection: Both columns retain ROW0 through ROW26; header repeats on each segment; first title and continued title appear below their respective tables; borders and column boundaries remain clear. ROW27 through ROW54 occupy two separate column segments; repeated headers and both continued captions are visible without collision. ROW55 through ROW64 finish in the left column with its repeated header and continued caption; the remaining page area is intentional final-page whitespace.",
+      "id": "V13"
+    },
+    {
+      "result": "pass",
+      "notes": "Direct page inspection: Both columns retain ROW0 through ROW26; header repeats on each segment; first title and continued title appear below their respective tables; borders and column boundaries remain clear. ROW27 through ROW54 occupy two separate column segments; repeated headers and both continued captions are visible without collision. ROW55 through ROW64 finish in the left column with its repeated header and continued caption; the remaining page area is intentional final-page whitespace.",
+      "id": "V14"
+    },
+    {
+      "result": "pass",
+      "notes": "Direct page inspection: Both columns retain ROW0 through ROW26; header repeats on each segment; first title and continued title appear below their respective tables; borders and column boundaries remain clear. ROW27 through ROW54 occupy two separate column segments; repeated headers and both continued captions are visible without collision. ROW55 through ROW64 finish in the left column with its repeated header and continued caption; the remaining page area is intentional final-page whitespace.",
+      "id": "V15"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V16"
+    },
+    {
+      "result": "pass",
+      "notes": "Direct page inspection: Both columns retain ROW0 through ROW26; header repeats on each segment; first title and continued title appear below their respective tables; borders and column boundaries remain clear. ROW27 through ROW54 occupy two separate column segments; repeated headers and both continued captions are visible without collision. ROW55 through ROW64 finish in the left column with its repeated header and continued caption; the remaining page area is intentional final-page whitespace.",
+      "id": "V17"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V18"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V19"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V20"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "These print proofs do not expose annotation/control UI or unknown object UI. Structural cloud retention tests are separate evidence and are not a visual certification.",
+      "id": "V21"
+    }
+  ],
+  "observed_pdf_fonts": [
+    "BAAAAA+LiberationSerif-Bold",
+    "CAAAAA+LiberationSerif",
+    "DAAAAA+LiberationSerif"
+  ],
+  "run_id": "38059546545",
+  "page_reviews": [
+    {
+      "observations": "Both columns retain ROW0 through ROW26; header repeats on each segment; first title and continued title appear below their respective tables; borders and column boundaries remain clear.",
+      "page": 1,
+      "status": "pass"
+    },
+    {
+      "observations": "ROW27 through ROW54 occupy two separate column segments; repeated headers and both continued captions are visible without collision.",
+      "page": 2,
+      "status": "pass"
+    },
+    {
+      "observations": "ROW55 through ROW64 finish in the left column with its repeated header and continued caption; the remaining page area is intentional final-page whitespace.",
+      "page": 3,
+      "status": "pass"
+    }
+  ],
+  "input_sha256": "2da65d74362eea0d578e8b9bf46d13f856cbc36f67ed90c2a47c8bb84ecf7866",
+  "engine_commit": "a8fb33e500512e2f42f9df9e3e8f3c1a7fffe90c",
+  "findings": [],
+  "reviewer": "Codex: direct inspection of every selected cloud-rendered page, with full-size inspection of detailed formulas and objects"
+}

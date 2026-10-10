@@ -1,0 +1,134 @@
+{
+  "schema_version": 1,
+  "pages": [
+    {
+      "file": "page-1.png",
+      "sha256": "ba9d2ea959e78818d5ea5db5d2d4f7344cd1e88dab0b4aee54efb8f0472057bf"
+    }
+  ],
+  "output_sha256": "9d191125b00d8f183f626dcf0aee01d5f8d59b6931b67b0ad77cb47733d76b90",
+  "checklist": [
+    {
+      "result": "pass",
+      "notes": "Page size, orientation, margins and content boundaries reviewed in the actual cloud page images.",
+      "id": "V01"
+    },
+    {
+      "result": "pass",
+      "notes": "Configured single/multiple columns and object positions reviewed; no text or object crosses its intended visible container.",
+      "id": "V02"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V03"
+    },
+    {
+      "result": "pass",
+      "notes": "No unintended blank page or clipped content; sparse isolated samples, explicit source breaks and final-page whitespace are intentional.",
+      "id": "V04"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V05"
+    },
+    {
+      "result": "pass",
+      "notes": "Actual PDF fonts: BAAAAA+Carlito, CAAAAA+Carlito, DAAAAA+Carlito-Bold. Existing-document substitutions are accepted for this compatibility proof; source-family identity in Microsoft Word is not asserted.",
+      "id": "V06"
+    },
+    {
+      "result": "pass",
+      "notes": "Complete glyphs in the languages present; generic combination proofs also show joined RTL Arabic and complete Chinese text.",
+      "id": "V07"
+    },
+    {
+      "result": "pass",
+      "notes": "Horizontal bars retain A=1, B=3, C=2, readable axes, chart title and Series legend.",
+      "id": "V08"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This selected proof contains no inline mathematical expression; displayed equations are reviewed separately.",
+      "id": "V09"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V10"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V11"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V12"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V13"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V14"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V15"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V16"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V17"
+    },
+    {
+      "result": "pass",
+      "notes": "Direct page inspection: Horizontal bars retain A=1, B=3, C=2, readable axes, chart title and Series legend.",
+      "id": "V18"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V19"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V20"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "These print proofs do not expose annotation/control UI or unknown object UI. Structural cloud retention tests are separate evidence and are not a visual certification.",
+      "id": "V21"
+    }
+  ],
+  "observed_pdf_fonts": [
+    "BAAAAA+Carlito",
+    "CAAAAA+Carlito",
+    "DAAAAA+Carlito-Bold"
+  ],
+  "run_id": "38059546545",
+  "page_reviews": [
+    {
+      "observations": "Horizontal bars retain A=1, B=3, C=2, readable axes, chart title and Series legend.",
+      "page": 1,
+      "status": "pass"
+    }
+  ],
+  "input_sha256": "7c1e4ff98d9fcfe28b408007384836339be8a8671611de05fcba21974ceceb52",
+  "engine_commit": "a8fb33e500512e2f42f9df9e3e8f3c1a7fffe90c",
+  "findings": [],
+  "reviewer": "Codex: direct inspection of every selected cloud-rendered page, with full-size inspection of detailed formulas and objects"
+}

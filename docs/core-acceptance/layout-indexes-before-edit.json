@@ -1,0 +1,143 @@
+{
+  "schema_version": 1,
+  "pages": [
+    {
+      "file": "page-1.png",
+      "sha256": "e814ef5788f17c1fecf7e2ab15d0a1a8581bdbb0c048701cf4bfd60b92df2464"
+    },
+    {
+      "file": "page-2.png",
+      "sha256": "24f2ae9c856e33052bb8f820c4af94d8f0713f2c631a7c1a17ace7de591626e9"
+    }
+  ],
+  "output_sha256": "513ad45b23c70663323048e1b791da2b375801178650b14b4f5cab6f0f417183",
+  "checklist": [
+    {
+      "result": "pass",
+      "notes": "Page size, orientation, margins and content boundaries reviewed in the actual cloud page images.",
+      "id": "V01"
+    },
+    {
+      "result": "pass",
+      "notes": "Configured single/multiple columns and object positions reviewed; no text or object crosses its intended visible container.",
+      "id": "V02"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V03"
+    },
+    {
+      "result": "pass",
+      "notes": "No unintended blank page or clipped content; sparse isolated samples, explicit source breaks and final-page whitespace are intentional.",
+      "id": "V04"
+    },
+    {
+      "result": "pass",
+      "notes": "Direct page inspection: Initial TOC contains Index proof and Retained chapter on page 1 and Deleted chapter on page 2; Figure 1 Caption evidence points to page 2. Deleted chapter, REMOVE section text, Figure 1 Caption evidence and Retained topic with page number 2 are complete. The simple index entry shares one line with its page number.",
+      "id": "V05"
+    },
+    {
+      "result": "pass",
+      "notes": "Actual PDF fonts: BAAAAA+Carlito-Bold, CAAAAA+LiberationSerif, DAAAAA+LiberationSerif-Bold. Existing-document substitutions are accepted for this compatibility proof; source-family identity in Microsoft Word is not asserted.",
+      "id": "V06"
+    },
+    {
+      "result": "pass",
+      "notes": "Complete glyphs in the languages present; generic combination proofs also show joined RTL Arabic and complete Chinese text.",
+      "id": "V07"
+    },
+    {
+      "result": "pass",
+      "notes": "Initial TOC contains Index proof and Retained chapter on page 1 and Deleted chapter on page 2; Figure 1 Caption evidence points to page 2. Deleted chapter, REMOVE section text, Figure 1 Caption evidence and Retained topic with page number 2 are complete. The simple index entry shares one line with its page number.",
+      "id": "V08"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This selected proof contains no inline mathematical expression; displayed equations are reviewed separately.",
+      "id": "V09"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V10"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V11"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V12"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V13"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V14"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V15"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V16"
+    },
+    {
+      "result": "pass",
+      "notes": "Direct page inspection: Initial TOC contains Index proof and Retained chapter on page 1 and Deleted chapter on page 2; Figure 1 Caption evidence points to page 2. Deleted chapter, REMOVE section text, Figure 1 Caption evidence and Retained topic with page number 2 are complete. The simple index entry shares one line with its page number.",
+      "id": "V17"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V18"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V19"
+    },
+    {
+      "result": "pass",
+      "notes": "Direct page inspection: Initial TOC contains Index proof and Retained chapter on page 1 and Deleted chapter on page 2; Figure 1 Caption evidence points to page 2. Deleted chapter, REMOVE section text, Figure 1 Caption evidence and Retained topic with page number 2 are complete. The simple index entry shares one line with its page number.",
+      "id": "V20"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "These print proofs do not expose annotation/control UI or unknown object UI. Structural cloud retention tests are separate evidence and are not a visual certification.",
+      "id": "V21"
+    }
+  ],
+  "observed_pdf_fonts": [
+    "BAAAAA+Carlito-Bold",
+    "CAAAAA+LiberationSerif",
+    "DAAAAA+LiberationSerif-Bold"
+  ],
+  "run_id": "38059546545",
+  "page_reviews": [
+    {
+      "observations": "Initial TOC contains Index proof and Retained chapter on page 1 and Deleted chapter on page 2; Figure 1 Caption evidence points to page 2.",
+      "page": 1,
+      "status": "pass"
+    },
+    {
+      "observations": "Deleted chapter, REMOVE section text, Figure 1 Caption evidence and Retained topic with page number 2 are complete. The simple index entry shares one line with its page number.",
+      "page": 2,
+      "status": "pass"
+    }
+  ],
+  "input_sha256": "0945c358affd0097065e83332c3b2bc7321cb0db9a44c28508de54e931c8a234",
+  "engine_commit": "a8fb33e500512e2f42f9df9e3e8f3c1a7fffe90c",
+  "findings": [],
+  "reviewer": "Codex: direct inspection of every selected cloud-rendered page, with full-size inspection of detailed formulas and objects"
+}

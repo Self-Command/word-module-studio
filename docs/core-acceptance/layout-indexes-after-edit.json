@@ -1,0 +1,152 @@
+{
+  "schema_version": 1,
+  "pages": [
+    {
+      "file": "page-1.png",
+      "sha256": "7ea58d6e71b012ce23b2551c5a0349e3934282dbcde64a99049df971de4dd025"
+    },
+    {
+      "file": "page-2.png",
+      "sha256": "0112c5c0fe96cd62ca87624bb75e487b8e4f532289581ee119cd36ab3e308c26"
+    },
+    {
+      "file": "page-3.png",
+      "sha256": "91b823104ba4a6d5de001a11d041786fcd5cc18d82477b2971114081d6586b2e"
+    }
+  ],
+  "output_sha256": "e7c77efdf771334cf874f3980079eb104a8cb1103ecdd615971a6baf9632a2d4",
+  "checklist": [
+    {
+      "result": "pass",
+      "notes": "Page size, orientation, margins and content boundaries reviewed in the actual cloud page images.",
+      "id": "V01"
+    },
+    {
+      "result": "pass",
+      "notes": "Configured single/multiple columns and object positions reviewed; no text or object crosses its intended visible container.",
+      "id": "V02"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V03"
+    },
+    {
+      "result": "pass",
+      "notes": "No unintended blank page or clipped content; sparse isolated samples, explicit source breaks and final-page whitespace are intentional.",
+      "id": "V04"
+    },
+    {
+      "result": "pass",
+      "notes": "Direct page inspection: TOC contains Index proof and Retained chapter on page 1 and Added chapter on page 3. Deleted chapter is absent. Figure 1 Caption evidence points to page 2. Figure 1 Caption evidence and alphabetical separator R are complete. Retained topic and page number 2 occupy one leader line; full PNG inspected. Sparse page reflects the explicit break in the source. Added chapter and ADDED content remain on page 3, matching the refreshed TOC. The sparse final page is intentional.",
+      "id": "V05"
+    },
+    {
+      "result": "pass",
+      "notes": "Actual PDF fonts: BAAAAA+Carlito-Bold, CAAAAA+LiberationSerif, DAAAAA+LiberationSerif-Bold. Existing-document substitutions are accepted for this compatibility proof; source-family identity in Microsoft Word is not asserted.",
+      "id": "V06"
+    },
+    {
+      "result": "pass",
+      "notes": "Complete glyphs in the languages present; generic combination proofs also show joined RTL Arabic and complete Chinese text.",
+      "id": "V07"
+    },
+    {
+      "result": "pass",
+      "notes": "TOC contains Index proof and Retained chapter on page 1 and Added chapter on page 3. Deleted chapter is absent. Figure 1 Caption evidence points to page 2. Figure 1 Caption evidence and alphabetical separator R are complete. Retained topic and page number 2 occupy one leader line; full PNG inspected. Sparse page reflects the explicit break in the source. Added chapter and ADDED content remain on page 3, matching the refreshed TOC. The sparse final page is intentional.",
+      "id": "V08"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This selected proof contains no inline mathematical expression; displayed equations are reviewed separately.",
+      "id": "V09"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V10"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V11"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V12"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V13"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V14"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V15"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V16"
+    },
+    {
+      "result": "pass",
+      "notes": "Direct page inspection: TOC contains Index proof and Retained chapter on page 1 and Added chapter on page 3. Deleted chapter is absent. Figure 1 Caption evidence points to page 2. Figure 1 Caption evidence and alphabetical separator R are complete. Retained topic and page number 2 occupy one leader line; full PNG inspected. Sparse page reflects the explicit break in the source. Added chapter and ADDED content remain on page 3, matching the refreshed TOC. The sparse final page is intentional.",
+      "id": "V17"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V18"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V19"
+    },
+    {
+      "result": "pass",
+      "notes": "Direct page inspection: TOC contains Index proof and Retained chapter on page 1 and Added chapter on page 3. Deleted chapter is absent. Figure 1 Caption evidence points to page 2. Figure 1 Caption evidence and alphabetical separator R are complete. Retained topic and page number 2 occupy one leader line; full PNG inspected. Sparse page reflects the explicit break in the source. Added chapter and ADDED content remain on page 3, matching the refreshed TOC. The sparse final page is intentional.",
+      "id": "V20"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "These print proofs do not expose annotation/control UI or unknown object UI. Structural cloud retention tests are separate evidence and are not a visual certification.",
+      "id": "V21"
+    }
+  ],
+  "observed_pdf_fonts": [
+    "BAAAAA+Carlito-Bold",
+    "CAAAAA+LiberationSerif",
+    "DAAAAA+LiberationSerif-Bold"
+  ],
+  "run_id": "38059546545",
+  "page_reviews": [
+    {
+      "observations": "TOC contains Index proof and Retained chapter on page 1 and Added chapter on page 3. Deleted chapter is absent. Figure 1 Caption evidence points to page 2.",
+      "page": 1,
+      "status": "pass"
+    },
+    {
+      "observations": "Figure 1 Caption evidence and alphabetical separator R are complete. Retained topic and page number 2 occupy one leader line; full PNG inspected. Sparse page reflects the explicit break in the source.",
+      "page": 2,
+      "status": "pass"
+    },
+    {
+      "observations": "Added chapter and ADDED content remain on page 3, matching the refreshed TOC. The sparse final page is intentional.",
+      "page": 3,
+      "status": "pass"
+    }
+  ],
+  "input_sha256": "a3324de249646be826be95d2fdd5d69418c4f9e1becda6f2da09d20b754e7668",
+  "engine_commit": "a8fb33e500512e2f42f9df9e3e8f3c1a7fffe90c",
+  "findings": [],
+  "reviewer": "Codex: direct inspection of every selected cloud-rendered page, with full-size inspection of detailed formulas and objects"
+}

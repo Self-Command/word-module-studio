@@ -2,7 +2,9 @@
 
 Composable DOCX generation, editing and verification for AI agents and Python applications.
 The public engine uses pinned OfficeCLI, Open XML SDK, Pandoc/OMML and LibreOffice.
-Candidate version: **0.1.0rc1**. Check [acceptance status](docs/status.md) before relying on a feature.
+Core layout version: **0.1.0**. The [accepted cloud run](https://github.com/Self-Command/word-module-studio/actions/runs/38059546545)
+passes 100 tests. Direct page review covers 26 generic proofs and 49 pages; see
+[acceptance scope](docs/status.md) and the [bound receipts](docs/core-acceptance.json).
 
 中文：将 Word 功能拆成可复用模块。新模板只提供区域、样式、字体和对象规则；
 自由编辑与强制模板共用内核。源码公开，个人任务可在自己选择的公有或私有仓库执行。
@@ -18,9 +20,9 @@ User / AI / application
   → editable DOCX + PDF + pages + report + visual receipt
 ```
 
-Install the candidate release ZIP by copying its `word-module-studio` folder into your
+Install the [release ZIP](https://github.com/Self-Command/word-module-studio/releases/tag/v0.1.0) by copying its `word-module-studio` folder into your
 Codex skills directory. Preserve the previous folder before upgrading; rollback replaces
-the candidate with that verified previous folder. Installation includes `core/` but excludes
+the installed version with that verified previous folder. Installation includes `core/` but excludes
 test manuscripts, model evidence, upstream showcase inputs and generated outputs.
 
 For standalone use, install `.github/workflows/document-task.yml` in your execution repository,
@@ -34,9 +36,15 @@ python core/src/word_module_studio/client.py fetch --repo OWNER/TASK-REPO --run-
 ```
 
 See [working task examples](examples/README.md), [module contracts](docs/modules.md),
-[coverage evidence](docs/module-coverage.json), and the [skill entry](skills/word-module-studio/SKILL.md).
+[feature acceptance](docs/core-features.json), [coverage evidence](docs/module-coverage.json),
+and the [skill entry](skills/word-module-studio/SKILL.md).
 The API can be imported inside Actions: `snapshot`, `execute`, `templates.build`, `compose`,
 `merge`, `extract`, `render`, and `receipt`. These reject local business execution.
+
+The [generic core configuration](examples/core-layout.json) combines theme and effective fonts,
+CJK/pagination controls, table AutoFit, actual font data embedding and practical math rules.
+Native frames/drop caps and editable field-cache refresh are independent interfaces.
+Paper-template development and its test suites remain paused for separate consumer acceptance.
 
 Formal new documents require an explicit font choice. LibreOffice PDF is a compatibility proof;
 Microsoft Word desktop rendering is not asserted. Automatic checks and visual acceptance are

@@ -1,11 +1,19 @@
 {
-  "schema_version": 1,
-  "run_id": "38052432267",
-  "renderer": "LibreOffice 26.8.1",
-  "test": "tests/test_core_layout.py::test_qualify_renderer_native_math_breaks",
-  "operator_runs": 24,
-  "native_manual_break_visible": false,
-  "native_break_source_sha256": "b5ad1f7b683683ed0a3d2ae15a3331410584937a2f75c7a2c4fe76109108052e",
+  "long_formula_receipts": [
+    "docs/core-acceptance/layout-gallery-triple.json",
+    "docs/core-acceptance/layout-gallery-unequal.json"
+  ],
   "default_compatibility_strategy": "outer_array",
-  "microsoft_word_native_rendering": "not-tested"
+  "operator_runs": 24,
+  "author_alignment_receipt": "docs/core-acceptance/layout-author-alignment.json",
+  "run_id": "38059546545",
+  "test": "tests/test_core_layout.py::test_qualify_renderer_native_math_breaks",
+  "renderer": "LibreOffice 26.8.1 compatibility proof; not Microsoft Word native rendering",
+  "microsoft_word_native_rendering": "not-tested",
+  "readable_size_receipt": "docs/core-acceptance/layout-readable-math.json",
+  "native_manual_break_visible": false,
+  "engine_commit": "a8fb33e500512e2f42f9df9e3e8f3c1a7fffe90c",
+  "native_break_source_sha256": "8f86efc83cecb76ab1cf244a1e7587882bbf031d69a49df724ce14833b145056",
+  "import_compatibility": "Source-point-size StarMath command and empty operand before leading matrix-cell relations in the diagnostic renderer only; delivered OMML unchanged.",
+  "schema_version": 1
 }

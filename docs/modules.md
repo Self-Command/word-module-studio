@@ -47,3 +47,35 @@ identity are retained with the failed task rather than described as a successful
 The coverage JSON names actual cloud test files and tracks acceptance separately. Native
 upstream support is not equivalent to our own regression evidence. The 21-item visual checklist
 is in the skill; a completed review with findings keeps delivery acceptance false.
+
+## Composing core layout rules
+
+`TemplateSpec` remains compatible with its original required fields. Optional `theme`,
+`typography`, region/style `native`, `table_policy`, `font_embedding`, `frames` and
+`equations` rules combine the existing modules. See [generic configuration](../examples/core-layout.json).
+Frame attributes use the SDK's native `FrameProperties`; `slot` identifies the paragraph.
+Font embedding writes obfuscated font data, relationships and font-table references after
+fontTools checks the actual file and embedding permissions. A settings flag alone is not
+reported as embedding.
+
+`LayoutContext.resolve` resolves paragraph/character inheritance, direct properties,
+explicit false pagination values and theme families. Header/footer references, notes and
+textboxes use their owning sections and container widths. Shared stories report their
+owners; ambiguous ownership and unsupported containers require review. These are source
+geometry and format rules. `container_proof` records the renderer's observed page and column
+positions, table rows and frame/shape dimensions for comparison and page review.
+
+`field_cache.refresh(source, output, folder)` requires a distinct output and refreshes only
+supported field results. It keeps the source instructions, other content and unrelated parts,
+audits references and SDK structure, and checks pagination convergence. The UNO-exported
+DOCX remains diagnostic. Simple XE imports with an empty hierarchical child are repaired in
+that compatibility document; the source XE instruction is retained in the deliverable.
+
+The default practical formula policy preserves author alignment and nested atoms. Width
+estimates guide outer break candidates and produce formula IDs and adjustment suggestions;
+actual page review decides acceptance. Native OMML breaks are exposed but the pinned
+LibreOffice renderer ignores them, so the compatible default uses outer equation arrays.
+The PDF import adapter supplies an empty StarMath operand before a leading relation and
+an explicit source font size without changing the delivered OMML. Missing operators,
+altered structure or severe clipping fail acceptance. Microsoft Word desktop behavior
+requires its own qualification.

@@ -1,0 +1,134 @@
+{
+  "schema_version": 1,
+  "pages": [
+    {
+      "file": "page-1.png",
+      "sha256": "7995e04c883766c0c975eac16c778808ab4ac9df4af3a1f36051d63798a05743"
+    }
+  ],
+  "output_sha256": "d5a0aedc9c26e66f8ba00de22c9d276151012eec11ac7271d20c8ea7c1ce250a",
+  "checklist": [
+    {
+      "result": "pass",
+      "notes": "Page size, orientation, margins and content boundaries reviewed in the actual cloud page images.",
+      "id": "V01"
+    },
+    {
+      "result": "pass",
+      "notes": "Configured single/multiple columns and object positions reviewed; no text or object crosses its intended visible container.",
+      "id": "V02"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V03"
+    },
+    {
+      "result": "pass",
+      "notes": "No unintended blank page or clipped content; sparse isolated samples, explicit source breaks and final-page whitespace are intentional.",
+      "id": "V04"
+    },
+    {
+      "result": "pass",
+      "notes": "Direct page inspection: Layout core heading, complete Chinese and Latin paragraph, and AutoFit table remain in the first column. Name/Value header and retained/123 data are legible. The one-page sample intentionally leaves unused space.",
+      "id": "V05"
+    },
+    {
+      "result": "pass",
+      "notes": "Actual PDF fonts: BAAAAA+LiberationSerif-Bold, CAAAAA+NotoSerifCJKsc-Regular, DAAAAA+LiberationSerif. Existing-document substitutions are accepted for this compatibility proof; source-family identity in Microsoft Word is not asserted.",
+      "id": "V06"
+    },
+    {
+      "result": "pass",
+      "notes": "Complete glyphs in the languages present; generic combination proofs also show joined RTL Arabic and complete Chinese text.",
+      "id": "V07"
+    },
+    {
+      "result": "pass",
+      "notes": "Layout core heading, complete Chinese and Latin paragraph, and AutoFit table remain in the first column. Name/Value header and retained/123 data are legible. The one-page sample intentionally leaves unused space.",
+      "id": "V08"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This selected proof contains no inline mathematical expression; displayed equations are reviewed separately.",
+      "id": "V09"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V10"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V11"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V12"
+    },
+    {
+      "result": "pass",
+      "notes": "Direct page inspection: Layout core heading, complete Chinese and Latin paragraph, and AutoFit table remain in the first column. Name/Value header and retained/123 data are legible. The one-page sample intentionally leaves unused space.",
+      "id": "V13"
+    },
+    {
+      "result": "pass",
+      "notes": "Direct page inspection: Layout core heading, complete Chinese and Latin paragraph, and AutoFit table remain in the first column. Name/Value header and retained/123 data are legible. The one-page sample intentionally leaves unused space.",
+      "id": "V14"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V15"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V16"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V17"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V18"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V19"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V20"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "These print proofs do not expose annotation/control UI or unknown object UI. Structural cloud retention tests are separate evidence and are not a visual certification.",
+      "id": "V21"
+    }
+  ],
+  "observed_pdf_fonts": [
+    "BAAAAA+LiberationSerif-Bold",
+    "CAAAAA+NotoSerifCJKsc-Regular",
+    "DAAAAA+LiberationSerif"
+  ],
+  "run_id": "38059546545",
+  "page_reviews": [
+    {
+      "observations": "Layout core heading, complete Chinese and Latin paragraph, and AutoFit table remain in the first column. Name/Value header and retained/123 data are legible. The one-page sample intentionally leaves unused space.",
+      "page": 1,
+      "status": "pass"
+    }
+  ],
+  "input_sha256": "5e7379c72b8db805245289bc664902739ae661e55ef31f8d568eb6e9070c5ea1",
+  "engine_commit": "a8fb33e500512e2f42f9df9e3e8f3c1a7fffe90c",
+  "findings": [],
+  "reviewer": "Codex: direct inspection of every selected cloud-rendered page, with full-size inspection of detailed formulas and objects"
+}

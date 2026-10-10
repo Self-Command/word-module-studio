@@ -1,28 +1,334 @@
 {
   "schema_version": 1,
-  "version": "0.1.0rc1",
-  "automatic_acceptance": "pending-final-run",
-  "visual_acceptance": "pending-page-review",
+  "version": "0.1.0",
+  "automatic_acceptance": "pass-scoped-core-layout",
+  "visual_acceptance": "pass-scoped-print-proofs",
   "modules": [
-    {"id":"M01","tests":["tests/test_operations.py","tests/test_task.py"],"handler":"package.py / engine.py"},
-    {"id":"M02","tests":["tests/test_native_modules.py","tests/test_advanced.py"],"handler":"backend.py / text.py"},
-    {"id":"M03","tests":["tests/test_native_modules.py","tests/test_advanced.py"],"handler":"backend.py / templates.py"},
-    {"id":"M04","tests":["tests/test_native_modules.py","tests/test_advanced.py","tests/test_compose.py"],"handler":"numbering.py / content_import.py"},
-    {"id":"M05","tests":["tests/test_native_modules.py","tests/test_templates.py","tests/test_render.py"],"handler":"backend.py / SDK / context.py"},
-    {"id":"M06","tests":["tests/test_native_modules.py","tests/test_advanced.py","tests/test_render.py"],"handler":"headers.py"},
-    {"id":"M07","tests":["tests/test_native_modules.py","tests/test_advanced.py"],"handler":"backend.py / captions.py / verify.py"},
-    {"id":"M08","tests":["tests/test_native_modules.py","tests/test_advanced.py"],"handler":"backend.py / render.py / uno_refresh.py"},
-    {"id":"M09","tests":["tests/test_native_modules.py","tests/test_templates.py","tests/test_consumer.py","tests/test_render.py"],"handler":"math.py / migration"},
-    {"id":"M10","tests":["tests/test_native_modules.py","tests/test_advanced.py","tests/test_render.py"],"handler":"tables.py / backend.py"},
-    {"id":"M11","tests":["tests/test_native_modules.py","tests/test_advanced.py","tests/test_public_paper.py"],"handler":"backend.py / content_import.py / compose.py"},
-    {"id":"M12","tests":["tests/test_native_modules.py","tests/test_advanced.py"],"handler":"backend.py / SDK"},
-    {"id":"M13","tests":["tests/test_native_modules.py","tests/test_advanced.py"],"handler":"shapes.py / backend.py"},
-    {"id":"M14","tests":["tests/test_native_modules.py","tests/test_advanced.py","tests/test_merge.py"],"handler":"backend.py / SDK / merge_parts.py"},
-    {"id":"M15","tests":["tests/test_native_modules.py","tests/test_advanced.py","tests/test_merge.py"],"handler":"backend.py / verify.py / merge_parts.py"},
-    {"id":"M16","tests":["tests/test_native_modules.py","tests/test_advanced.py"],"handler":"controls.py / backend.py"},
-    {"id":"M17","tests":["tests/test_merge.py"],"handler":"merge.py / merge_parts.py"},
-    {"id":"M18","tests":["tests/test_native_modules.py","tests/test_advanced.py","tests/test_task.py"],"handler":"backend.py / accessibility.py"},
-    {"id":"M19","tests":["tests/test_templates.py","tests/test_consumer.py","tests/test_distribution.py"],"handler":"templates.py"},
-    {"id":"M20","tests":["tests/test_render.py","tests/test_public_paper.py","tests/test_distribution.py"],"handler":"render.py / verify.py / distribution.py"}
+    {
+      "id": "M01",
+      "tests": [
+        "tests/test_operations.py",
+        "tests/test_task.py"
+      ],
+      "handler": "package.py / engine.py",
+      "automatic": "pass-scoped-regression",
+      "visual": "pass-scoped-final-print-output",
+      "visual_receipts": [
+        "docs/core-acceptance/composition-source-sections-and-notes.json"
+      ],
+      "scope": "Automatic evidence covers the named tests. Print receipts cover present objects and operations only; interactive UI, arbitrary inputs and Word native rendering are not certified."
+    },
+    {
+      "id": "M02",
+      "tests": [
+        "tests/test_native_modules.py",
+        "tests/test_advanced.py",
+        "tests/test_core_layout.py"
+      ],
+      "handler": "backend.py / text.py",
+      "automatic": "pass-scoped-regression",
+      "visual": "pass-scoped-final-print-output",
+      "visual_receipts": [
+        "docs/core-acceptance/layout-gallery-single.json",
+        "docs/core-acceptance/layout-gallery-triple.json"
+      ],
+      "scope": "Automatic evidence covers the named tests. Print receipts cover present objects and operations only; interactive UI, arbitrary inputs and Word native rendering are not certified."
+    },
+    {
+      "id": "M03",
+      "tests": [
+        "tests/test_native_modules.py",
+        "tests/test_advanced.py",
+        "tests/test_core_layout.py"
+      ],
+      "handler": "backend.py / templates.py",
+      "automatic": "pass-scoped-regression",
+      "visual": "pass-scoped-final-print-output",
+      "visual_receipts": [
+        "docs/core-acceptance/layout-composition.json",
+        "docs/core-acceptance/layout-drop-cap.json"
+      ],
+      "scope": "Automatic evidence covers the named tests. Print receipts cover present objects and operations only; interactive UI, arbitrary inputs and Word native rendering are not certified."
+    },
+    {
+      "id": "M04",
+      "tests": [
+        "tests/test_native_modules.py",
+        "tests/test_advanced.py",
+        "tests/test_compose.py"
+      ],
+      "handler": "numbering.py / content_import.py",
+      "automatic": "pass-scoped-regression",
+      "visual": "pass-scoped-final-print-output",
+      "visual_receipts": [
+        "docs/core-acceptance/layout-gallery-single.json"
+      ],
+      "scope": "Automatic evidence covers the named tests. Print receipts cover present objects and operations only; interactive UI, arbitrary inputs and Word native rendering are not certified."
+    },
+    {
+      "id": "M05",
+      "tests": [
+        "tests/test_native_modules.py",
+        "tests/test_templates.py",
+        "tests/test_render.py",
+        "tests/test_core_layout.py"
+      ],
+      "handler": "backend.py / SDK / context.py",
+      "automatic": "pass-scoped-regression",
+      "visual": "pass-scoped-final-print-output",
+      "visual_receipts": [
+        "docs/core-acceptance/rendering-double.json",
+        "docs/core-acceptance/rendering-landscape.json",
+        "docs/core-acceptance/layout-gallery-unequal.json"
+      ],
+      "scope": "Automatic evidence covers the named tests. Print receipts cover present objects and operations only; interactive UI, arbitrary inputs and Word native rendering are not certified."
+    },
+    {
+      "id": "M06",
+      "tests": [
+        "tests/test_native_modules.py",
+        "tests/test_advanced.py",
+        "tests/test_render.py",
+        "tests/test_core_layout.py"
+      ],
+      "handler": "headers.py",
+      "automatic": "pass-scoped-regression",
+      "visual": "pass-scoped-final-print-output",
+      "visual_receipts": [
+        "docs/core-acceptance/layout-gallery-triple.json",
+        "docs/core-acceptance/composition-source-sections-and-notes.json"
+      ],
+      "scope": "Automatic evidence covers the named tests. Print receipts cover present objects and operations only; interactive UI, arbitrary inputs and Word native rendering are not certified."
+    },
+    {
+      "id": "M07",
+      "tests": [
+        "tests/test_native_modules.py",
+        "tests/test_advanced.py",
+        "tests/test_core_layout.py"
+      ],
+      "handler": "backend.py / captions.py / verify.py",
+      "automatic": "pass-scoped-regression",
+      "visual": "pass-scoped-final-print-output",
+      "visual_receipts": [
+        "docs/core-acceptance/layout-indexes-after-edit.json",
+        "docs/core-acceptance/rendering-single.json"
+      ],
+      "scope": "Automatic evidence covers the named tests. Print receipts cover present objects and operations only; interactive UI, arbitrary inputs and Word native rendering are not certified."
+    },
+    {
+      "id": "M08",
+      "tests": [
+        "tests/test_native_modules.py",
+        "tests/test_advanced.py",
+        "tests/test_core_layout.py"
+      ],
+      "handler": "backend.py / render.py / uno_refresh.py",
+      "automatic": "pass-scoped-regression",
+      "visual": "pass-scoped-final-print-output",
+      "visual_receipts": [
+        "docs/core-acceptance/layout-indexes-before-edit.json",
+        "docs/core-acceptance/layout-indexes-after-edit.json"
+      ],
+      "scope": "Automatic evidence covers the named tests. Print receipts cover present objects and operations only; interactive UI, arbitrary inputs and Word native rendering are not certified."
+    },
+    {
+      "id": "M09",
+      "tests": [
+        "tests/test_native_modules.py",
+        "tests/test_templates.py",
+        "tests/test_render.py",
+        "tests/test_core_layout.py"
+      ],
+      "handler": "math.py / migration",
+      "automatic": "pass-scoped-regression",
+      "visual": "pass-scoped-final-print-output",
+      "visual_receipts": [
+        "docs/core-acceptance/layout-readable-math.json",
+        "docs/core-acceptance/layout-author-alignment.json",
+        "docs/core-acceptance/layout-gallery-triple.json",
+        "docs/core-acceptance/rendering-triple.json"
+      ],
+      "scope": "Automatic evidence covers the named tests. Print receipts cover present objects and operations only; interactive UI, arbitrary inputs and Word native rendering are not certified."
+    },
+    {
+      "id": "M10",
+      "tests": [
+        "tests/test_native_modules.py",
+        "tests/test_advanced.py",
+        "tests/test_render.py",
+        "tests/test_core_layout.py"
+      ],
+      "handler": "tables.py / backend.py",
+      "automatic": "pass-scoped-regression",
+      "visual": "pass-scoped-final-print-output",
+      "visual_receipts": [
+        "docs/core-acceptance/layout-composition.json",
+        "docs/core-acceptance/layout-native-objects.json",
+        "docs/core-acceptance/rendering-continued-table.json"
+      ],
+      "scope": "Automatic evidence covers the named tests. Print receipts cover present objects and operations only; interactive UI, arbitrary inputs and Word native rendering are not certified."
+    },
+    {
+      "id": "M11",
+      "tests": [
+        "tests/test_native_modules.py",
+        "tests/test_advanced.py",
+        "tests/test_core_layout.py"
+      ],
+      "handler": "backend.py / content_import.py / compose.py",
+      "automatic": "pass-scoped-regression",
+      "visual": "pass-scoped-final-print-output",
+      "visual_receipts": [
+        "docs/core-acceptance/layout-native-objects.json"
+      ],
+      "scope": "Automatic evidence covers the named tests. Print receipts cover present objects and operations only; interactive UI, arbitrary inputs and Word native rendering are not certified."
+    },
+    {
+      "id": "M12",
+      "tests": [
+        "tests/test_native_modules.py",
+        "tests/test_advanced.py",
+        "tests/test_core_layout.py"
+      ],
+      "handler": "backend.py / SDK",
+      "automatic": "pass-scoped-regression",
+      "visual": "pass-scoped-final-print-output",
+      "visual_receipts": [
+        "docs/core-acceptance/layout-chart-area.json",
+        "docs/core-acceptance/layout-chart-bar.json",
+        "docs/core-acceptance/layout-chart-column.json",
+        "docs/core-acceptance/layout-chart-line.json",
+        "docs/core-acceptance/layout-chart-pie.json",
+        "docs/core-acceptance/layout-chart-scatter.json"
+      ],
+      "scope": "Automatic evidence covers the named tests. Print receipts cover present objects and operations only; interactive UI, arbitrary inputs and Word native rendering are not certified."
+    },
+    {
+      "id": "M13",
+      "tests": [
+        "tests/test_native_modules.py",
+        "tests/test_advanced.py",
+        "tests/test_core_layout.py"
+      ],
+      "handler": "shapes.py / backend.py",
+      "automatic": "pass-scoped-regression",
+      "visual": "pass-scoped-final-print-output",
+      "visual_receipts": [
+        "docs/core-acceptance/layout-native-objects.json",
+        "docs/core-acceptance/layout-drop-cap.json"
+      ],
+      "scope": "Automatic evidence covers the named tests. Print receipts cover present objects and operations only; interactive UI, arbitrary inputs and Word native rendering are not certified."
+    },
+    {
+      "id": "M14",
+      "tests": [
+        "tests/test_native_modules.py",
+        "tests/test_advanced.py",
+        "tests/test_merge.py",
+        "tests/test_core_layout.py"
+      ],
+      "handler": "backend.py / SDK / merge_parts.py",
+      "automatic": "pass-scoped-regression",
+      "visual": "pass-scoped-final-print-output",
+      "visual_receipts": [
+        "docs/core-acceptance/layout-gallery-triple.json",
+        "docs/core-acceptance/composition-source-sections-and-notes.json"
+      ],
+      "scope": "Automatic evidence covers the named tests. Print receipts cover present objects and operations only; interactive UI, arbitrary inputs and Word native rendering are not certified."
+    },
+    {
+      "id": "M15",
+      "tests": [
+        "tests/test_native_modules.py",
+        "tests/test_advanced.py",
+        "tests/test_merge.py"
+      ],
+      "handler": "backend.py / verify.py / merge_parts.py",
+      "automatic": "pass-scoped-regression",
+      "visual": "not-applicable-to-print-ui; structural-retention-passed",
+      "visual_receipts": [],
+      "scope": "Automatic evidence covers the named tests. Print receipts cover present objects and operations only; interactive UI, arbitrary inputs and Word native rendering are not certified."
+    },
+    {
+      "id": "M16",
+      "tests": [
+        "tests/test_native_modules.py",
+        "tests/test_advanced.py"
+      ],
+      "handler": "controls.py / backend.py",
+      "automatic": "pass-scoped-regression",
+      "visual": "not-applicable-to-print-ui; structural-retention-passed",
+      "visual_receipts": [],
+      "scope": "Automatic evidence covers the named tests. Print receipts cover present objects and operations only; interactive UI, arbitrary inputs and Word native rendering are not certified."
+    },
+    {
+      "id": "M17",
+      "tests": [
+        "tests/test_merge.py"
+      ],
+      "handler": "merge.py / merge_parts.py",
+      "automatic": "pass-scoped-regression",
+      "visual": "pass-scoped-final-print-output",
+      "visual_receipts": [
+        "docs/core-acceptance/composition-source-sections-and-notes.json"
+      ],
+      "scope": "Automatic evidence covers the named tests. Print receipts cover present objects and operations only; interactive UI, arbitrary inputs and Word native rendering are not certified."
+    },
+    {
+      "id": "M18",
+      "tests": [
+        "tests/test_native_modules.py",
+        "tests/test_advanced.py",
+        "tests/test_task.py"
+      ],
+      "handler": "backend.py / accessibility.py",
+      "automatic": "pass-scoped-regression",
+      "visual": "pass-scoped-final-print-output",
+      "visual_receipts": [
+        "docs/core-acceptance/layout-gallery-single.json",
+        "docs/core-acceptance/layout-native-objects.json"
+      ],
+      "scope": "Automatic evidence covers the named tests. Print receipts cover present objects and operations only; interactive UI, arbitrary inputs and Word native rendering are not certified."
+    },
+    {
+      "id": "M19",
+      "tests": [
+        "tests/test_templates.py",
+        "tests/test_distribution.py",
+        "tests/test_core_layout.py"
+      ],
+      "handler": "templates.py",
+      "automatic": "pass-scoped-regression",
+      "visual": "pass-scoped-final-print-output",
+      "visual_receipts": [
+        "docs/core-acceptance/layout-composition.json",
+        "docs/core-acceptance/rendering-landscape.json"
+      ],
+      "scope": "Automatic evidence covers the named tests. Print receipts cover present objects and operations only; interactive UI, arbitrary inputs and Word native rendering are not certified."
+    },
+    {
+      "id": "M20",
+      "tests": [
+        "tests/test_render.py",
+        "tests/test_distribution.py",
+        "tests/test_core_layout.py"
+      ],
+      "handler": "render.py / verify.py / distribution.py",
+      "automatic": "pass-scoped-regression",
+      "visual": "pass-scoped-final-print-output",
+      "visual_receipts": [
+        "docs/core-acceptance/rendering-continued-table.json",
+        "docs/core-acceptance/layout-gallery-unequal.json"
+      ],
+      "scope": "Automatic evidence covers the named tests. Print receipts cover present objects and operations only; interactive UI, arbitrary inputs and Word native rendering are not certified."
+    }
+  ],
+  "acceptance_manifest": "docs/core-acceptance.json",
+  "run_id": "38059546545",
+  "engine_commit": "a8fb33e500512e2f42f9df9e3e8f3c1a7fffe90c",
+  "paused_consumer_tests": [
+    "tests/test_consumer.py",
+    "tests/test_public_paper.py"
   ]
 }

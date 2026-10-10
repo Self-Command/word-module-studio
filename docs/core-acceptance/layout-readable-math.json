@@ -1,0 +1,135 @@
+{
+  "schema_version": 1,
+  "pages": [
+    {
+      "file": "page-1.png",
+      "sha256": "309f9075c39f99c36c3c9656dc714d2efeea2aa9dbc70cfb75b5678124d1a544"
+    }
+  ],
+  "output_sha256": "c1b672c66c110acfcf51af12ac7f6c71e30fa7cdd92b5c705ecdbd1455ddad16",
+  "checklist": [
+    {
+      "result": "pass",
+      "notes": "Page size, orientation, margins and content boundaries reviewed in the actual cloud page images.",
+      "id": "V01"
+    },
+    {
+      "result": "pass",
+      "notes": "Configured single/multiple columns and object positions reviewed; no text or object crosses its intended visible container.",
+      "id": "V02"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V03"
+    },
+    {
+      "result": "pass",
+      "notes": "No unintended blank page or clipped content; sparse isolated samples, explicit source breaks and final-page whitespace are intentional.",
+      "id": "V04"
+    },
+    {
+      "result": "pass",
+      "notes": "Direct page inspection: Readable math and body-size reference precede the fraction x=(1+y squared)/(1+z). Numerator, denominator, equals sign and R1 label are complete and readable at the source size; full PNG inspected.",
+      "id": "V05"
+    },
+    {
+      "result": "pass",
+      "notes": "Actual PDF fonts: BAAAAA+LiberationSerif-Bold, CAAAAA+LiberationSerif, DAAAAA+TeXGyrePagellaMath-Regular, EAAAAA+OpenSymbol. Existing-document substitutions are accepted for this compatibility proof; source-family identity in Microsoft Word is not asserted.",
+      "id": "V06"
+    },
+    {
+      "result": "pass",
+      "notes": "Complete glyphs in the languages present; generic combination proofs also show joined RTL Arabic and complete Chinese text.",
+      "id": "V07"
+    },
+    {
+      "result": "pass",
+      "notes": "Readable math and body-size reference precede the fraction x=(1+y squared)/(1+z). Numerator, denominator, equals sign and R1 label are complete and readable at the source size; full PNG inspected.",
+      "id": "V08"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This selected proof contains no inline mathematical expression; displayed equations are reviewed separately.",
+      "id": "V09"
+    },
+    {
+      "result": "pass",
+      "notes": "Direct page inspection: Readable math and body-size reference precede the fraction x=(1+y squared)/(1+z). Numerator, denominator, equals sign and R1 label are complete and readable at the source size; full PNG inspected.",
+      "id": "V10"
+    },
+    {
+      "result": "pass",
+      "notes": "Direct page inspection: Readable math and body-size reference precede the fraction x=(1+y squared)/(1+z). Numerator, denominator, equals sign and R1 label are complete and readable at the source size; full PNG inspected.",
+      "id": "V11"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V12"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V13"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V14"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V15"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V16"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V17"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V18"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V19"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V20"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "These print proofs do not expose annotation/control UI or unknown object UI. Structural cloud retention tests are separate evidence and are not a visual certification.",
+      "id": "V21"
+    }
+  ],
+  "observed_pdf_fonts": [
+    "BAAAAA+LiberationSerif-Bold",
+    "CAAAAA+LiberationSerif",
+    "DAAAAA+TeXGyrePagellaMath-Regular",
+    "EAAAAA+OpenSymbol"
+  ],
+  "run_id": "38059546545",
+  "page_reviews": [
+    {
+      "observations": "Readable math and body-size reference precede the fraction x=(1+y squared)/(1+z). Numerator, denominator, equals sign and R1 label are complete and readable at the source size; full PNG inspected.",
+      "page": 1,
+      "status": "pass"
+    }
+  ],
+  "input_sha256": "78eae13c5b67c289aa78daa1d1421c79177e2a103d5428a959071aeebe9b3fcc",
+  "engine_commit": "a8fb33e500512e2f42f9df9e3e8f3c1a7fffe90c",
+  "findings": [],
+  "reviewer": "Codex: direct inspection of every selected cloud-rendered page, with full-size inspection of detailed formulas and objects"
+}

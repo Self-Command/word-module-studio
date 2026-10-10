@@ -6,6 +6,10 @@ table AutoFit policies, editable field-cache refresh, and practical reversible O
 Independent module and combination proofs use generic documents. Cloud test runs and bound
 page receipts are included in the acceptance report.
 
+Accepted engine: `a8fb33e500512e2f42f9df9e3e8f3c1a7fffe90c`; cloud run 38059546545.
+All six suites pass 100 tests. Direct review accepts 26 generic proofs and all 49 pages.
+The release gate rechecks exact PDF/page identities and source consistency before packaging.
+
 All conversion, rendering and validation run in GitHub Actions. The skill ZIP contains only
 allowlisted implementation resources; users can run document tasks in a private repository.
 

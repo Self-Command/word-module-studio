@@ -1,0 +1,134 @@
+{
+  "schema_version": 1,
+  "pages": [
+    {
+      "file": "page-1.png",
+      "sha256": "511cf5416447f5c6613b94c81b116b752b10d54ec2bd77170dad29b96167bd1f"
+    }
+  ],
+  "output_sha256": "c7816f5ea765441726b57f4621f060cb8de1c7d4675286d9fdb3fb8b2b5ffe70",
+  "checklist": [
+    {
+      "result": "pass",
+      "notes": "Page size, orientation, margins and content boundaries reviewed in the actual cloud page images.",
+      "id": "V01"
+    },
+    {
+      "result": "pass",
+      "notes": "Configured single/multiple columns and object positions reviewed; no text or object crosses its intended visible container.",
+      "id": "V02"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V03"
+    },
+    {
+      "result": "pass",
+      "notes": "No unintended blank page or clipped content; sparse isolated samples, explicit source breaks and final-page whitespace are intentional.",
+      "id": "V04"
+    },
+    {
+      "result": "pass",
+      "notes": "Direct page inspection: Floating picture retains its oval/triangle details and separates from the native framed Container anchor text. Merged native table data, retained second row, oval shape, Editable box content and native footnote are all visible without collision. Full PNG inspected.",
+      "id": "V05"
+    },
+    {
+      "result": "pass",
+      "notes": "Actual PDF fonts: BAAAAA+LiberationSerif-Bold, CAAAAA+LiberationSerif, DAAAAA+LiberationSerif. Existing-document substitutions are accepted for this compatibility proof; source-family identity in Microsoft Word is not asserted.",
+      "id": "V06"
+    },
+    {
+      "result": "pass",
+      "notes": "Complete glyphs in the languages present; generic combination proofs also show joined RTL Arabic and complete Chinese text.",
+      "id": "V07"
+    },
+    {
+      "result": "pass",
+      "notes": "Floating picture retains its oval/triangle details and separates from the native framed Container anchor text. Merged native table data, retained second row, oval shape, Editable box content and native footnote are all visible without collision. Full PNG inspected.",
+      "id": "V08"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This selected proof contains no inline mathematical expression; displayed equations are reviewed separately.",
+      "id": "V09"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V10"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V11"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V12"
+    },
+    {
+      "result": "pass",
+      "notes": "Direct page inspection: Floating picture retains its oval/triangle details and separates from the native framed Container anchor text. Merged native table data, retained second row, oval shape, Editable box content and native footnote are all visible without collision. Full PNG inspected.",
+      "id": "V13"
+    },
+    {
+      "result": "pass",
+      "notes": "Direct page inspection: Floating picture retains its oval/triangle details and separates from the native framed Container anchor text. Merged native table data, retained second row, oval shape, Editable box content and native footnote are all visible without collision. Full PNG inspected.",
+      "id": "V14"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V15"
+    },
+    {
+      "result": "pass",
+      "notes": "Direct page inspection: Floating picture retains its oval/triangle details and separates from the native framed Container anchor text. Merged native table data, retained second row, oval shape, Editable box content and native footnote are all visible without collision. Full PNG inspected.",
+      "id": "V16"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V17"
+    },
+    {
+      "result": "pass",
+      "notes": "Direct page inspection: Floating picture retains its oval/triangle details and separates from the native framed Container anchor text. Merged native table data, retained second row, oval shape, Editable box content and native footnote are all visible without collision. Full PNG inspected.",
+      "id": "V18"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "This isolated proof has no corresponding object or operation. Other selected core proofs cover it where applicable.",
+      "id": "V19"
+    },
+    {
+      "result": "pass",
+      "notes": "Direct page inspection: Floating picture retains its oval/triangle details and separates from the native framed Container anchor text. Merged native table data, retained second row, oval shape, Editable box content and native footnote are all visible without collision. Full PNG inspected.",
+      "id": "V20"
+    },
+    {
+      "result": "not-applicable",
+      "notes": "These print proofs do not expose annotation/control UI or unknown object UI. Structural cloud retention tests are separate evidence and are not a visual certification.",
+      "id": "V21"
+    }
+  ],
+  "observed_pdf_fonts": [
+    "BAAAAA+LiberationSerif-Bold",
+    "CAAAAA+LiberationSerif",
+    "DAAAAA+LiberationSerif"
+  ],
+  "run_id": "38059546545",
+  "page_reviews": [
+    {
+      "observations": "Floating picture retains its oval/triangle details and separates from the native framed Container anchor text. Merged native table data, retained second row, oval shape, Editable box content and native footnote are all visible without collision. Full PNG inspected.",
+      "page": 1,
+      "status": "pass"
+    }
+  ],
+  "input_sha256": "cca5b98fbcb14de4c16e2f1d95c8438979a948c58cbbedc8769bbc97f19d6047",
+  "engine_commit": "a8fb33e500512e2f42f9df9e3e8f3c1a7fffe90c",
+  "findings": [],
+  "reviewer": "Codex: direct inspection of every selected cloud-rendered page, with full-size inspection of detailed formulas and objects"
+}
