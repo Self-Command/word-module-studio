@@ -179,5 +179,42 @@ def paginate(package, target, props):
     original_caption.getparent().remove(original_caption)
     if not boundaries:
         return apply(package, target, {**props, 'operation': 'format'})
-    result = split(table, {**props, 'split_rows': boundaries}, headers)
-    return {**result, 'boundary_source': 'LibreOffice native row positions', 'initial_row_positions': rows}
+    parent = table.getparent()
+    previous, following = table.getprevious(), table.getnext()
+    prototype = deepcopy(table)
+    original_stops = [headers, *boundaries, len(rows)]
+    capacities = [stop - start for start, stop in zip(original_stops, original_stops[1:])]
+    attempts = []
+    for reserve in range(1, 4):
+        if reserve > 1:
+            start = list(parent).index(previous) + 1 if previous is not None else 0
+            end = list(parent).index(following) if following is not None else len(parent)
+            for node in list(parent)[start:end]: parent.remove(node)
+            table = deepcopy(prototype); parent.insert(start, table)
+        # Every fragment needs room for its own caption and repeated header.
+        continuation_capacity = max(capacities[1:-1] or capacities[:1]) - reserve
+        if continuation_capacity <= 0: raise WordError('TABLE_ROW_AND_CAPTION_CANNOT_FIT')
+        first_capacity = capacities[0] - reserve
+        if first_capacity <= 0: raise WordError('TABLE_ROW_AND_CAPTION_CANNOT_FIT')
+        trial = []; stop = headers + first_capacity
+        while stop < len(rows):
+            trial.append(stop); stop += continuation_capacity
+        result = split(table, {**props, 'split_rows': trial}, headers)
+        package.save()
+        with tempfile.TemporaryDirectory(dir=package.path.parent) as temporary:
+            folder = Path(temporary)
+            proof = render(package.path, folder)
+            final_layout = json.loads((folder / (package.path.stem + '.layout.json')).read_text())
+        fragments = final_layout['tables'][ordinal:ordinal + result['segments']]
+        captions = [p for p in final_layout['paragraphs'] if p['text'].startswith('Table ') and props['title'] in p['text']]
+        valid = len(fragments) == result['segments'] and len(captions) == result['segments']
+        for fragment, title in zip(fragments, captions):
+            placed = fragment['rows']
+            if not placed or any('diagnostic' in row for row in placed): valid = False; continue
+            first, last = placed[0], placed[-1]
+            if any(row['page'] != first['page'] or abs(row['x_pt'] - first['x_pt']) > 12 for row in placed): valid = False
+            if title['page'] != last['page'] or not first['x_pt'] - 12 <= title['x_pt'] <= first['x_pt'] + LayoutContext.resolve(package, {'element': parent, 'part': 'word/document.xml'}).available_width_twips / 20 + 12: valid = False
+        attempts.append({'reserved_rows': reserve, 'split_rows': trial, 'segments': result['segments'], 'single_column_fragments_and_attached_captions': valid, 'automatic_pass': proof['automatic_pass']})
+        if valid and proof['automatic_pass']:
+            return {**result, 'boundary_source': 'LibreOffice native row positions', 'initial_row_positions': rows, 'convergence': attempts}
+    raise WordError('TABLE_PAGINATION_NOT_CONVERGED', str(attempts))

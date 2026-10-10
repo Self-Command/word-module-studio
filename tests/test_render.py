@@ -47,13 +47,16 @@ def test_real_cloud_pagination(tmp_path, columns, landscape, sans):
 def test_real_continuation_captions_and_headers(tmp_path):
     from word_module_studio.tables import apply
     from word_module_studio.package import Package, W, NS
-    template = build(spec(2), tmp_path / 'template')
+    policy = spec(2); policy['regions'] = [policy['regions'][1]]
+    template = build(policy, tmp_path / 'template')
     markdown = tmp_path / 'rows.md'
     markdown.write_text('# Native continued table\n\n| Row | Observation |\n|---|---|\n' +
         '\n'.join('| ROW' + str(i) + ' | Repeated native row with retained data and enough text to span several columns. |' for i in range(65)), encoding='utf-8')
     output = tmp_path / 'continued.docx'; compose(markdown, template, output)
     package = Package(output); target = next(o for o in package.objects() if o['kind'] == 'table')
     result = apply(package, target, {'operation': 'paginate', 'title': 'Retained observations', 'number': 1, 'header_rows': 1, 'three_line': True, 'caption_position': 'below'})
+    from word_module_studio.runtime import write_json
+    write_json(tmp_path / 'continuations.json', result)
     package.objects(stamp=True); package.save()
     assert result['segments'] > 1
     report = render(output, tmp_path / 'proof')
