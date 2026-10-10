@@ -17,11 +17,11 @@ def require_actions():
         raise WordError("CLOUD_ONLY", "Document operations, tests, conversion and validation require GitHub Actions.")
 
 
-def run(args, *, input_text=None, timeout=180, cwd=None):
+def run(args, *, input_text=None, timeout=180, cwd=None, reject_warnings=False):
     require_actions()
     proc = subprocess.run([str(a) for a in args], cwd=cwd, input=input_text,
                           capture_output=True, text=True, encoding="utf-8", timeout=timeout)
-    if proc.returncode:
+    if proc.returncode or (reject_warnings and '[WARNING]' in proc.stderr):
         raise WordError("COMMAND_FAILED", f"{args[0]} ({proc.returncode})\n{proc.stdout[-4000:]}\n{proc.stderr[-4000:]}")
     return proc.stdout
 

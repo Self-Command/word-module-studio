@@ -1,0 +1,52 @@
+name: Document task
+on:
+  workflow_dispatch:
+    inputs:
+      task_ref:
+        description: Explicit-file task branch
+        type: string
+        required: true
+      task_id:
+        description: Task identity
+        type: string
+        required: true
+      engine_commit:
+        description: Full word-module-studio commit
+        type: string
+        required: true
+permissions:
+  contents: read
+jobs:
+  document:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          repository: Self-Command/word-module-studio
+          ref: ${{ inputs.engine_commit }}
+          path: engine
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ inputs.task_ref }}
+          path: task-input
+      - uses: actions/setup-python@06da6279cdbca41027908073e81a4544dc79c06b
+        with:
+          python-version: '3.12.8'
+      - uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1
+        with:
+          dotnet-version: '10.0.100'
+      - run: bash ci/bootstrap.sh && bash ci/render-bootstrap.sh
+        working-directory: engine
+      - run: python ci/task.py
+        working-directory: engine
+        env:
+          WMS_TASK_ID: ${{ inputs.task_id }}
+          WMS_ENGINE_COMMIT: ${{ inputs.engine_commit }}
+          WMS_INPUT_ROOT: ../task-input/tasks
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: word-task-${{ inputs.task_id }}-${{ github.run_id }}
+          path: engine/build/
+          retention-days: 30
