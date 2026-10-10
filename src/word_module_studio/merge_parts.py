@@ -102,7 +102,8 @@ def prepare_identifiers(destination, source, prefix):
                     q = E.QName(key)
                     if q.namespace in para_namespaces and q.localname in ('paraId', 'durableId'):
                         import hashlib
-                        identifier_map.setdefault(value, hashlib.sha256((prefix + value).encode()).hexdigest()[:8].upper())
+                        number = int(hashlib.sha256((prefix + value).encode()).hexdigest()[:8], 16) & 0x7fffffff
+                        identifier_map.setdefault(value, f'{number or 1:08X}')
     for part, root in related:
         for node in root.iter():
             for key, value in list(node.attrib.items()):

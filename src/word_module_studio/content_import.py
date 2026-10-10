@@ -70,7 +70,9 @@ def import_lists(source, target, elements):
                     props = OxmlElement("w:pPr")
                     set_child(props, "ind", {"w:left": str(400*(int(level.get(W+"ilvl"))+1)), "w:hanging": "400"})
                     item.append(props); clean.append(item)
-                numbering.append(clean)
+                first_number = numbering.find(W + 'num')
+                if first_number is None: numbering.append(clean)
+                else: first_number.addprevious(clean)
                 copy = deepcopy(num); copy.set(W+"numId", str(nid)); copy.find(W+"abstractNumId").set(W+"val", str(aid))
                 for child in list(copy):
                     if child.tag not in {W+"abstractNumId", W+"lvlOverride"}: copy.remove(child)

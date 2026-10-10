@@ -42,7 +42,7 @@ def preservation(before, after, operations):
     for operation in operations:
         props = operation.get('props', {})
         changes_content = operation['action'] == 'remove' or operation['action'] == 'extension' and operation['module'] in ('M02', 'M10', 'M13', 'M16') or any(
-            key in props for key in ('text', 'find', 'replace', 'data', 'formula', 'revision.action'))
+            key in props for key in ('text', 'find', 'replace', 'data', 'formula', 'revision.type', 'revision.action'))
         if not changes_content: continue
         target = old_package.locate(operation['target'])
         nodes = set(target['element'].iter())

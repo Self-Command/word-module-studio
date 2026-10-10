@@ -58,7 +58,15 @@ def apply(package, item, props, *, metrics=None):
     original = tree(formula)
     changes = wrap(formula, budget, size, metrics=metrics) if props.get('wrap', True) else []
     if tree(restore(formula, changes)) != original: raise WordError('FORMULA_RECOVERY_FAILED')
-    if math_width_pt(formula, size, metrics) > budget + 0.1: raise WordError('FORMULA_CANNOT_FIT', str(props.get('number', 'unlabelled')))
+    measured = math_width_pt(formula, size, metrics)
+    if measured > budget + 0.1:
+        from .runtime import write_json
+        diagnostics = Path('build/formula-overflows'); diagnostics.mkdir(parents=True, exist_ok=True)
+        name = __import__('hashlib').sha256(E.tostring(formula)).hexdigest()[:16]
+        (diagnostics / (name + '.xml')).write_bytes(E.tostring(formula, pretty_print=True))
+        write_json(diagnostics / (name + '.json'), {'number': props.get('number'), 'budget_pt': budget,
+            'measured_pt': measured, 'parts': [{'kind': E.QName(c).localname, 'width_pt': math_width_pt(c, size, metrics)} for c in formula]})
+        raise WordError('FORMULA_CANNOT_FIT', f"{props.get('number', 'unlabelled')}: {measured:.2f} pt exceeds {budget:.2f} pt; {name}")
     if mode == 'inline':
         if target.tag != W + 'p': raise WordError('INLINE_MATH_REQUIRES_PARAGRAPH')
         target.append(formula)
