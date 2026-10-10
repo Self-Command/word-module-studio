@@ -24,6 +24,9 @@ def relationships(path):
         if len(ids) != len(set(ids)): raise WordError('DUPLICATE_RELATIONSHIP_ID', part)
     document = package.xml('word/document.xml')
     bookmarks = {node.get(W + 'name') for node in document.iter(W + 'bookmarkStart')}
+    for link in document.iter(W + 'hyperlink'):
+        anchor = link.get(W + 'anchor')
+        if anchor and anchor not in bookmarks: raise WordError('BROKEN_HYPERLINK_REFERENCE', anchor)
     instructions = [node.text or '' for node in document.iter(W + 'instrText')]
     instructions += [node.get(W + 'instr', '') for node in document.iter(W + 'fldSimple')]
     for instruction in instructions:

@@ -55,9 +55,10 @@ def parse(path, resources, folder):
                             formula = inline['c'][1]
                             tags = re.findall(r'\\tag\{([^{}]+)\}', formula)
                             if len(tags) > 1: raise WordError('DUPLICATE_EQUATION_TAG')
+                            labels = re.findall(r'\\label\{([^{}]+)\}', formula)
                             formula = re.sub(r'\\(?:tag|label)\{[^{}]+\}', '', formula)
                             marker = '__WMS_DISPLAY_' + str(len(equations)) + '__'
-                            equations.append({'formula': formula, 'number': tags[0] if tags else None, 'marker': marker})
+                            equations.append({'formula': formula, 'number': tags[0] if tags else None, 'marker': marker, 'labels': labels})
                             result.append({'t': 'Para', 'c': [{'t': 'Str', 'c': marker}]})
                         else: segment.append(inline)
                     if segment: result.append({'t': child['t'], 'c': visit(segment)})
@@ -65,6 +66,41 @@ def parse(path, resources, folder):
             return result
         return value
     ast = visit(ast)
+    # Named author/affiliation metadata is semantic source content. Pandoc's
+    # DOCX writer understands author, but silently ignores structured authors.
+    def literal(value):
+        if isinstance(value, dict):
+            if value.get('t') in ('MetaString', 'Str'): return str(value['c'])
+            if value.get('t') in ('Space', 'SoftBreak', 'LineBreak'): return ' '
+            return literal(value.get('c', []))
+        if isinstance(value, list): return ''.join(literal(child) for child in value)
+        return str(value) if value is not None else ''
+    meta = ast.get('meta', {})
+    if 'authors' in meta and 'author' not in meta:
+        authors = meta['authors']
+        if authors.get('t') != 'MetaList': raise WordError('AUTHOR_METADATA_UNSUPPORTED')
+        records = []
+        for author in authors['c']:
+            if author.get('t') == 'MetaMap':
+                fields = author['c']; name = literal(fields.get('name'))
+                details = [key + ': ' + literal(fields[key]) for key in ('affiliation', 'orcid') if fields.get(key)]
+                name += ' (' + '; '.join(details) + ')' if details else ''
+            else: name = literal(author)
+            if not name: raise WordError('AUTHOR_METADATA_UNSUPPORTED')
+            records.append({'t': 'MetaInlines', 'c': [{'t': 'Str', 'c': name}]})
+        meta['author'] = {'t': 'MetaList', 'c': records}
+    affiliations = meta.get('affiliations')
+    if affiliations:
+        if affiliations.get('t') != 'MetaList': raise WordError('AFFILIATION_METADATA_UNSUPPORTED')
+        blocks = []
+        for entry in affiliations['c']:
+            fields = entry.get('c', {}) if entry.get('t') == 'MetaMap' else {}
+            text = (literal(fields.get('index')) + ': ' if fields.get('index') else '') + literal(fields.get('name')) if fields else literal(entry)
+            blocks.append({'t': 'Para', 'c': [{'t': 'Str', 'c': text}]})
+        ast['blocks'] = blocks + ast['blocks']
+    from .references import prepare
+    reference_ledger = prepare(ast, equations)
+    write_json(folder / 'references.source.json', reference_ledger)
     bibliography = ast.get('meta', {}).get('bibliography')
     if bibliography:
         def literal(value):
@@ -128,6 +164,7 @@ def compose(markdown, manifest, output, *, region=None, resources=(), data=None)
     native = diagnostics / 'content.native.docx'
     run(['pandoc', '-f', 'json', '-t', 'docx', '-o', native, *(['--citeproc'] if ast.get('meta', {}).get('bibliography') else [])], input_text=json.dumps(ast), reject_warnings=True)
     source, destination = Document(native), Document(manifest['master'])
+    expected_math = [deepcopy(m) for m in source.element.body.iter(M + 'oMath')]
     slot = next((n for n in destination.element.body.iter(W + 'sdt')
         if n.find('w:sdtPr/w:tag', namespaces=NS) is not None
         and n.find('w:sdtPr/w:tag', namespaces=NS).get(W + 'val') == 'region.' + region), None)
@@ -158,13 +195,16 @@ def compose(markdown, manifest, output, *, region=None, resources=(), data=None)
         marker = next((o for o in package.objects() if o['kind'] == 'paragraph' and o['text'] == equation['marker']), None)
         if marker is None: raise WordError('EQUATION_MARKER_MISSING')
         number = equation['number']
+        if number is None and equation.get('labels'): number = str(index)
         if number is None and spec.get('equations', {}).get('numbering') == 'sequential': number = str(index)
         if number is not None:
             if number in used_numbers: raise WordError('DUPLICATE_EQUATION_NUMBER', number)
             used_numbers.add(number)
         ledger.append(equation_apply(package, marker, {'formula': equation['formula'], 'number': number, 'mode': 'display',
             'size_pt': size, 'number_width_twips': spec.get('equations', {}).get('number_width_twips', 600),
-            'wrap': spec.get('equations', {}).get('long_formula', 'safe_wrap') == 'safe_wrap'}, metrics=metrics))
+            'wrap': spec.get('equations', {}).get('long_formula', 'safe_wrap') == 'safe_wrap',
+            'bookmarks': [record['bookmark'] for record in json.loads((diagnostics / 'references.source.json').read_text())['objects']
+                          if record['sequence'] == 'Equation' and record['label'] in equation.get('labels', [])]}, metrics=metrics))
         marker['element'].getparent().remove(marker['element'])
     from .tables import apply as table_apply
     from .captions import apply as caption_apply
@@ -172,12 +212,17 @@ def compose(markdown, manifest, output, *, region=None, resources=(), data=None)
         and not any(c.get(W + 'val') == 'word-module-studio-equation-layout' for c in o['element'].xpath('./w:tblPr/w:tblCaption', namespaces=NS))]
     for index, table in enumerate(tables, 1):
         previous = table['element'].getprevious()
-        title = ''.join(previous.xpath('.//w:t/text()', namespaces=NS)) if previous is not None and previous.tag == W + 'p' and previous.find('w:pPr/w:pStyle', namespaces=NS) is not None and previous.find('w:pPr/w:pStyle', namespaces=NS).get(W + 'val') == 'Caption' else None
+        source_caption = previous if previous is not None and previous.tag == W + 'p' and previous.find('w:pPr/w:pStyle', namespaces=NS) is not None and previous.find('w:pPr/w:pStyle', namespaces=NS).get(W + 'val') == 'Caption' else None
+        title = ''.join(source_caption.xpath('.//w:t/text()', namespaces=NS)) if source_caption is not None else None
         if title: previous.getparent().remove(previous)
         metadata_caption = table['element'].find('w:tblPr/w:tblCaption', namespaces=NS)
         if title is None and metadata_caption is not None: title = metadata_caption.get(W + 'val')
         table_apply(package, table, {'operation': 'format', 'header_rows': 1, 'three_line': True,
             **({'title': title, 'number': index, 'caption_position': spec['captions']['table']} if title else {})})
+        if source_caption is not None:
+            generated = table['element'].getprevious() if spec['captions']['table'] == 'above' else table['element'].getnext()
+            from .captions import retain_inline
+            retain_inline(generated, source_caption)
     for index, picture in enumerate([o for o in package.objects() if o['kind'] == 'picture'], 1):
         from .context import LayoutContext
         width = min(LayoutContext.resolve(package, picture).column_widths_twips) * 635
@@ -189,17 +234,36 @@ def compose(markdown, manifest, output, *, region=None, resources=(), data=None)
         if caption is not None and caption.tag == W + 'p' and caption.find('w:pPr/w:pStyle', namespaces=NS) is not None and caption.find('w:pPr/w:pStyle', namespaces=NS).get(W + 'val') == 'Caption':
             title = ''.join(caption.xpath('.//w:t/text()', namespaces=NS)); caption.getparent().remove(caption)
             caption_apply(package, {'element': paragraph}, {'operation': 'caption', 'sequence': 'Figure', 'title': title, 'number': index, 'position': spec['captions']['figure']})
+            generated = paragraph.getprevious() if spec['captions']['figure'] == 'above' else paragraph.getnext()
+            from .captions import retain_inline
+            retain_inline(generated, caption)
+    from .references import finish
+    references = finish(package, json.loads((diagnostics / 'references.source.json').read_text()))
     package.objects(stamp=True); package.save()
     verify_locked(output, manifest)
     from .verify import relationships
     integrity = relationships(output)
     sdk = json.loads(run(['dotnet', '.tools/sdk/WordSdk.dll', 'validate', output]))
+    from collections import Counter
+    from .migration.math_layout import tree
+    def key(math):
+        value = deepcopy(math)
+        for node in value.iter():
+            for name in list(node.attrib):
+                if name.startswith('{' + NS['wms'] + '}'): del node.attrib[name]
+        return json.dumps(tree(value), ensure_ascii=False)
+    required = Counter(key(math) for math in expected_math)
+    actual = Counter(key(math) for math in Package(output).xml('word/document.xml').iter(M + 'oMath'))
+    if required - actual: raise WordError('INLINE_OR_CAPTION_MATH_CHANGED')
     actual_text = ''.join(Package(output).xml('word/document.xml').xpath('//w:t/text()', namespaces=NS))
     for text in expected_text:
-        if text and not text.startswith('__WMS_DISPLAY_') and text not in actual_text: raise WordError('CONTENT_TEXT_CHANGED', text[:80])
+        if text and not text.startswith('__WMS_DISPLAY_'):
+            for reference in references['references']: text = text.replace(reference['marker'], reference['number'])
+            if text not in actual_text: raise WordError('CONTENT_TEXT_CHANGED', text[:80])
     report = {'schema_version': 1, 'build_success': True, 'automatic_pass': True, 'visual_review_complete': False,
         'delivery_accepted': False, 'source_sha256': digest(markdown), 'output_sha256': digest(output),
         'template': {key: manifest[key] for key in ('id', 'version', 'spec_sha256', 'master_sha256')},
-        'display_equations': len(equations), 'equations': ledger, 'relationships': integrity, 'sdk': sdk}
+        'display_equations': len(equations), 'equations': ledger, 'references': references,
+        'inline_math_preserved': len(expected_math), 'relationships': integrity, 'sdk': sdk}
     write_json(output.with_suffix('.compose.json'), report)
     return report

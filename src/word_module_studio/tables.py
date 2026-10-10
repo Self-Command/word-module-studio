@@ -89,6 +89,12 @@ def split(table, props, headers):
         fragment = deepcopy(table)
         for old in fragment.findall(W + 'tr'): fragment.remove(old)
         fragment.extend(deepcopy(row) for row in rows[:headers] + rows[start:stop])
+        if props.get('three_line'):
+            selected = fragment.findall(W + 'tr')
+            for row, side in ((selected[0], 'top'), (selected[-1], 'bottom')):
+                for cell in row.findall(W + 'tc'):
+                    borders = cell.find('w:tcPr/w:tcBorders', namespaces=NS)
+                    if borders is not None: _set(borders, side, {'val': 'single', 'sz': 8})
         for node in fragment.iter():
             if ID in node.attrib: del node.attrib[ID]
         parts.append(fragment)

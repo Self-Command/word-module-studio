@@ -22,12 +22,17 @@ def test_unmodified_licensed_public_markdown_first_use(tmp_path):
         result = compose(source, manifest, output, resources=[*folder.glob('*.png'), folder / 'paper.bib'])
         proof = render(output, tmp_path / 'proof')
         assert result['display_equations'] >= 1
+        assert result['inline_math_preserved'] >= 10
+        assert len(result['references']['references']) >= 4
         assert proof['automatic_pass'], proof['issues']
         package = Package(output)
         assert len(package.xml('word/document.xml').xpath('//*[local-name()="pic"]')) == 4
         with pdfplumber.open(tmp_path / 'proof/first.pdf') as pdf:
             text = ''.join(p.extract_text() or '' for p in pdf.pages)
             assert 'PyKoopman' in text and 'References' in text and 'Schmid' in text
+            assert 'Shaowu Pan' in text and 'Eurika Kaiser' in text
+            assert 'fig:LinearizingTransformation' not in text
+        assert package.xml('word/document.xml').xpath('//w:fldSimple[contains(@w:instr,"REF wms_figure_")]', namespaces=NS)
     finally:
         write_json(tmp_path / 'first-use-inputs.json', {'sources': inputs, 'source_sha256': digest(source),
             'source_unchanged': all(digest(folder / name) == sha for name, sha in inputs.items()),

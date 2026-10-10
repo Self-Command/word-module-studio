@@ -52,7 +52,7 @@ def build(spec, folder):
         return manifest
     folder.mkdir(parents=True, exist_ok=True)
     from docx import Document
-    from docx.shared import Pt
+    from docx.shared import Pt, RGBColor
     from docx.oxml.ns import qn
     document = Document()
     for name, rule in spec['styles'].items():
@@ -60,6 +60,7 @@ def build(spec, folder):
         if style is None: style = document.styles.add_style(name, 1)
         style.font.name = spec['fonts']['latin']
         style.font.size = Pt(rule['size_pt'])
+        style.font.color.rgb = RGBColor.from_string(rule.get('color', '000000'))
         style.font.bold, style.font.italic = rule.get('bold', False), rule.get('italic', False)
         fonts_node = style.element.get_or_add_rPr().get_or_add_rFonts()
         fonts_node.set(qn('w:eastAsia'), spec['fonts']['cjk'])

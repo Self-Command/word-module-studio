@@ -30,7 +30,7 @@ def convert(formula, mode='display'):
 
 def apply(package, item, props, *, metrics=None):
     require_actions()
-    allowed = {'formula', 'mode', 'number', 'number_width_twips', 'size_pt', 'wrap', 'operation'}
+    allowed = {'formula', 'mode', 'number', 'number_width_twips', 'size_pt', 'wrap', 'operation', 'bookmarks'}
     if set(props) - allowed: raise WordError('MATH_PROPERTY_UNSUPPORTED')
     target = item['element']
     mode = props.get('mode', 'display')
@@ -81,6 +81,7 @@ def apply(package, item, props, *, metrics=None):
         elif any(formula.iter(M + 'eqArr')) or len(list(formula.iter(M + 'mr'))) > 1:
             table = _equation_table(formula, '(' + str(props['number']) + ')', min(context.column_widths_twips), number_width)
             _append(target, table)
+            _number_bookmarks(package, table, props)
             return {'original_math': original, 'changes': changes, 'mode': mode, 'number': props['number'], 'layout': 'centered-multiline', 'budget_pt': budget}
         else:
             tabs = E.SubElement(ppr, W + 'tabs')
@@ -91,7 +92,21 @@ def apply(package, item, props, *, metrics=None):
             E.SubElement(E.SubElement(p, W + 'r'), W + 'tab')
             E.SubElement(E.SubElement(p, W + 'r'), W + 't').text = '(' + str(props['number']) + ')'
         _append(target, p)
+        _number_bookmarks(package, p, props)
     return {'original_math': original, 'changes': changes, 'mode': mode, 'number': props.get('number'), 'budget_pt': budget}
+
+
+def _number_bookmarks(package, element, props):
+    from .references import bookmark
+    if not props.get('bookmarks'): return
+    text = next(t for t in element.iter(W + 't') if t.text == '(' + str(props['number']) + ')')
+    run = text.getparent(); text.text = str(props['number'])
+    start, end = E.Element(W + 'r'), E.Element(W + 'r')
+    E.SubElement(start, W + 't').text = '('; E.SubElement(end, W + 't').text = ')'
+    run.addprevious(start); run.addnext(end)
+    for name in props.get('bookmarks', []):
+        if not __import__('re').fullmatch(r'[A-Za-z_][A-Za-z_0-9]{0,39}', name): raise WordError('INVALID_BOOKMARK_NAME')
+        bookmark(package, run.getparent(), run, name)
 
 
 def _append(target, node):

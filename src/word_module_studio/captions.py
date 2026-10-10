@@ -1,5 +1,6 @@
 """Native SEQ captions with separate Figure/Table sequences and bookmarks."""
 import re
+from copy import deepcopy
 from lxml import etree as E
 from .package import W, NS
 from .runtime import require_actions, WordError
@@ -42,3 +43,15 @@ def apply(package, target, props):
     if props.get('position', 'below') == 'above': target['element'].addprevious(p)
     else: target['element'].addnext(p)
     return {'sequence': props['sequence'], 'number': props['number'], 'position': props.get('position', 'below')}
+
+
+def retain_inline(generated, source):
+    """Keep caption math, emphasis, links and punctuation after the SEQ prefix."""
+    generated.remove(generated[-1])
+    space = E.SubElement(E.SubElement(generated, W + 'r'), W + 't')
+    space.text = ' '; space.set('{http://www.w3.org/XML/1998/namespace}space', 'preserve')
+    for node in source:
+        if node.tag in (W + 'pPr', W + 'bookmarkStart', W + 'bookmarkEnd'): continue
+        imported = deepcopy(node)
+        for marker in list(imported.xpath('.//w:bookmarkStart | .//w:bookmarkEnd', namespaces=NS)): marker.getparent().remove(marker)
+        generated.append(imported)

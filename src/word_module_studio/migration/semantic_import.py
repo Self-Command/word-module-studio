@@ -31,7 +31,7 @@ def expand_semantic_tex(ast,output):
             records.append({'source': source, 'kind': kind, 'reason': 'Semantic hyperlink', 'replacement': replacement})
             return replacement
         if reference:
-            replacement = ([{'t': 'Link', 'c': [['', [], []], [{'t': 'Str', 'c': reference[2]}], ['#' + reference[2], '']]}]
+            replacement = ([{'t': 'Link', 'c': [['', [], [['wms-ref', 'true']]], [{'t': 'Str', 'c': reference[2]}], ['#' + reference[2], '']]}]
                 if reference[1] == 'ref' else [{'t': 'Span', 'c': [[reference[2], [], []], []]}])
             records.append({'source': source, 'kind': kind, 'reason': 'Semantic native reference or label', 'replacement': replacement})
             return replacement

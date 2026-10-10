@@ -46,3 +46,18 @@ def test_legacy_fill_escapes_semantic_data_and_preserves_registered_geometry(tmp
     text = ''.join(Package(output).xml('word/document.xml').xpath('//w:t/text()', namespaces=NS))
     assert 'Ada & <review>' in text and 'Retained body' in text
 
+def test_caption_math_and_numbered_source_references_survive(tmp_path):
+    from word_module_studio.runtime import digest
+    template = build(spec(2), tmp_path / 'reference-template')
+    source = tmp_path / 'reference.md'
+    image = Path('fixtures/upstream/word/pictures-logo.png').resolve()
+    source.write_text('See figure \\ref{fig:sample} and equation \\ref{eq:sample}.\n\n'
+        f'![Native $x^2$ caption.\\label{{fig:sample}}]({image})\n\n'
+        '$$x=1\\tag{Q1}\\label{eq:sample}$$', encoding='utf-8')
+    original = digest(source); output = tmp_path / 'references.docx'
+    report = compose(source, template, output, resources=[image])
+    root = Package(output).xml('word/document.xml')
+    assert len(list(root.iter(M + 'oMath'))) == 2
+    assert len(root.xpath('//w:fldSimple[contains(@w:instr," REF wms_")]', namespaces=NS)) == 2
+    assert digest(source) == original and report['inline_math_preserved'] == 1
+
