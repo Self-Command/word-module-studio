@@ -44,7 +44,7 @@ def submit(repository, manifest_file, engine_commit):
     commit = json.loads(gh(['api', '--method', 'POST', f'repos/{repository}/git/commits'], {'message': 'Word task ' + task, 'tree': tree['sha'], 'parents': [base_ref]}))
     ref = 'tasks/' + task
     gh(['api', '--method', 'POST', f'repos/{repository}/git/refs'], {'ref': 'refs/heads/' + ref, 'sha': commit['sha']})
-    gh(['workflow', 'run', 'document-task.yml', '--repo', repository, '-f', 'task_ref=' + ref,
+    gh(['workflow', 'run', 'document-task.yml', '--repo', repository, '-f', 'task_ref=' + commit['sha'],
         '-f', 'task_id=' + task, '-f', 'engine_commit=' + engine_commit])
     return {'repository': repository, 'task_id': task, 'input_commit': commit['sha'], 'engine_commit': engine_commit,
             'status_url': 'https://github.com/' + repository + '/actions/workflows/document-task.yml'}

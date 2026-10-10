@@ -85,6 +85,28 @@ def build(spec, folder):
             child(ppr, 'spacing', {'before': 0, 'after': 0, 'line': 20, 'lineRule': 'exact'})
             section = child(ppr, 'sectPr')
         if region.get('break'): child(section, 'type', {'val': region['break']})
+        for kind in ('header', 'footer'):
+            if kind in region:
+                content_type = 'application/vnd.openxmlformats-officedocument.wordprocessingml.' + kind + '+xml'
+                part = 'word/' + kind + str(index + 1) + '.xml'
+                header = E.Element(W + ('hdr' if kind == 'header' else 'ftr'), nsmap={'w': NS['w']})
+                paragraph = child(header, 'p'); child(child(paragraph, 'pPr'), 'jc', {'val': 'center'})
+                pieces = __import__('re').split(r'(\{\{(?:PAGE|NUMPAGES)\}\})', region[kind])
+                for piece in pieces:
+                    if piece in ('{{PAGE}}', '{{NUMPAGES}}'):
+                        field = child(paragraph, 'fldSimple', {'instr': piece[2:-2]})
+                        child(child(field, 'r'), 't').text = '1'
+                    elif piece: child(child(paragraph, 'r'), 't').text = piece
+                package.parts[part] = E.tostring(header, encoding='UTF-8', xml_declaration=True)
+                rels = package.xml('word/_rels/document.xml.rels')
+                identifiers = {node.get('Id') for node in rels}; suffix = 1
+                while 'rId' + str(suffix) in identifiers: suffix += 1
+                relationship = E.SubElement(rels, '{http://schemas.openxmlformats.org/package/2006/relationships}Relationship',
+                    Id='rId' + str(suffix), Type=NS['r'] + '/' + kind, Target=kind + str(index + 1) + '.xml')
+                reference = E.Element(W + kind + 'Reference'); reference.set(W + 'type', 'default')
+                reference.set('{' + NS['r'] + '}id', relationship.get('Id')); section.insert(0, reference)
+                E.SubElement(package.xml('[Content_Types].xml'), '{http://schemas.openxmlformats.org/package/2006/content-types}Override',
+                    PartName='/' + part, ContentType=content_type)
         page = region['page']
         child(section, 'pgSz', {'w': page['width_twips'], 'h': page['height_twips'],
             'orient': 'landscape' if page['width_twips'] > page['height_twips'] else 'portrait'})
@@ -102,6 +124,8 @@ def build(spec, folder):
     math_font = math.find('m:mathFont', namespaces=NS)
     if math_font is None: math_font = E.SubElement(math, '{' + NS['m'] + '}mathFont')
     math_font.set('{' + NS['m'] + '}val', spec['fonts']['math'])
+    from .ooxml import order_properties
+    order_properties(root)
     package.save()
     manifest = {'schema_version': 1, 'id': spec['id'], 'version': spec['version'], 'spec': spec,
         'spec_sha256': identity, 'master': str((folder / 'master.docx').resolve()),

@@ -6,7 +6,7 @@ from .runtime import require_actions, WordError
 ROOT = Path(__file__).resolve().parents[2]
 MODULES = {
  "M01": ("Document and package", ["document", "body"]),
- "M02": ("Text and characters", ["run", "paragraph", "hyperlink"]),
+ "M02": ("Text and characters", ["run", "paragraph", "hyperlink", "body", "document"]),
  "M03": ("Paragraphs and styles", ["paragraph", "run", "style", "styles"]),
  "M04": ("Lists and numbering", ["paragraph", "numbering", "abstractNum", "num"]),
  "M05": ("Pages and sections", ["section", "pagebreak", "document"]),
@@ -56,13 +56,15 @@ def check_properties(module, kind, action, props):
     definitions = {}
     if module == 'M15' and kind != 'revision':
         revision = contract('revision')['properties']
-        for key in ('revision.type', 'revision.author', 'revision.date', 'revision.id'):
+        for key in ('revision.type', 'revision.author', 'revision.date', 'revision.id', 'revision.action'):
             definitions[key] = {'add': True, 'set': True, 'type': 'string'}
+    if module == 'M15' and kind == 'revision': definitions['revision.action'] = data['properties']['action']
     for key, value in data["properties"].items():
         definitions[key.lower()] = value
         aliases = value.get("aliases", [])
         if isinstance(aliases, list):
             for alias in aliases: definitions[alias.lower()] = value
+        for alias in value.get('propAliases', []): definitions[alias.lower()] = value
     for key, value in props.items():
         definition = definitions.get(key.lower())
         if definition is None or not definition.get(action, False):

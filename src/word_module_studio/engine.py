@@ -43,7 +43,10 @@ def execute(batch, input_path, output_path, *, template=None):
             props = operation.get("props", {})
             target = package.locate(operation["target"])
             kind = operation.get("kind") if action == "add" else target["kind"]
+            from .capabilities import MODULES
+            if module not in MODULES: raise WordError('UNKNOWN_MODULE', module)
             if action == "get":
+                if target['kind'] not in MODULES[module][1]: raise WordError('MODULE_ELEMENT_MISMATCH', module)
                 ledger.append({"operation_id": operation["id"], "object": {k: v for k, v in target.items() if k != "element"}})
                 continue
             if action == "extension":

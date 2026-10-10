@@ -44,6 +44,7 @@ jobs:
           WMS_TASK_ID: ${{ inputs.task_id }}
           WMS_ENGINE_COMMIT: ${{ inputs.engine_commit }}
           WMS_INPUT_ROOT: ../task-input/tasks
+          WMS_INPUT_COMMIT: ${{ inputs.task_ref }}
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
