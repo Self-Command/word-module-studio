@@ -135,6 +135,9 @@ def _equation_table(formula, number, width, number_width):
         cell = E.SubElement(row, W + 'tc')
         cell_props = E.SubElement(cell, W + 'tcPr')
         cell_w = E.SubElement(cell_props, W + 'tcW'); cell_w.set(W + 'w', str(cell_width)); cell_w.set(W + 'type', 'dxa')
+        margins = E.SubElement(cell_props, W + 'tcMar')
+        for side in ('top', 'left', 'bottom', 'right'):
+            margin = E.SubElement(margins, W + side); margin.set(W + 'w', '0'); margin.set(W + 'type', 'dxa')
         E.SubElement(cell_props, W + 'vAlign').set(W + 'val', 'center')
         p = E.SubElement(cell, W + 'p')
         E.SubElement(E.SubElement(p, W + 'pPr'), W + 'jc').set(W + 'val', 'center' if index == 0 else 'right')

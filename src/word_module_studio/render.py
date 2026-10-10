@@ -106,7 +106,7 @@ def receipt(proof_folder, value):
     if any(p.get('status') not in ('pass', 'fail') or not p.get('observations') for p in reviews):
         raise WordError('VISUAL_RECEIPT_PAGE_REVIEWS_INCOMPLETE')
     report['visual_review_complete'] = True
-    report['visual_issues_found'] = bool(value.get('findings')) or any(item['result'] == 'fail' for item in value['checklist'])
+    report['visual_issues_found'] = bool(value.get('findings')) or any(item['result'] == 'fail' for item in value['checklist']) or any(p['status'] == 'fail' for p in reviews)
     report['delivery_accepted'] = report['automatic_pass'] and not report['visual_issues_found']
     report['reviewer'] = value['reviewer']
     report['findings'] = value.get('findings', [])
