@@ -23,11 +23,12 @@ def template_spec(identity, policy, fonts, *, variant='front'):
     def slots(language): return [{'key': key + '_' + language, 'style': role} for key, role in roles.items()
         if key in policy.get('front_roles', list(roles)) and not (policy.get('anonymous') and key in ('authors', 'affiliation'))]
     languages = policy.get('metadata_languages', ['zh', 'en'])
-    front = [slot for language in languages if variant == 'front' or language != 'en' for slot in slots(language)]
+    move_en_to_end = variant == 'end' and len(languages) > 1 and 'en' in languages
+    front = [slot for language in languages if not move_en_to_end or language != 'en' for slot in slots(language)]
     regions = [{'id': 'front', 'page': deepcopy(page), 'columns': 1, 'gap_twips': twips(page_policy.get('column_spacing_cm', .6)), 'slots': front},
         {'id': 'body', 'page': deepcopy(page), 'columns': policy.get('body_columns', 2), 'gap_twips': twips(page_policy.get('column_spacing_cm', .6)),
             'break': 'nextPage' if policy.get('front_separate_page') else 'continuous'}]
-    if variant == 'end' and 'en' in languages:
+    if move_en_to_end:
         regions.append({'id': 'end', 'page': deepcopy(page), 'columns': 1, 'gap_twips': 0, 'break': 'continuous', 'slots': slots('en')})
     if policy.get('page_numbers'): regions[0].update(footer='{{PAGE}}', page_start=1, page_format='decimal')
     return {'schema_version': 1, 'id': identity['id'], 'version': identity['version'] + '-' + variant,

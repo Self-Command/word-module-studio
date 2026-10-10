@@ -30,7 +30,7 @@ def test_real_cloud_pagination(tmp_path, columns, landscape, sans):
     proof = tmp_path / 'proof'; report = render(output, proof)
     assert len(report['pages']) >= 2
     assert report['automatic_pass'], report['issues']
-    assert any('TeXGyrePagellaMath' in name.replace('-', '') for name in report['actual_fonts']), report['actual_fonts']
+    assert any('TeXGyrePagellaMath' in name.replace('-', '') for name in report['actual_fonts']), (report['actual_fonts'], report['math_font_application'])
     with pdfplumber.open(proof / 'result.pdf') as pdf:
         text = ''.join(p.extract_text() or '' for p in pdf.pages)
         assert all('COLCHECK' + str(index) in text for index in range(12))

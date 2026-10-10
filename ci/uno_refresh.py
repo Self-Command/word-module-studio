@@ -42,15 +42,23 @@ try:
         if node is not None: math_font = node.get(namespace + 'val')
     formula_fonts = []
     embedded = document.getEmbeddedObjects()
+    font_properties = ('FontNameVariables', 'FontNameFunctions', 'FontNameNumbers', 'FontNameText',
+        'CustomFontNameSerif', 'CustomFontNameSans', 'CustomFontNameFixed')
     for index in range(embedded.Count):
         item = embedded.getByIndex(index); model = item.Model
         if not model.supportsService('com.sun.star.formula.FormulaProperties'): continue
         if math_font:
-            for name in ('FontNameVariables', 'FontNameFunctions', 'FontNameNumbers', 'FontNameText'):
+            for name in font_properties:
                 model.setPropertyValue(name, math_font)
             item.ExtendedControlOverEmbeddedObject.update()
-        formula_fonts.append({'index': index, 'requested': math_font,
-            'actual': {name: model.getPropertyValue(name) for name in ('FontNameVariables', 'FontNameFunctions', 'FontNameNumbers', 'FontNameText')}})
+        formula_fonts.append({'index': index, 'requested': math_font, 'formula': model.Formula,
+            'actual': {name: model.getPropertyValue(name) for name in font_properties}})
+    for iteration in range(3):
+        document.TextFields.refresh()
+        for index in range(document.DocumentIndexes.Count): document.DocumentIndexes.getByIndex(index).update()
+        document.TextFields.refresh()
+        pass_file = output.with_name(output.stem + '.pass-' + str(iteration) + '.pdf')
+        document.storeToURL(uno.systemPathToFileUrl(str(pass_file)), (prop('FilterName', 'writer_pdf_Export'), prop('Overwrite', True)))
     document.TextFields.refresh()
     for index in range(document.DocumentIndexes.Count): document.DocumentIndexes.getByIndex(index).update()
     document.TextFields.refresh()

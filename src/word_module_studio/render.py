@@ -20,28 +20,27 @@ def render(source, folder):
     pdf = folder / (source.stem + '.pdf')
     fingerprints = []
     with tempfile.TemporaryDirectory() as temporary:
-        refresh_source = source
+        with socket.socket() as connection:
+            connection.bind(('127.0.0.1', 0)); port = connection.getsockname()[1]
+        profile = Path(temporary) / 'profile'
+        process = subprocess.Popen(['libreoffice', '-env:UserInstallation=' + profile.as_uri(), '--headless', '--norestore', '--nodefault',
+            f'--accept=socket,host=127.0.0.1,port={port};urp;StarOffice.ServiceManager'], stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+        try:
+            run(['/usr/bin/python3', ROOT / 'ci/uno_refresh.py', source, pdf, port], timeout=120)
+        finally:
+            if process.poll() is None: process.terminate()
+            try: process.wait(timeout=10)
+            except subprocess.TimeoutExpired: process.kill(); process.wait(timeout=10)
+        if not pdf.is_file(): raise WordError('RENDER_OUTPUT_MISSING')
+        # Refresh the same in-memory document. Re-importing a refreshed DOCX
+        # would repeatedly round-trip OMML and measure converter drift instead
+        # of field/page-cache convergence.
         for attempt in range(3):
-            with socket.socket() as connection:
-                connection.bind(('127.0.0.1', 0)); port = connection.getsockname()[1]
-            profile = Path(temporary) / ('profile-' + str(attempt))
-            process = subprocess.Popen(['libreoffice', '-env:UserInstallation=' + profile.as_uri(), '--headless', '--norestore', '--nodefault',
-                f'--accept=socket,host=127.0.0.1,port={port};urp;StarOffice.ServiceManager'], stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
-            try:
-                run(['/usr/bin/python3', ROOT / 'ci/uno_refresh.py', refresh_source, pdf, port], timeout=120)
-            finally:
-                if process.poll() is None: process.terminate()
-                try: process.wait(timeout=10)
-                except subprocess.TimeoutExpired: process.kill(); process.wait(timeout=10)
-            if not pdf.is_file(): raise WordError('RENDER_OUTPUT_MISSING')
-            with pdfplumber.open(pdf) as document:
+            pass_file = pdf.with_name(pdf.stem + '.pass-' + str(attempt) + '.pdf')
+            with pdfplumber.open(pass_file) as document:
                 signature = [(page.width, page.height, [(c['text'], round(c['x0'], 2), round(c['top'], 2)) for c in page.chars]) for page in document.pages]
             fingerprints.append(hashlib.sha256(json.dumps(signature, ensure_ascii=False).encode()).hexdigest())
             if len(fingerprints) > 1 and fingerprints[-1] == fingerprints[-2]: break
-            # Carry the refreshed cache forward so TOC/page dependencies can converge.
-            import shutil
-            refresh_source = Path(temporary) / ('refresh-' + str(attempt) + '.docx')
-            shutil.copyfile(pdf.with_suffix('.refreshed.docx'), refresh_source)
         else: raise WordError('FIELD_PAGINATION_NOT_CONVERGED')
     run(['pdftoppm', '-png', '-r', '110', pdf, folder / 'page'], timeout=180)
     pages = sorted(folder.glob('page-*.png'), key=lambda p: int(p.stem.rsplit('-', 1)[-1]))
