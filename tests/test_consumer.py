@@ -49,4 +49,5 @@ def test_original_model_thirty_formula_identity_and_text(tmp_path):
     import pdfplumber
     with pdfplumber.open(tmp_path / 'proof/model.pdf') as pdf:
         text = ''.join(p.extract_text() or '' for p in pdf.pages)
-        assert all('(M' + str(i) + ')' in text for i in range(1, 31))
+        missing = [i for i in range(1, 31) if '(M' + str(i) + ')' not in text]
+        assert not missing, {'missing_equation_numbers': missing, 'pdf_text': text}

@@ -97,6 +97,8 @@ def split(table, props, headers):
                     if borders is not None: _set(borders, side, {'val': 'single', 'sz': 8})
         for node in fragment.iter():
             if ID in node.attrib: del node.attrib[ID]
+        from .ooxml import order_properties
+        order_properties(fragment)
         parts.append(fragment)
         start = stop
     cursor = table
