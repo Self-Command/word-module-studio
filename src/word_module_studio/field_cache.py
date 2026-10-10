@@ -38,6 +38,7 @@ def normalized(instruction):
     value = re.sub(r'\s+', ' ', re.sub(r'\\\*\s+MERGEFORMAT', '', instruction, flags=re.I)).strip().upper()
     # Writer makes default decimal formatting explicit on exported sequence fields.
     if value.startswith('SEQ '): value = re.sub(r'\s+\\\*\s+ARABIC\b', '', value)
+    if value.startswith('INDEX '): value = re.sub(r'\s+\\E\s+"[^"]*"', '', value)
     return value
 
 
@@ -158,6 +159,14 @@ def transplant(source, refreshed):
         for record in fields(refreshed.xml(part)):
             candidates[(scope(refreshed, part), normalized(record['instruction']))].append((part, record))
     used, updated = defaultdict(int), []
+    sequences = defaultdict(list)
+    for part in parts(refreshed):
+        for record in fields(refreshed.xml(part)):
+            if normalized(record['instruction']).split(' ', 1)[0] == 'SEQ': sequences[scope(refreshed, part)].append((part, record))
+    source_sequences = defaultdict(int)
+    for part in parts(source):
+        source_sequences[scope(source, part)] += sum(normalized(r['instruction']).split(' ', 1)[0] == 'SEQ' for r in fields(source.xml(part)))
+    sequence_ordinals = defaultdict(int)
     styles = {s.get(W + 'styleId') for s in source.xml('word/styles.xml').findall(W + 'style')}
     original = source.xml('word/document.xml')
     names = {n.get(W + 'name') for n in original.iter(W + 'bookmarkStart')}
@@ -166,9 +175,15 @@ def transplant(source, refreshed):
         for record in fields(source.xml(part)):
             code = normalized(record['instruction']); kind = code.split(' ', 1)[0]
             if kind not in SUPPORTED: continue
-            key = scope(source, part), code; index = used[key]; used[key] += 1
-            if index >= len(candidates[key]): raise WordError('FIELD_CACHE_MATCH_MISSING', part + ': ' + code)
-            candidate_part, candidate = candidates[key][index]
+            area = scope(source, part); key = area, code; index = used[key]; used[key] += 1
+            ordinal = sequence_ordinals[area]
+            if kind == 'SEQ': sequence_ordinals[area] += 1
+            if index < len(candidates[key]): candidate_part, candidate = candidates[key][index]
+            elif kind == 'SEQ' and len(sequences[area]) == source_sequences[area] and ordinal < len(sequences[area]) and normalized(sequences[area][ordinal][1]['instruction']) == 'SEQ':
+                # Writer can export an unnamed SEQ. Counts and story ordinal must
+                # agree; only its result is copied, never its damaged instruction.
+                candidate_part, candidate = sequences[area][ordinal]
+            else: raise WordError('FIELD_CACHE_MATCH_MISSING', part + ': ' + code)
             nodes = result_nodes(candidate)
             for value in nodes:
                 for node in value.iter():
