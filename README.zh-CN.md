@@ -128,7 +128,7 @@ $wordEngineCommit = gh api repos/Self-Command/word-module-studio/git/ref/tags/v0
 }
 ```
 
-从已安装技能文件夹调用入口，清单使用自己文件的完整路径：
+本地使用上文的 `run --manifest ... --output ...`。选择 Actions 时，从已安装技能文件夹提交，清单使用自己文件的完整路径：
 
 ```powershell
 python core/src/word_module_studio/client.py submit --repo YOUR_NAME/word-tasks --manifest "PATH_TO_TASK/task.json" --engine-commit $wordEngineCommit
@@ -180,7 +180,7 @@ python core/src/word_module_studio/client.py fetch --repo YOUR_NAME/word-tasks -
 
 ```text
 使用 $word-module-studio 修改附件 DOCX 的标题并刷新目录。
-在我的私有 YOUR_NAME/word-tasks 仓库执行，保留现有字体，先检查再修改，
+在本地执行，不上传我的文档；保留现有字体，先检查再修改，
 返回可编辑 Word、兼容 PDF 和页面复检报告。
 ```
 

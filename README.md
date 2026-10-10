@@ -142,7 +142,7 @@ python core/src/word_module_studio/client.py status --repo YOUR_NAME/word-tasks 
 python core/src/word_module_studio/client.py fetch --repo YOUR_NAME/word-tasks --run-id RUN_ID --dir outputs
 ```
 
-The downloaded `task-report.json` contains `result.snapshot.sha256`, object IDs, capabilities and accessibility findings. Inspecting does not edit the original. Downloads are nested under their artifact folders.
+The local or downloaded `task-report.json` contains `result.snapshot.sha256`, object IDs, capabilities and accessibility findings. Inspecting does not edit the original. Downloads are nested under their artifact folders.
 
 ## Edit the document
 
@@ -161,7 +161,7 @@ Copy the snapshot's file SHA-256 and actual target object ID into `batch.json`:
 }
 ```
 
-Submit through the same transport with this task manifest:
+Run locally or submit to Actions using this task manifest:
 
 ```json
 {
@@ -180,15 +180,15 @@ An agent can invoke the installed skill directly:
 
 ```text
 Use $word-module-studio to update the attached DOCX title and rebuild its contents.
-Execute in my private YOUR_NAME/word-tasks repository. Preserve the current fonts,
-inspect before editing, and return the DOCX, compatibility PDF and page-review report.
+Execute locally without uploading my document. Preserve the current fonts, inspect
+before editing, and return the DOCX, compatibility PDF and page-review report.
 ```
 
 ## Create a document or reusable template
 
 Choose an explicit font scheme for a formal new document. The [generic configuration](examples/core-layout.json) combines themes, CJK/pagination rules, columns, AutoFit, font embedding and math policies. Its values are examples and can be changed to suit the user's document.
 
-For a reusable template, run `template-build` → `template-probe` → page review and `visual-receipt` → `template-register`. Then use `compose` with Markdown, the registered manifest and unchanged DOCX master, plus explicitly listed data, images, bibliography or font resources. `font_scheme` must match the template. Candidate templates can be probed through the Python API inside Actions; a probe does not register them.
+For a reusable template, run `template-build` → `template-probe` → page review and `visual-receipt` → `template-register`. Then use `compose` with Markdown, the registered manifest and unchanged DOCX master, plus explicitly listed data, images, bibliography or font resources. `font_scheme` must match the template. Candidate templates can be probed through the Python API in either configured runtime; a probe does not register them.
 
 The [task guide](examples/README.md) explains input roles and the template lifecycle. [TemplateSpec](schemas/template-spec.schema.json) is the authoritative configuration. In either configured runtime:
 

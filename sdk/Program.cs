@@ -4,9 +4,6 @@ using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Validation;
 using DocumentFormat.OpenXml.Wordprocessing;
 
-if (Environment.GetEnvironmentVariable("GITHUB_ACTIONS") != "true" ||
-    String.IsNullOrEmpty(Environment.GetEnvironmentVariable("GITHUB_RUN_ID")))
-    throw new InvalidOperationException("CLOUD_ONLY");
 if (args.Length < 2 || (args[0] != "validate" && args[0] != "apply"))
     throw new ArgumentException("Usage: WordSdk validate file.docx | apply file.docx request.json");
 using var document = WordprocessingDocument.Open(args[1], args[0] == "apply");

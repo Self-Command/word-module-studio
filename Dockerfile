@@ -9,6 +9,7 @@ COPY requirements.lock requirements-resolved.lock pins.json pyproject.toml LICEN
 COPY sdk/ ./sdk/
 COPY src/ ./src/
 COPY schemas/ ./schemas/
+COPY docs/core-features.json docs/module-coverage.json ./docs/
 COPY third_party/ ./third_party/
 COPY ci/bootstrap.sh ci/render-bootstrap.sh ci/uno_refresh.py ./ci/
 RUN bash ci/bootstrap.sh && bash ci/render-bootstrap.sh

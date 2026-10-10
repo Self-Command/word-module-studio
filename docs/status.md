@@ -33,7 +33,8 @@ historical evidence and is not used as completion of these additions.
 
 The qualification runs referenced here execute in GitHub Actions. Users can choose local
 Python, an optional local Docker environment, or Actions; the document API has no Actions
-requirement. The current development session uses cloud verification for these changes. The original editable DOCX is retained; UNO exports are
+requirement. Local and Actions tasks share the same inspection and acceptance rules.
+The original editable DOCX is retained; UNO exports are
 diagnostic, and only supported field caches are transplanted into a distinct delivery copy.
 
 LibreOffice 26.8.1 is the qualified compatibility renderer. Microsoft Word native rendering

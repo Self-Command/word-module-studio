@@ -16,6 +16,7 @@ def _font_environment(function):
     def scoped(root, folder, **kwargs):
         root = Path(root).resolve()
         task = json.loads((root / 'manifest.json').read_text(encoding='utf-8-sig'))
+        validate('task', task)
         fonts = [entry for entry in task['files'] if entry['role'] == 'font']
         if not fonts: return function(root, folder, **kwargs)
         if not Path('/etc/fonts/fonts.conf').is_file():
