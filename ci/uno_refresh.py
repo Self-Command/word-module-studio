@@ -51,7 +51,14 @@ try:
         if math_font:
             for name in font_properties:
                 model.setPropertyValue(name, math_font)
-            item.ExtendedControlOverEmbeddedObject.update()
+            control = item.ExtendedControlOverEmbeddedObject
+            control.update()
+            # A font change recalculates StarMath's intrinsic area. Writer can
+            # retain a stale imported frame size and scale the whole formula to
+            # a few points. Use the native area rather than measuring glyphs here.
+            if control.getMapUnit(1) != uno.getConstantByName('com.sun.star.embed.EmbedMapUnits.ONE_100TH_MM'):
+                raise RuntimeError('FORMULA_VISUAL_AREA_UNIT_UNSUPPORTED')
+            item.Size = control.getVisualAreaSize(1)
         formula_fonts.append({'index': index, 'requested': math_font, 'formula': model.Formula,
             'base_font_height_pt': model.BaseFontHeight,
             'object_width_pt': item.Size.Width * 72 / 2540, 'object_height_pt': item.Size.Height * 72 / 2540,
