@@ -34,6 +34,14 @@ def execute_task(root, folder, *, task_id, engine_commit):
     def value(role): return json.loads(one(role).read_text(encoding='utf-8-sig'))
     from word_module_studio.templates import build
     def template():
+        if inputs.get('template-manifest'):
+            from word_module_studio.templates import check_identity
+            manifest = value('template-manifest'); manifest['master'] = str(one('master'))
+            check_identity(manifest)
+            if stage not in ('template-probe', 'template-register') and manifest.get('state') != 'registered': raise WordError('TEMPLATE_NOT_REGISTERED')
+            if not task.get('font_scheme') or task['font_scheme'] != manifest['spec']['fonts']: raise WordError('EXPLICIT_FONT_SCHEME_REQUIRED')
+            return manifest
+        if stage not in ('template-build', 'template-probe'): raise WordError('TEMPLATE_REGISTERED_MASTER_REQUIRED')
         spec = value('template')
         if not task.get('font_scheme') or task['font_scheme'] != spec['fonts']: raise WordError('EXPLICIT_FONT_SCHEME_REQUIRED')
         return build(spec, folder / 'template')
@@ -54,10 +62,13 @@ def execute_task(root, folder, *, task_id, engine_commit):
         from word_module_studio.engine import execute
         request = value('batch')
         result = execute(request, one('document'), output, template=template() if request['mode'] == 'locked_template' else None)
-    elif stage == 'compose':
+    elif stage in ('compose', 'template-probe'):
         from word_module_studio.compose import compose
         result = compose(one('markdown'), template(), output, resources=[*inputs.get('image', []), *inputs.get('bibliography', [])], data=value('data') if inputs.get('data') else None)
     elif stage == 'template-build': result = template()
+    elif stage == 'template-register':
+        from word_module_studio.templates import register
+        result = register(template(), value('composition-report'), value('visual-report'), folder / 'registered-manifest.json')
     elif stage == 'render':
         from word_module_studio.render import render
         shutil.copyfile(one('document'), output)
@@ -86,7 +97,7 @@ def execute_task(root, folder, *, task_id, engine_commit):
         from word_module_studio.distribution import build_package
         result = build_package(folder)
     else: raise WordError('TASK_STAGE_UNSUPPORTED', stage)
-    if stage in ('edit', 'compose', 'merge', 'extract'):
+    if stage in ('edit', 'compose', 'template-probe', 'merge', 'extract'):
         from word_module_studio.render import render
         result['proof'] = render(output, folder / 'proof')
         result['automatic_pass'] = result.get('automatic_pass', True) and result['proof']['automatic_pass']

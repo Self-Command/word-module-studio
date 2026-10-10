@@ -144,7 +144,15 @@ def native_path(element, part, sections):
 def snapshot(path):
     require_actions()
     package = Package(path)
-    objects = [{k: v for k, v in o.items() if k != "element"} for o in package.objects()]
+    from dataclasses import asdict
+    from .context import LayoutContext
+    objects = []
+    for item in package.objects():
+        record = {k: v for k, v in item.items() if k != 'element'}
+        if item['part'] == 'word/document.xml' and item['kind'] in ('paragraph', 'table', 'equation', 'picture', 'chart', 'shape', 'textbox', 'sdt'):
+            context = LayoutContext.resolve(package, item)
+            record.update(layout_context=asdict(context), style=context.style_id, region=context.region)
+        objects.append(record)
     known = {o["part"] for o in objects} | {'word/settings.xml', 'word/fontTable.xml', 'word/webSettings.xml'}
     return {"schema_version": 1, "sha256": digest(path), "objects": objects,
             "parts": {n: hashlib.sha256(v).hexdigest() for n, v in package.parts.items()},

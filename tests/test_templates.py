@@ -49,3 +49,22 @@ def test_locked_template_rejects_injections(tmp_path, module, props):
 def test_missing_font_is_explicit(tmp_path):
     changed = spec(); changed['fonts']['latin'] = 'WordStudioNonexistentFont'
     with pytest.raises(WordError, match='FONT_MISSING'): build(changed, tmp_path / 'master')
+
+
+def test_registration_relocated_master_and_changed_bytes(tmp_path):
+    from word_module_studio.templates import register
+    from word_module_studio.compose import compose
+    import shutil
+    manifest = build(spec(), tmp_path / 'original')
+    source = tmp_path / 'probe.md'; source.write_text('Registration proof with $x^2$.', encoding='utf-8')
+    composition = compose(source, manifest, tmp_path / 'probe.docx')
+    with pytest.raises(WordError, match='TEMPLATE_ACCEPTANCE_REQUIRED'): register(manifest, composition, {}, tmp_path / 'no.json')
+    # Contract exercise only; the release gate requires separately reviewed real page artifacts.
+    visual = {'automatic_pass': True, 'visual_review_complete': True, 'delivery_accepted': True,
+        'input_sha256': composition['output_sha256'], 'output_sha256': 'a' * 64, 'run_id': 'synthetic-test', 'reviewer': 'Synthetic contract fixture'}
+    registered = register(manifest, composition, visual, tmp_path / 'registered.json')
+    relocated = tmp_path / 'other/master.docx'; relocated.parent.mkdir(); shutil.copyfile(manifest['master'], relocated)
+    registered['master'] = str(relocated); check_identity(registered)
+    assert registered['state'] == 'registered'
+    with relocated.open('ab') as file: file.write(b'changed')
+    with pytest.raises(WordError, match='TEMPLATE_MASTER_CHANGED'): check_identity(registered)

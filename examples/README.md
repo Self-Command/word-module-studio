@@ -21,8 +21,13 @@ but an input hash mismatch fails rather than editing a newer file accidentally.
 {"schema_version":1,"stage":"edit","files":[{"path":"input.docx","role":"document"},{"path":"batch.json","role":"batch"}]}
 ```
 
-A compose task lists MD, TemplateSpec, data and explicit image/bibliography/font resources.
-`font_scheme` must match the template. Build a new template identity before filling it.
+A formal compose task lists MD, the registered `template-manifest`, its unchanged DOCX `master`,
+data and explicit image/bibliography/font resources. `font_scheme` must match the template.
+For a new identity, use `template-build`, then `template-probe` with a representative MD and
+the candidate master/manifest. Review that proof through `visual-receipt`, and pass the
+composition report and accepted visual report to `template-register`. Later tasks reuse the
+downloaded master bytes. Python `compose` also accepts candidate manifests for development
+probes and regression, which are separate from registration.
 The same policy can have one, two or three columns without a template-specific engine branch.
 
 After downloading a document, a render task lists that DOCX and returns PDF/PNG/report.

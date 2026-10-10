@@ -170,11 +170,27 @@ def build(spec, folder):
 
 def check_identity(manifest):
     require_actions()
+    if manifest['id'] != manifest['spec']['id'] or manifest['version'] != manifest['spec']['version']: raise WordError('TEMPLATE_IDENTITY_MISMATCH')
     if canonical_spec(manifest['spec']) != manifest['spec_sha256']: raise WordError('TEMPLATE_SPEC_CHANGED')
     if digest(manifest['master']) != manifest['master_sha256']: raise WordError('TEMPLATE_MASTER_CHANGED')
     current = check_fonts(manifest['spec']['fonts'])
     if {k: v['sha256'] for k, v in current.items()} != {k: v['sha256'] for k, v in manifest['fonts'].items()}:
         raise WordError('TEMPLATE_FONT_CHANGED')
+
+
+def register(manifest, composition, visual, destination):
+    """Register only the exact master used by an accepted composition proof."""
+    require_actions(); check_identity(manifest)
+    if not composition.get('automatic_pass') or not visual.get('automatic_pass') or not visual.get('visual_review_complete') or not visual.get('delivery_accepted'):
+        raise WordError('TEMPLATE_ACCEPTANCE_REQUIRED')
+    identity = {key: manifest[key] for key in ('id', 'version', 'spec_sha256', 'master_sha256')}
+    if composition.get('template') != identity: raise WordError('TEMPLATE_PROBE_IDENTITY_MISMATCH')
+    if composition.get('output_sha256') != visual.get('input_sha256'): raise WordError('TEMPLATE_PROBE_OUTPUT_MISMATCH')
+    registered = deepcopy(manifest)
+    registered.update(state='registered', automatic_pass=True, visual_review_complete=True,
+        acceptance={'run_id': visual['run_id'], 'proof_sha256': visual['output_sha256'], 'reviewer': visual['reviewer'], 'template': identity})
+    write_json(destination, registered)
+    return registered
 
 
 def check_operations(operations, manifest):

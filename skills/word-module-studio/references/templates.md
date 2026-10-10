@@ -8,6 +8,11 @@ Build the master once, validate it, then record its spec/master/font fingerprint
 manuscript cannot mutate style definitions, section geometry, headers, footers or the master.
 Font changes create another registered identity. Candidate masters cannot be claimed released.
 
+Cloud task order is `template-build` → `template-probe` → bound `visual-receipt` →
+`template-register`. Formal `compose` carries the registered manifest and exact master as
+explicit input files; relocation changes only the local path, never its expected fingerprint.
+The Python composition API accepts candidates for development; that does not register them.
+
 Front/body/end regions may use different layouts. No object can infer a global document width:
 math, tables, captions and figures resolve their own LayoutContext. Data tables and equation
 number layout tables remain different roles. English abstract placement is composition data.
