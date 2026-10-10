@@ -1,16 +1,16 @@
-# Explicit tasks
+# Explicit document tasks
 
-Choose your own task repository and install the dispatch workflow. Each manifest lists only
-its required inputs; `client.py submit` calculates missing SHA-256 values before upload.
+Choose a task repository you control, with `document-task.yml` on its default branch. Keep local inputs outside the skill/source repository. A manifest lists only files needed for one stage, relative to its own folder. The transport supplies task identity, engine commit and missing SHA-256 values before upload.
+
+## Inspect and edit
+
 An inspect task returns a snapshot without editing its input:
 
 ```json
 {"schema_version":1,"stage":"inspect","files":[{"path":"input.docx","role":"document"}]}
 ```
 
-For an edit, save the returned snapshot, copy the required object ID and input SHA-256 into
-`batch.json`, and list both files in the task. IDs remain stable after unrelated insertions,
-but an input hash mismatch fails rather than editing a newer file accidentally.
+Read `result.snapshot` in the downloaded task report. Use its `sha256` and a target object's `id` in the batch. Do not guess paragraph positions; inspect again after changing the input.
 
 ```json
 {"schema_version":1,"input_sha256":"SHA256_FROM_SNAPSHOT","mode":"free_edit",
@@ -21,32 +21,67 @@ but an input hash mismatch fails rather than editing a newer file accidentally.
 {"schema_version":1,"stage":"edit","files":[{"path":"input.docx","role":"document"},{"path":"batch.json","role":"batch"}]}
 ```
 
-A formal compose task lists MD, the registered `template-manifest`, its unchanged DOCX `master`,
-data and explicit image/bibliography/font resources. `font_scheme` must match the template.
-For a new identity, use `template-build`, then `template-probe` with a representative MD and
-the candidate master/manifest. Review that proof through `visual-receipt`, and pass the
-composition report and accepted visual report to `template-register`. Later tasks reuse the
-downloaded master bytes. Python `compose` also accepts candidate manifests for development
-probes and regression, which are separate from registration.
-The same policy can have one, two or three columns without a template-specific engine branch.
+Submit/status/fetch commands are in the English and Chinese READMEs. Edits return a new DOCX and compatibility proof. A `locked_template` task also carries the registered manifest, exact master and matching `font_scheme`.
 
-After downloading a document, a render task lists that DOCX and returns PDF/PNG/report.
-Review every page and submit a `visual-receipt` task listing the render report, all page PNGs
-as `proof`, and the completed receipt as `receipt`. A receipt contains the original run ID,
-PDF hash, identical page hash list, reviewer, V01–V21 checklist, every page's observations
-and findings. Review completion and accepted delivery are distinct states.
+## Build and register a reusable template
 
-The Python equivalent inside Actions is:
+Copy `core-layout.json` to a task folder and choose its identity, fonts and layout. The example uses cloud-installed fonts and embeds the declared redistributable Latin font. Use that declaration only when the actual font permits it.
+
+1. Submit `template-build` with one `template` JSON and `font_scheme` matching its `fonts`.
+2. Download the candidate manifest and master. Submit `template-probe` with representative `markdown`, the candidate `template-manifest`, unchanged `master`, matching `font_scheme`, and explicitly needed resources.
+3. Review every page. Submit `visual-receipt` with the completed receipt and its proof files.
+4. Submit `template-register` with the candidate `template-manifest`, exact `master`, matching `font_scheme`, accepted `composition-report` and `visual-report`. Download the registered manifest and retain its master bytes.
+5. Submit `compose` with `markdown`, the registered `template-manifest`, exact `master` and matching `font_scheme`. Optional `data`, `image`, `bibliography` and `font` files are explicit entries. A changed font scheme or physical layout requires a new identity/version.
+
+```json
+{
+  "schema_version":1,
+  "stage":"template-build",
+  "font_scheme":{"latin":"Liberation Serif","cjk":"Noto Serif CJK SC","math":"TeX Gyre Pagella Math","rtl":"Noto Sans Arabic"},
+  "files":[{"path":"core-layout.json","role":"template"}]
+}
+```
+
+```json
+{
+  "schema_version":1,
+  "stage":"compose",
+  "font_scheme":{"latin":"Liberation Serif","cjk":"Noto Serif CJK SC","math":"TeX Gyre Pagella Math","rtl":"Noto Sans Arabic"},
+  "files":[
+    {"path":"document.md","role":"markdown"},
+    {"path":"registered-manifest.json","role":"template-manifest"},
+    {"path":"master.docx","role":"master"},
+    {"path":"figure.png","role":"image"}
+  ]
+}
+```
+
+Content cannot override the registered master's pages, columns or protected styles. TemplateSpec supplies layout data to the same shared engine.
+
+## Other stages
+
+| Stage | Input roles | Purpose |
+| --- | --- | --- |
+| `render` | One `document` | Copy the DOCX and create PDF, page PNGs and report. |
+| `refresh-fields` | One `document` | Refresh supported editable field results in a distinct copy with proof. |
+| `verify` | One `document` | SDK structure, relationships, snapshot and accessibility checks. |
+| `merge` | Two or more `document` files | First file is the master; choose `header_policy: master` or `source_regions`. |
+| `extract` | One `document`, one `data` | Data JSON supplies `object_ids` from the input snapshot. |
+| `visual-receipt` | One `receipt`, explicit `proof` files | Validate the bound review. |
+| `package` | No document input | Build a candidate installation from approved engine files. |
+
+For `visual-receipt`, include the render report (`report.json`) and every page PNG as `proof`. The receipt holds the original run ID, PDF hash, identical page list, reviewer, V01–V21 checklist, observations for every page and findings. Review completion and delivery acceptance are distinct. See the skill's visual-review reference.
+
+## Python API inside Actions
 
 ```python
 from word_module_studio.templates import build
 from word_module_studio.compose import compose
 from word_module_studio.render import render
-manifest = build(template_spec, 'build/template')
-compose('paper.md', manifest, 'build/paper.docx', resources=['figure.png'], data=metadata)
-render('build/paper.docx', 'build/proof')
+
+manifest = build(template_spec, "build/template")
+compose("document.md", manifest, "build/document.docx", resources=["figure.png"], data=metadata)
+render("build/document.docx", "build/proof")
 ```
 
-Paper applications keep model evidence, content approval, official rules and LaTeX in their
-own consumer. `consumers/reference_paper.py` maps policy data to the same TemplateSpec;
-the core never switches on competition or journal names.
+Candidates are allowed for development probes. A successful probe does not register a template or accept its pages. Document execution remains cloud-only.

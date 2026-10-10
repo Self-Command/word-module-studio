@@ -42,9 +42,8 @@ Font embedding is proved from actual package data, not from whether Word uses th
 Interactive annotation/control presentation and arbitrary unknown-object UI are not
 certified by these PDFs; their cloud structural retention checks remain available.
 
-Paper-template consumers and their nine suites remain paused and outside this release.
-The historical reference-paper-studio baseline is
-`ede3e05309d86f256a8cc0d4121d71df185e36ab`, with model run 38016554238 and matrix run
-38016552113. Its manuscript-specific defects and academic/LaTeX approvals require separate
-consumer integration. Generic core long-equation and continuation-caption examples now
-pass their own automatic and visual checks.
+The standalone repository contains only this generic DOCX skill, its engine, contracts,
+cloud entry points, generic regression fixtures, verification evidence and documentation.
+Application adapters, domain policies, user documents and unrelated project inputs are not
+part of the current source tree or installation package. Reused generic mathematical and
+content-import helpers retain their original MIT provenance and license.

@@ -20,7 +20,7 @@ if {j['name'] for j in workflow['jobs'] if j['conclusion'] == 'success'} != {'co
     raise WordError('CORE_SUITES_INCOMPLETE')
 run(['git', 'fetch', '--depth=1', 'origin', manifest['engine_commit']])
 protected = ['src', 'schemas', 'sdk', 'ci', 'third_party', '.github/workflows', 'skills', 'pins.json',
-    'pyproject.toml', 'requirements.lock', 'requirements-resolved.lock']
+    'pyproject.toml', 'requirements.lock', 'requirements-resolved.lock', 'publication-manifest.json']
 if run(['git', 'diff', '--name-only', manifest['engine_commit'], 'HEAD', '--', *protected]).strip():
     raise WordError('CORE_SOURCE_CHANGED_AFTER_ACCEPTANCE')
 download = Path('build/accepted-ci'); download.mkdir(parents=True, exist_ok=True)

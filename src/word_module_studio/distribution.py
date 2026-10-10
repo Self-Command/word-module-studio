@@ -8,8 +8,30 @@ from .runtime import require_actions, WordError, digest, write_json
 from . import __version__
 
 ROOT = Path(__file__).resolve().parents[2]
-CORE = ('src', 'schemas', 'sdk', 'ci', 'consumers', 'third_party', 'docs', 'examples', '.github/workflows',
-        'pyproject.toml', 'requirements.lock', 'requirements-resolved.lock', 'pins.json', 'LICENSE', 'THIRD_PARTY_NOTICES.md', 'README.md', 'README.zh-CN.md')
+
+def publication_manifest():
+    """An explicit inventory prevents directory copies from collecting new inputs."""
+    require_actions()
+    inventory = json.loads((ROOT / 'publication-manifest.json').read_text(encoding='utf-8-sig'))
+    if inventory.get('schema_version') != 1: raise WordError('PUBLICATION_MANIFEST_INVALID')
+    for group in ('repository_files', 'skill_files', 'core_files'):
+        names = inventory.get(group)
+        if not isinstance(names, list) or not names or len(names) != len(set(names)):
+            raise WordError('PUBLICATION_MANIFEST_INVALID', group)
+        for name in names:
+            if not isinstance(name, str): raise WordError('PUBLICATION_PATH_INVALID', str(name))
+            path = Path(name)
+            if '\\' in name or path.is_absolute() or '..' in path.parts:
+                raise WordError('PUBLICATION_PATH_INVALID', str(name))
+            source = ROOT / path
+            if source.is_symlink() or not source.resolve().is_relative_to(ROOT.resolve()) or not source.is_file():
+                raise WordError('PACKAGE_RESOURCE_MISSING', name)
+    approved = set(inventory['repository_files'])
+    if not set(inventory['skill_files'] + inventory['core_files']) <= approved:
+        raise WordError('PUBLICATION_RESOURCE_NOT_APPROVED')
+    if any(not name.startswith('skills/word-module-studio/') for name in inventory['skill_files']):
+        raise WordError('PUBLICATION_SKILL_PATH_INVALID')
+    return inventory
 
 
 def build_package(folder, *, acceptance=None):
@@ -17,15 +39,14 @@ def build_package(folder, *, acceptance=None):
     folder = Path(folder).resolve(); folder.mkdir(parents=True, exist_ok=True)
     stage = folder / 'package' / 'word-module-studio'
     if stage.exists(): raise WordError('PACKAGE_OUTPUT_ALREADY_EXISTS')
-    shutil.copytree(ROOT / 'skills/word-module-studio', stage)
-    core = stage / 'core'; core.mkdir()
-    for name in CORE:
-        source, target = ROOT / name, core / name
-        if not source.exists(): raise WordError('PACKAGE_RESOURCE_MISSING', name)
-        target.parent.mkdir(parents=True, exist_ok=True)
-        if source.is_dir():
-            shutil.copytree(source, target, ignore=shutil.ignore_patterns('__pycache__', '*.pyc', 'bin', 'obj', '*.egg-info'))
-        else: shutil.copyfile(source, target)
+    inventory = publication_manifest()
+    prefix = 'skills/word-module-studio/'
+    for group in ('skill_files', 'core_files'):
+        for name in inventory[group]:
+            relative = name[len(prefix):] if group == 'skill_files' else 'core/' + name
+            target = stage / relative
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(ROOT / name, target)
     files = {str(p.relative_to(stage)).replace('\\', '/'): digest(p) for p in sorted(stage.rglob('*')) if p.is_file()}
     manifest = {'schema_version': 1, 'version': __version__, 'engine_commit': os.environ.get('GITHUB_SHA'),
         'run_id': os.environ['GITHUB_RUN_ID'], 'release_status': 'core-layout-accepted' if acceptance else 'candidate', 'files': files}

@@ -5,5 +5,5 @@
   "dotnet": "10.0.100",
   "pandoc": {"version": "3.12.1", "url": "https://github.com/jgm/pandoc/releases/download/3.12.1/pandoc-3.12.1-1-amd64.deb", "sha256": "b4217ac7c54067c442f9d4cd38bcd0c184a43f3e7053431a12263a6f92a33ba2", "license": "GPL-2.0-or-later"},
   "libreoffice": {"version": "26.8.1", "url": "https://download.documentfoundation.org/libreoffice/stable/26.8.1/deb/x86_64/LibreOffice_26.8.1_Linux_x86-64_deb.tar.gz", "sha256": "30903df3b9f61360d9660cd707de48cd2831469114492a5008ed58a0ac77d044", "license": "MPL-2.0"},
-  "migration": {"repository": "Self-Command/reference-paper-studio", "tested_commit": "ede3e05309d86f256a8cc0d4121d71df185e36ab", "model_run": "38016554238", "matrix_run": "38016552113", "source_license": "MIT"}
+  "migration": {"repository": "Self-Command/reference-paper-studio", "source_commit": "ede3e05309d86f256a8cc0d4121d71df185e36ab", "source_license": "MIT", "scope": "reused generic content import and mathematical layout helpers"}
 }

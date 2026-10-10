@@ -7,7 +7,7 @@
     "Existing-document fonts may be substituted. Actual PDF families are recorded per receipt; fontconfig candidates are advisory and are not claimed to equal the renderer font choice.",
     "Actual font embedding is structurally tested from font data; these PDFs do not establish that Word loads the embedded face.",
     "Comments, revisions, controls and unknown parts have structural retention evidence; their interactive Word UI presentation is not visually certified.",
-    "Paper-template consumers are paused and are excluded from this core acceptance."
+    "Application-specific templates and business workflows are outside this generic core acceptance."
   ],
   "engine_commit": "a8fb33e500512e2f42f9df9e3e8f3c1a7fffe90c",
   "proofs": [

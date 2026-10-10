@@ -4,7 +4,9 @@ Original Word Module Studio source: Apache-2.0, Copyright 2026 Self-Command.
 
 - OfficeCLI: Apache-2.0, iOfficeAI contributors. Pinned v1.0.156,
   commit 699cafbc8f0b8a7841c6cca53dafd0c24e982f56. Machine-readable help contracts
-  copied unmodified into third_party/officecli/help. Word showcase source/assets
+  for DOCX and their required shared definitions copied unmodified into
+  third_party/officecli/help. Unused definitions for other formats are excluded.
+  Word showcase source/assets
   copied into fixtures/upstream/word for cloud qualification, not installation.
   Original license retained in third_party/officecli/LICENSE.
 - reference-paper-studio: MIT, Copyright 2026 Self-Command. Mathematical

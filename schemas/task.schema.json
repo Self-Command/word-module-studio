@@ -3,7 +3,7 @@
  "required":["schema_version","stage","files"],"properties":{
   "schema_version":{"const":1},"task_id":{"type":"string","pattern":"^task-[a-f0-9]{16}$"},"engine_commit":{"type":"string","pattern":"^[a-f0-9]{40}$"},
   "stage":{"enum":["inspect","edit","compose","template-probe","template-build","template-register","render","refresh-fields","verify","merge","extract","visual-receipt","package"]},
-  "files":{"type":"array","items":{"type":"object","additionalProperties":false,"required":["path","role","sha256"],"properties":{"path":{"type":"string"},"role":{"enum":["document","markdown","image","bibliography","font","template","batch","data","receipt","proof","model-evidence","master","template-manifest","composition-report","visual-report"]},"sha256":{"type":"string","pattern":"^[a-f0-9]{64}$"}}}},
+  "files":{"type":"array","items":{"type":"object","additionalProperties":false,"required":["path","role","sha256"],"properties":{"path":{"type":"string"},"role":{"enum":["document","markdown","image","bibliography","font","template","batch","data","receipt","proof","master","template-manifest","composition-report","visual-report"]},"sha256":{"type":"string","pattern":"^[a-f0-9]{64}$"}}}},
   "template_id":{"type":"string"},"template_version":{"type":"string"},"font_scheme":{"type":"object"},"output_name":{"type":"string","pattern":"^[A-Za-z0-9_.-]+$"},"header_policy":{"enum":["master","source_regions"]}
  }
 }

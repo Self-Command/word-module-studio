@@ -8,3 +8,8 @@ sdk/bin/
 sdk/obj/
 jobs/
 .venv/
+dist/
+outputs/
+tasks/
+private-inputs/
+excluded/

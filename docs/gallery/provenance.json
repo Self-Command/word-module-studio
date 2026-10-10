@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "run_id": "38059546545",
+  "engine_commit": "a8fb33e500512e2f42f9df9e3e8f3c1a7fffe90c",
+  "renderer": "LibreOffice 26.8.1",
+  "kind": "unmodified accepted generic proof pages",
+  "images": [
+    {
+      "file": "editable-math.png",
+      "receipt": "docs/core-acceptance/layout-readable-math.json",
+      "source_proof": "test-work/test_configured_math_font_is_r0/proof",
+      "source_page": "page-1.png",
+      "page_number": 1,
+      "sha256": "309f9075c39f99c36c3c9656dc714d2efeea2aa9dbc70cfb75b5678124d1a544"
+    },
+    {
+      "file": "author-alignment.png",
+      "receipt": "docs/core-acceptance/layout-author-alignment.json",
+      "source_proof": "test-work/test_practical_math_preserves_0/alignment-proof",
+      "source_page": "page-1.png",
+      "page_number": 1,
+      "sha256": "47e1b68de4552d57816e7715cd13142a1792866c9d6f5673a41b5e85ee3aa24c"
+    },
+    {
+      "file": "two-columns.png",
+      "receipt": "docs/core-acceptance/layout-gallery-double.json",
+      "source_proof": "test-work/test_generic_layout_gallery_do0/proof",
+      "source_page": "page-1.png",
+      "page_number": 1,
+      "sha256": "fce9702a33376b21d6a91506053ec772152c9dd0f8ded357d867ab794486417c"
+    },
+    {
+      "file": "three-columns.png",
+      "receipt": "docs/core-acceptance/layout-gallery-triple.json",
+      "source_proof": "test-work/test_generic_layout_gallery_tr0/proof",
+      "source_page": "page-1.png",
+      "page_number": 1,
+      "sha256": "1d942c5626c314284e8cee0251ceff33b00bd4f76e01384e5196440babaa7840"
+    },
+    {
+      "file": "native-objects.png",
+      "receipt": "docs/core-acceptance/layout-native-objects.json",
+      "source_proof": "test-work/test_core_object_gallery0/proof",
+      "source_page": "page-1.png",
+      "page_number": 1,
+      "sha256": "511cf5416447f5c6613b94c81b116b752b10d54ec2bd77170dad29b96167bd1f"
+    },
+    {
+      "file": "drop-cap.png",
+      "receipt": "docs/core-acceptance/layout-drop-cap.json",
+      "source_proof": "test-work/test_drop_cap_visual_gallery0/proof",
+      "source_page": "page-1.png",
+      "page_number": 1,
+      "sha256": "04606cb444d523b9307d6cd694cf767a3c31463cc5b70b447776f157998c6704"
+    },
+    {
+      "file": "editable-chart.png",
+      "receipt": "docs/core-acceptance/layout-chart-scatter.json",
+      "source_proof": "test-work/test_core_chart_gallery_scatte0/proof",
+      "source_page": "page-1.png",
+      "page_number": 1,
+      "sha256": "f27406f654e0fcc22c3eb15c9e08758919b6d2405c225caef66c44d1a334c727"
+    },
+    {
+      "file": "continued-table.png",
+      "receipt": "docs/core-acceptance/rendering-continued-table.json",
+      "source_proof": "test-work/test_real_continuation_caption0/proof",
+      "source_page": "page-2.png",
+      "page_number": 2,
+      "sha256": "22e302fbaa7c312a6b54593d3257384ec67ac17b17659f2fd1baea96be41ec32"
+    }
+  ]
+}

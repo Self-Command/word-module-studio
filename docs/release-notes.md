@@ -1,4 +1,12 @@
-Word Module Studio provides composable DOCX operations and JSON/Python/Codex interfaces.
+Word Module Studio 0.1.1 publishes the standalone, general-purpose DOCX skill with JSON,
+Python and Codex interfaces. English and Chinese READMEs explain installation, cloud task
+setup, editing, template registration, outputs and qualification limits, with eight actual
+test-page images and their source fingerprints.
+
+The current source and installation exclude application adapters, domain policies, external
+manuscripts and unrelated project data. An explicit publication inventory checks the source
+tree and supplies the exact installation files. Regression checks verify that unlisted files
+cannot enter the package, even when placed inside otherwise supported directories.
 
 The core layout release adds themes and effective font inheritance, section and container
 ownership, CJK and pagination controls, native frames and drop caps, real font embedding,
@@ -19,4 +27,4 @@ arrays. Author alignment and nested mathematical atoms stay intact; difficult fo
 require a small manual adjustment recorded by formula ID. Page clipping or severe occlusion
 must fail visual acceptance. Font embedding requires redistributable font files.
 
-Paper template suites remain paused pending their own integration and acceptance.
+Application-specific integrations require their own repositories and acceptance.

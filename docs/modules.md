@@ -34,7 +34,7 @@ geometry and checks the registered master/spec/font fingerprints.
 | M16 Controls | OfficeCLI text/richtext/picture/date/check/list; `controls.apply`: bind, conditional/repeat/fill | Native custom XML bindings; safe semantic values |
 | M17 Merge/extract | `merge` / `extract`; docxcompose adapter imports auxiliary parts | Explicit master/source-region header policy; remap media/styles/bookmarks/notes/comments |
 | M18 Metadata/accessibility | OfficeCLI core properties; `accessibility.inspect` | Heading hierarchy, default language, image alt and table header checks |
-| M19 Template/fonts | `templates.build`, identity and protection checks | TemplateSpec only; explicit font scheme, immutable master, no consumer-name branch |
+| M19 Template/fonts | `templates.build`, identity and protection checks | TemplateSpec, explicit font scheme and immutable master |
 | M20 Proof/review | `render`, `geometry`, `receipt`, SDK and semantic differences | PDF+PNG, run and file fingerprints; manual page observations required |
 
 Common failures: `CLOUD_ONLY`, `STALE_INPUT`, `INVALID_TARGET`, `UNSUPPORTED_PROPERTY`,

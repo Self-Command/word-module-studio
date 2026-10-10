@@ -327,8 +327,5 @@
   "acceptance_manifest": "docs/core-acceptance.json",
   "run_id": "38059546545",
   "engine_commit": "a8fb33e500512e2f42f9df9e3e8f3c1a7fffe90c",
-  "paused_consumer_tests": [
-    "tests/test_consumer.py",
-    "tests/test_public_paper.py"
-  ]
+  "scope": "standalone generic DOCX modules; application-specific projects are not included"
 }
