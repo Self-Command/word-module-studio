@@ -22,6 +22,8 @@ commands = [
     ["add", document, "/body", "--type", "equation", "--prop", r"formula=\frac{x^{2}}{1+y}+\sum_{i=1}^{n}i"],
     ["add", document, "/body", "--type", "table", "--prop", "rows=2", "--prop", "cols=2"],
     ["get", document, "/section[2]", "--json"],
+    ["save", document],
+    ["close", document],
 ]
 results = []
 for cmd in commands:
@@ -34,6 +36,7 @@ write_json(folder / "commands.json", results)
 assert all(r["success"] for r in results), "BACKEND_QUALIFICATION_FAILED"
 with ZipFile(document) as archive:
     root = etree.fromstring(archive.read("word/document.xml"))
+    (folder / "document.xml").write_bytes(archive.read("word/document.xml"))
     ns = {"w": "http://schemas.openxmlformats.org/wordprocessingml/2006/main", "m": "http://schemas.openxmlformats.org/officeDocument/2006/math"}
     assert "中文 English العربية" in "".join(root.xpath("//w:t/text()", namespaces=ns))
     assert root.xpath("//w:cols[@w:num='2']", namespaces=ns)
