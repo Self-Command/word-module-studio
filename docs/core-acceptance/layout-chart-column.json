@@ -6,7 +6,7 @@
       "sha256": "9dbc5a528158020f1a1c33b9af2ae0c8e36d4280de29138aa7d49ed431b60d82"
     }
   ],
-  "output_sha256": "cc351a8335d9cf71e64e3086739e779cc162a12a42503f5627e8a08f36563f4d",
+  "output_sha256": "6de461bcab062bf87e2d5ae6380aaa699165228ad2e7eee7a8c39d9f121e08e5",
   "checklist": [
     {
       "result": "pass",
@@ -119,7 +119,7 @@
     "CAAAAA+Carlito",
     "DAAAAA+Carlito-Bold"
   ],
-  "run_id": "38059546545",
+  "run_id": "38064409279",
   "page_reviews": [
     {
       "observations": "Column chart shows A=1, B=3, C=2 with complete title, axes and Series legend.",
@@ -127,8 +127,14 @@
       "status": "pass"
     }
   ],
-  "input_sha256": "d1460c55475f760e6b72cef01917a6e5a4c801e4eb3904394d0cae84db96edd1",
-  "engine_commit": "a8fb33e500512e2f42f9df9e3e8f3c1a7fffe90c",
+  "input_sha256": "0c315f28a599d767d02da0d1deae780c271b055c5735de4ee3c8cfabcf1781dc",
+  "engine_commit": "2ee18d51df26f8e0fbc175bf4e0f3b7988430b99",
   "findings": [],
-  "reviewer": "Codex: direct inspection of every selected cloud-rendered page, with full-size inspection of detailed formulas and objects"
+  "reviewer": "Codex: direct review of original cloud pages; all current page hashes and PDF font families match, with current artifact identities rebound",
+  "review_provenance": {
+    "original_run_id": "38059546545",
+    "original_engine_commit": "a8fb33e500512e2f42f9df9e3e8f3c1a7fffe90c",
+    "method": "Original direct page review retained only because every current page SHA-256 and observed PDF font family exactly match the reviewed source. Release gate also verifies hashes of actual current page files.",
+    "current_page_hashes_match_original": true
+  }
 }

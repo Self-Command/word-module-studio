@@ -1,10 +1,10 @@
 # Core layout acceptance
 
-Version 0.1.0 completes the core layout integration scope. Engine commit
-`a8fb33e500512e2f42f9df9e3e8f3c1a7fffe90c` passed all six jobs in
-[run 38059546545](https://github.com/Self-Command/word-module-studio/actions/runs/38059546545):
-core 39, advanced 20, composition 9, layout 26, rendering 5 and distribution 1,
-for 100 regression tests. This is evidence for the listed scenarios, not every Word behavior.
+Version 0.1.1 publishes the standalone generic Word skill and its tested core layout scope. Engine commit
+`2ee18d51df26f8e0fbc175bf4e0f3b7988430b99` passed all six jobs in
+[run 38064409279](https://github.com/Self-Command/word-module-studio/actions/runs/38064409279):
+core 39, advanced 20, composition 9, layout 26, rendering 5 and distribution 2,
+for 101 regression tests. This is evidence for the listed scenarios, not every Word behavior.
 
 Direct review covered 26 generic proofs and all 49 pages: single/double/triple and unequal
 columns, landscape pages, Chinese/Latin/RTL content, effective fonts and theme inheritance,
@@ -12,6 +12,10 @@ AutoFit and merged tables, continued captions, six editable chart types, floatin
 native frames/drop caps, textboxes/shapes, native notes, source-section merging, readable
 fractions/cases, author alignment, long outer continuation lines and refreshed TOC/caption
 index/alphabetical index after additions and deletions.
+
+For 0.1.1, every current page SHA-256 and observed PDF font family exactly matches the
+original directly reviewed run 38059546545. Receipts retain that inspection provenance and
+bind the new run's input and PDF identities; the release gate verifies the current page files.
 
 [The acceptance manifest](core-acceptance.json) binds every selected proof and its page
 hashes to a 21-item receipt with individual page observations. The release workflow checks

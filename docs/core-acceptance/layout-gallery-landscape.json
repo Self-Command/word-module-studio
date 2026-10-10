@@ -10,7 +10,7 @@
       "sha256": "52ac23c3ce8ef28a80c673935f8042e2fd4a671cfe8d9859624749c6493b5302"
     }
   ],
-  "output_sha256": "6b0b08d9c243abfb0eedeca300563d78d4249d2a883bbdd571651332f163e981",
+  "output_sha256": "d1063131f9d708edfdbb025ae4b975989090766a14e88808c94fff1c0d031071",
   "checklist": [
     {
       "result": "pass",
@@ -128,7 +128,7 @@
     "HAAAAA+LiberationSerif",
     "IAAAAA+LiberationSerif"
   ],
-  "run_id": "38059546545",
+  "run_id": "38064409279",
   "page_reviews": [
     {
       "observations": "landscape geometry is visible, including unequal widths where configured. Complete Chinese and joined RTL Arabic text precede numbered observations 1 and 2. REGION paragraphs stay inside their columns; header and Page 1 / 2 footer are retained.",
@@ -141,8 +141,14 @@
       "status": "pass"
     }
   ],
-  "input_sha256": "1e756797751e276295fb1d40b25347e9f1fe2b246c9bf87d5c793e7e02e8bf74",
-  "engine_commit": "a8fb33e500512e2f42f9df9e3e8f3c1a7fffe90c",
+  "input_sha256": "0a37f492a5bb08d3bac6d33982a0741f45fcb169e9665fe8da3d6489f662dbb0",
+  "engine_commit": "2ee18d51df26f8e0fbc175bf4e0f3b7988430b99",
   "findings": [],
-  "reviewer": "Codex: direct inspection of every selected cloud-rendered page, with full-size inspection of detailed formulas and objects"
+  "reviewer": "Codex: direct review of original cloud pages; all current page hashes and PDF font families match, with current artifact identities rebound",
+  "review_provenance": {
+    "original_run_id": "38059546545",
+    "original_engine_commit": "a8fb33e500512e2f42f9df9e3e8f3c1a7fffe90c",
+    "method": "Original direct page review retained only because every current page SHA-256 and observed PDF font family exactly match the reviewed source. Release gate also verifies hashes of actual current page files.",
+    "current_page_hashes_match_original": true
+  }
 }

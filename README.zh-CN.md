@@ -24,7 +24,7 @@
 | **带工作簿数据的可编辑图表** | **跨栏续表** |
 | [<img src="docs/gallery/editable-chart.png" width="400" alt="包含三个数值点的原生散点图">](docs/gallery/editable-chart.png) | [<img src="docs/gallery/continued-table.png" width="400" alt="续表保留行数据、重复表头和题注">](docs/gallery/continued-table.png) |
 
-8 张图片均在[来源清单](docs/gallery/provenance.json)中记录页面与 SHA-256 指纹，来自[云端运行 38059546545](https://github.com/Self-Command/word-module-studio/actions/runs/38059546545)。该次排版基线通过 **100 项回归测试、26 份通用校样和全部 49 页逐页审阅**。这些证据对应具体场景，不能代表全部 Word 功能或任意输入均已通过。
+8 张图片均在[来源清单](docs/gallery/provenance.json)中记录页面与 SHA-256 指纹，来自[云端运行 38059546545](https://github.com/Self-Command/word-module-studio/actions/runs/38059546545)。该次排版基线通过 **100 项回归测试、26 份通用校样和全部 49 页逐页审阅**。独立技能 0.1.1 源码在[云端运行 38064409279](https://github.com/Self-Command/word-module-studio/actions/runs/38064409279)通过 **6 组检查、101 项测试**，包含发布文件清单与未登记文件不得进入安装包的检查。这些证据对应具体场景，不能代表全部 Word 功能或任意输入均已通过。
 
 ## 支持哪些功能
 

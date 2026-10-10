@@ -6,7 +6,7 @@
       "sha256": "611ec5316d4d1b9fc0f8631f740e42bb6c2ac9a6dbf74d78e78066a471426721"
     }
   ],
-  "output_sha256": "d1584f2ad383e1a84c1decc4ddb1694569294e1bda122010040b3137bcedd140",
+  "output_sha256": "1b5e151a08e4fce41dca58f5740bca4b55a7a5ea70dc9c722b21a63de30440a3",
   "checklist": [
     {
       "result": "pass",
@@ -118,7 +118,7 @@
     "BAAAAA+LiberationSans",
     "CAAAAA+Carlito"
   ],
-  "run_id": "38059546545",
+  "run_id": "38064409279",
   "page_reviews": [
     {
       "observations": "First and second text remain complete. The inherited Liberation Sans first paragraph and retained renderer-substituted second paragraph are recorded separately in the actual PDF font manifest.",
@@ -126,8 +126,14 @@
       "status": "pass"
     }
   ],
-  "input_sha256": "a5cd13aa5113e834bf64fdcd51a5201c0bc452d8b5d313063119bbf94b55da4c",
-  "engine_commit": "a8fb33e500512e2f42f9df9e3e8f3c1a7fffe90c",
+  "input_sha256": "4bbb6e52117e3d394d018b0bb73abce38f5ee0178f0764dc63894f191ff9c60b",
+  "engine_commit": "2ee18d51df26f8e0fbc175bf4e0f3b7988430b99",
   "findings": [],
-  "reviewer": "Codex: direct inspection of every selected cloud-rendered page, with full-size inspection of detailed formulas and objects"
+  "reviewer": "Codex: direct review of original cloud pages; all current page hashes and PDF font families match, with current artifact identities rebound",
+  "review_provenance": {
+    "original_run_id": "38059546545",
+    "original_engine_commit": "a8fb33e500512e2f42f9df9e3e8f3c1a7fffe90c",
+    "method": "Original direct page review retained only because every current page SHA-256 and observed PDF font family exactly match the reviewed source. Release gate also verifies hashes of actual current page files.",
+    "current_page_hashes_match_original": true
+  }
 }

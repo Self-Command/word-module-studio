@@ -1,15 +1,15 @@
 {
   "schema_version": 1,
-  "run_id": "38059546545",
+  "run_id": "38064409279",
   "limitations": [
-    "Acceptance is bounded to these generic core documents and 100 regression scenarios; it does not certify every Word feature or arbitrary document.",
+    "Acceptance is bounded to these generic core documents and 101 regression scenarios; it does not certify every Word feature or arbitrary document.",
     "LibreOffice 26.8.1 compatibility proof only; Microsoft Word native rendering is not tested. Native OMML operator breaks are ignored by this renderer; compatible outer arrays are the default.",
     "Existing-document fonts may be substituted. Actual PDF families are recorded per receipt; fontconfig candidates are advisory and are not claimed to equal the renderer font choice.",
     "Actual font embedding is structurally tested from font data; these PDFs do not establish that Word loads the embedded face.",
     "Comments, revisions, controls and unknown parts have structural retention evidence; their interactive Word UI presentation is not visually certified.",
     "Application-specific templates and business workflows are outside this generic core acceptance."
   ],
-  "engine_commit": "a8fb33e500512e2f42f9df9e3e8f3c1a7fffe90c",
+  "engine_commit": "2ee18d51df26f8e0fbc175bf4e0f3b7988430b99",
   "proofs": [
     {
       "path": "test-work/test_real_cloud_pagination_1_F0/proof",
@@ -141,5 +141,14 @@
       "suite": "composition",
       "receipt": "docs/core-acceptance/composition-source-sections-and-notes.json"
     }
-  ]
+  ],
+  "review_revalidation": {
+    "original_run_id": "38059546545",
+    "current_run_id": "38064409279",
+    "proof_count": 26,
+    "page_count": 49,
+    "all_current_page_sha256_match_original": true,
+    "all_observed_pdf_font_families_match_original": true,
+    "method": "Carry forward original direct inspection only for byte-identical page images; bind the receipts to the new input and PDF identities."
+  }
 }
