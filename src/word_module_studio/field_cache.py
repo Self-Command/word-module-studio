@@ -183,7 +183,7 @@ def transplant(source, refreshed):
                 # Writer can export an unnamed SEQ. Counts and story ordinal must
                 # agree; only its result is copied, never its damaged instruction.
                 candidate_part, candidate = sequences[area][ordinal]
-            else: raise WordError('FIELD_CACHE_MATCH_MISSING', part + ': ' + code)
+            else: raise WordError('FIELD_CACHE_MATCH_MISSING', part + ': ' + code + '; exported: ' + repr([k for k in candidates if k[0] == area]))
             nodes = result_nodes(candidate)
             for value in nodes:
                 for node in value.iter():

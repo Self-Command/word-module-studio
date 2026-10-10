@@ -207,8 +207,8 @@ def test_toc_and_caption_index_refresh_after_edit(tmp_path):
     doc.add_page_break(); doc.add_heading('Deleted chapter', 1); doc.add_paragraph('REMOVE section text.')
     doc.save(source); package = Package(source); body = package.xml('word/document.xml').find(W + 'body')
     toc = _field(body, r' TOC \o "1-3" \h '); body.remove(toc); body.insert(1, toc)
-    caption = _field(body, r' SEQ Figure ', '1')
-    E.SubElement(E.SubElement(caption, W + 'r'), W + 't').text = ' Caption evidence'
+    from word_module_studio.captions import caption as native_caption
+    body.append(native_caption('Figure', 'Caption evidence', '1', position='below'))
     index = _field(body, r' TOC \c "Figure" \h '); body.remove(index); body.insert(2, index)
     _field(body, r' XE "Retained topic" ', '')
     _field(body, r' INDEX \h "A" ')
@@ -310,3 +310,16 @@ def test_drop_cap_visual_gallery(document, tmp_path):
         capitals = [c['size'] for p in pdf.pages for c in p.chars if c['text'] == 'D']
         body = [c['size'] for p in pdf.pages for c in p.chars if c['text'] == 's']
     assert capitals and body and max(capitals) > max(body) * 1.5, 'Native drop cap must appear at its requested line height'
+
+
+def test_configured_math_font_is_readable(tmp_path):
+    from word_module_studio.compose import compose
+    policy = spec(1); policy['regions'] = [policy['regions'][1]]
+    manifest = build(policy, tmp_path / 'template')
+    source = tmp_path / 'readable.md'; source.write_text('# Readable math\n\nBody size reference.\n\n$$x=\\frac{1+y^2}{1+z}\\tag{R1}$$', encoding='utf-8')
+    output = tmp_path / 'readable.docx'; compose(source, manifest, output)
+    report = render(output, tmp_path / 'proof')
+    import pdfplumber
+    with pdfplumber.open(tmp_path / 'proof/readable.pdf') as pdf:
+        math_glyphs = [c for p in pdf.pages for c in p.chars if 'TeXGyrePagellaMath' in c['fontname'].replace('-', '') and c['text'] in 'xyz=+1']
+    assert math_glyphs and max(c['size'] for c in math_glyphs) >= 8, report['math_font_application']
