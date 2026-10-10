@@ -20,6 +20,7 @@ def apply(package, target, props):
     table = target['element']
     if table.tag != W + 'tbl': raise WordError('TABLE_REQUIRED')
     operation = props.get('operation', 'format')
+    if operation == 'paginate': return paginate(package, target, props)
     if operation == 'merge': return merge(table, props)
     allowed = {'operation', 'widths_twips', 'three_line', 'header_rows', 'split_rows', 'title', 'number', 'caption_position'}
     if set(props) - allowed: raise WordError('TABLE_PROPERTY_UNSUPPORTED')
@@ -139,3 +140,44 @@ def merge(table, props):
         if r1 > r0:
             _set(tcpr, 'vMerge', {'val': 'restart' if index == 0 else 'continue'})
     return {'merged': [r0, r1, c0, c1]}
+
+
+def paginate(package, target, props):
+    """Derive safe continuation boundaries from actual cloud pagination."""
+    import json
+    import tempfile
+    from pathlib import Path
+    from .render import render
+    allowed = {'operation', 'title', 'number', 'header_rows', 'caption_position', 'widths_twips', 'three_line'}
+    if set(props) - allowed: raise WordError('PAGINATION_PROPERTY_UNSUPPORTED')
+    if not props.get('title') or not props.get('number'): raise WordError('CONTINUATION_CAPTION_REQUIRED')
+    table = target['element']
+    if table.xpath('.//w:vMerge', namespaces=NS): raise WordError('TABLE_PAGINATION_MERGED_ROWS_REQUIRE_EXPLICIT_SPLIT')
+    headers = props.get('header_rows', 1)
+    formatting = {k: v for k, v in props.items() if k not in ('operation', 'title', 'number', 'caption_position')}
+    apply(package, target, {'operation': 'format', **formatting})
+    # Add a real first caption so its height participates in boundary discovery.
+    original_caption = caption('Table', props['title'], props['number'], position=props.get('caption_position', 'below'))
+    if props.get('caption_position', 'below') == 'above': table.addprevious(original_caption)
+    else: table.addnext(original_caption)
+    package.save()
+    native_tables = list(package.xml('word/document.xml').iter(W + 'tbl'))
+    ordinal = native_tables.index(table)
+    with tempfile.TemporaryDirectory(dir=package.path.parent) as temporary:
+        folder = Path(temporary)
+        render(package.path, folder)
+        layout = json.loads((folder / (package.path.stem + '.layout.json')).read_text())
+    if ordinal >= len(layout['tables']): raise WordError('TABLE_PAGINATION_MAPPING_FAILED')
+    rows = layout['tables'][ordinal]['rows']
+    if len(rows) != len(table.findall(W + 'tr')) or any('diagnostic' in row for row in rows): raise WordError('TABLE_PAGINATION_MAPPING_FAILED')
+    boundaries = []
+    for index in range(max(headers, 1), len(rows)):
+        previous, current = rows[index - 1], rows[index]
+        if current['page'] != previous['page'] or abs(current['x_pt'] - previous['x_pt']) > 12:
+            if index <= headers: raise WordError('TABLE_HEADER_CANNOT_FIT')
+            boundaries.append(index)
+    original_caption.getparent().remove(original_caption)
+    if not boundaries:
+        return apply(package, target, {**props, 'operation': 'format'})
+    result = split(table, {**props, 'split_rows': boundaries}, headers)
+    return {**result, 'boundary_source': 'LibreOffice native row positions', 'initial_row_positions': rows}

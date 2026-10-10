@@ -42,3 +42,30 @@ def test_real_cloud_pagination(tmp_path, columns, landscape, sans):
         assert max(starts) - min(starts) > 70, 'Columns must affect actual pagination, not only w:cols'
     with pytest.raises(WordError, match='VISUAL_RECEIPT_IDENTITY_MISMATCH'):
         receipt(proof, {'run_id': 'wrong'})
+
+
+def test_real_continuation_captions_and_headers(tmp_path):
+    from word_module_studio.tables import apply
+    from word_module_studio.package import Package, W, NS
+    template = build(spec(2), tmp_path / 'template')
+    markdown = tmp_path / 'rows.md'
+    markdown.write_text('# Native continued table\n\n| Row | Observation |\n|---|---|\n' +
+        '\n'.join('| ROW' + str(i) + ' | Repeated native row with retained data and enough text to span several columns. |' for i in range(65)), encoding='utf-8')
+    output = tmp_path / 'continued.docx'; compose(markdown, template, output)
+    package = Package(output); target = next(o for o in package.objects() if o['kind'] == 'table')
+    result = apply(package, target, {'operation': 'paginate', 'title': 'Retained observations', 'number': 1, 'header_rows': 1, 'three_line': True, 'caption_position': 'below'})
+    package.objects(stamp=True); package.save()
+    assert result['segments'] > 1
+    report = render(output, tmp_path / 'proof')
+    assert report['automatic_pass'], report['issues']
+    with pdfplumber.open(tmp_path / 'proof/continued.pdf') as document:
+        text = ''.join(p.extract_text() or '' for p in document.pages)
+    assert all('ROW' + str(i) in text for i in range(65))
+    assert 'continued' in text and text.count('Retained observations') == result['segments']
+    root = Package(output).xml('word/document.xml')
+    assert len(root.xpath('//w:tbl//w:tblHeader', namespaces=NS)) == result['segments']
+    identity = {key: report[key] for key in ('run_id', 'output_sha256', 'pages')}
+    # Synthetic negative receipt tests the gate; it is not a release review.
+    identity.update(reviewer='test fixture', checklist=[{'id': f'V{i:02}', 'result': 'pass'} for i in range(1, 22)],
+        page_reviews=[{'page': i, 'status': 'fail' if i == 1 else 'pass', 'observations': 'Synthetic receipt validation case'} for i in range(1, len(report['pages']) + 1)])
+    assert not receipt(tmp_path / 'proof', identity)['delivery_accepted']
