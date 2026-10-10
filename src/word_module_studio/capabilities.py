@@ -54,6 +54,10 @@ def check_properties(module, kind, action, props):
     data = contract(kind)
     if not data.get("operations", {}).get(action): raise WordError("UNSUPPORTED_ACTION", f"{kind}/{action}")
     definitions = {}
+    if module == 'M15' and kind != 'revision':
+        revision = contract('revision')['properties']
+        for key in ('revision.type', 'revision.author', 'revision.date', 'revision.id'):
+            definitions[key] = {'add': True, 'set': True, 'type': 'string'}
     for key, value in data["properties"].items():
         definitions[key.lower()] = value
         aliases = value.get("aliases", [])

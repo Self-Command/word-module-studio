@@ -60,6 +60,8 @@ def apply(package, target, props):
                 borders = _set(cell_props, 'tcBorders')
                 for side in ('top', 'left', 'bottom', 'right'):
                     _set(borders, side, {'val': 'single' if side == 'bottom' and index == headers - 1 else 'nil', 'sz': 4})
+    from .ooxml import order_properties
+    order_properties(table)
     if props.get('split_rows'): return split(table, props, headers)
     return {'widths_twips': widths, 'rows': len(rows), 'header_rows': headers, 'three_line': props.get('three_line', False)}
 

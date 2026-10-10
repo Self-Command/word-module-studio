@@ -96,4 +96,6 @@ def bind(package, target, props):
     if old is not None: control_props.remove(old)
     binding = E.SubElement(control_props, W + 'dataBinding')
     binding.set(W + 'storeItemID', store_id); binding.set(W + 'xpath', '/data/' + key)
+    from .ooxml import order_properties
+    order_properties(target['element'])
     return {'store_id': store_id, 'item': item, 'xpath': '/data/' + key}

@@ -2,7 +2,7 @@
 set -euo pipefail
 [[ "${GITHUB_ACTIONS:-}" == true && -n "${GITHUB_RUN_ID:-}" ]] || { echo CLOUD_ONLY; exit 2; }
 sudo apt-get update -qq
-sudo apt-get install -y --no-install-recommends poppler-utils fontconfig fonts-noto-cjk fonts-noto-core fonts-liberation fonts-texgyre python3-uno
+sudo apt-get install -y --no-install-recommends poppler-utils fontconfig fonts-noto-cjk fonts-noto-core fonts-liberation fonts-texgyre fonts-texgyre-math python3-uno
 mkdir -p .tools/downloads build/provenance
 archive=.tools/downloads/LibreOffice_26.8.1_Linux_x86-64_deb.tar.gz
 curl --fail --location --retry 3 --connect-timeout 20 --max-time 300 https://download.documentfoundation.org/libreoffice/stable/26.8.1/deb/x86_64/LibreOffice_26.8.1_Linux_x86-64_deb.tar.gz -o "$archive"

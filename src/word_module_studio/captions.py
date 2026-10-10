@@ -26,6 +26,8 @@ def caption(sequence, title, number, *, prefix=None, continuation=False, bookmar
     text.text = ' ' + title + (' (continued)' if continuation else '')
     if bookmark:
         E.SubElement(p, W + 'bookmarkEnd').set(W + 'id', str(number + 5000))
+    from .ooxml import order_properties
+    order_properties(p)
     return p
 
 

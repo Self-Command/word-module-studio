@@ -8,3 +8,4 @@ pypdf==6.1.1
 pillow==12.3.0
 pytest==8.4.2
 PyYAML==6.0.3
+docxcompose==2.2.0

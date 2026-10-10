@@ -20,7 +20,8 @@ class LayoutContext:
         root = package.xml("word/document.xml")
         sections = list(root.iter(W + "sectPr"))
         element = item["element"]
-        if item["part"] == "word/document.xml":
+        if element.tag in (W + 'body', W + 'document'): section = sections[-1] if sections else None
+        elif item["part"] == "word/document.xml":
             ordered = list(root.iter())
             position = ordered.index(element)
             section = next((s for s in sections if ordered.index(s) >= position), sections[-1] if sections else None)

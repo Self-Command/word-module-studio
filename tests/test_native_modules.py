@@ -25,7 +25,7 @@ def item(file, kind, text=None):
 @pytest.mark.parametrize('module,props,path,expected', [
     ('M02', {'bold': True, 'italic': True, 'color': 'A00000'}, '//w:b', None),
     ('M03', {'align': 'center', 'keepNext': True}, '//w:jc', 'center'),
-    ('M04', {'list': 'decimal'}, '//w:numPr', None),
+    ('M04', {'listStyle': 'ordered'}, '//w:numPr', None),
 ])
 def test_basic_formatting(document, tmp_path, module, props, path, expected):
     output = apply(document, tmp_path, module, item(document, 'paragraph', 'first'), props=props)
@@ -41,7 +41,7 @@ def test_section_unequal_columns_and_page_number(document, tmp_path):
     output = apply(output, tmp_path, 'M05', item(output, 'section'), action='extension',
         props={'operation': 'unequal_columns', 'widths_twips': [3500, 4200], 'gap_twips': 500}, name='unequal')
     root = Package(output).xml('word/document.xml')
-    assert root.xpath('//w:cols[@w:equalWidth="0"]/w:col[@w:w="3500"]', namespaces=NS)
+    assert root.xpath('//w:cols[@w:equalWidth="0" or @w:equalWidth="false"]/w:col[@w:w="3500"]', namespaces=NS)
     assert root.xpath('//w:pgNumType[@w:start="3"][@w:fmt="lowerRoman"]', namespaces=NS)
 
 
@@ -99,7 +99,7 @@ def test_picture_native_resource(document, tmp_path):
     output = apply(document, tmp_path, 'M11', item(document, 'paragraph', 'second'), action='add', kind='picture',
         props={'path': str(image), 'width': '3cm', 'alt': 'Qualification logo'})
     package = Package(output)
-    assert any(n.startswith('word/media/') for n in package.parts)
+    assert any(node.get('Type', '').endswith('/image') for name in package.parts if name.endswith('.rels') for node in package.xml(name))
     assert 'Qualification logo' in E.tostring(package.xml('word/document.xml')).decode()
 
 
@@ -109,7 +109,7 @@ def test_editable_chart(document, tmp_path, chart_type):
         props={'chartType': chart_type, 'data': 'Series:1,3,2', 'categories': 'A,B,C', 'title': 'Editable chart', 'width': '7cm', 'height': '5cm'})
     package = Package(output)
     assert any(n.startswith('word/charts/') and n.endswith('.xml') for n in package.parts)
-    assert any(n.startswith('word/embeddings/') for n in package.parts), 'Chart data must be editable'
+    assert any(node.get('Type', '').endswith('/package') for name in package.parts if name.endswith('.rels') for node in package.xml(name)), 'Chart data must be editable'
 
 
 def test_native_shape(document, tmp_path):

@@ -3,6 +3,7 @@ import json
 import shutil
 from pathlib import Path
 import tempfile
+from contextlib import contextmanager
 from .runtime import require_actions, WordError, digest, write_json, run
 from .package import Package, snapshot, semantic
 from .backend import OfficeBackend
@@ -31,8 +32,7 @@ def execute(batch, input_path, output_path, *, template=None):
     ledger = []
     output_path = Path(output_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    with tempfile.TemporaryDirectory(dir=output_path.parent) as temporary:
-        work = Path(temporary) / "transaction.docx"
+    with transaction_work(output_path) as work:
         shutil.copyfile(input_path, work)
         package = Package(work)
         package.objects(stamp=True)
@@ -69,7 +69,13 @@ def execute(batch, input_path, output_path, *, template=None):
         if 'M15' in modules:
             preserved = [p for p in preserved if not p.startswith(('word/commentsExtended', 'word/commentsIds', 'word/people'))]
         for part in preserved:
-            if source["parts"][part] != final["parts"].get(part): raise WordError("UNKNOWN_PART_CHANGED", part)
+            if source["parts"][part] != final["parts"].get(part):
+                original_package, final_package = Package(input_path), Package(work)
+                if part.endswith('.xml') and xml_tree(original_package.xml(part)) == xml_tree(final_package.xml(part)):
+                    final_package.parts[part] = original_package.parts[part]
+                    final_package.roots.pop(part, None)
+                    final_package.save()
+                else: raise WordError("UNKNOWN_PART_CHANGED", part)
         validation = json.loads(run(["dotnet", ".tools/sdk/WordSdk.dll", "validate", work]))
         from .verify import relationships, preservation
         integrity = relationships(work)
@@ -85,3 +91,20 @@ def execute(batch, input_path, output_path, *, template=None):
         "relationships": integrity, "content_preservation": retained}
     write_json(output_path.with_suffix(".operations.json"), report)
     return report
+
+
+@contextmanager
+def transaction_work(output):
+    require_actions()
+    with tempfile.TemporaryDirectory(dir=output.parent) as temporary:
+        work = Path(temporary) / 'transaction.docx'
+        try: yield work
+        except Exception as exc:
+            if work.exists(): shutil.copyfile(work, output.with_suffix('.failed.docx'))
+            write_json(output.with_suffix('.failure.json'), {'build_success': False, 'automatic_pass': False,
+                'visual_review_complete': False, 'delivery_accepted': False, 'error': str(exc), 'diagnostic_only': True})
+            raise
+
+
+def xml_tree(node):
+    return (node.tag, tuple(sorted(node.attrib.items())), node.text or '', node.tail or '', tuple(xml_tree(c) for c in node))

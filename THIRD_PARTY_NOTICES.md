@@ -11,6 +11,9 @@ Original Word Module Studio source: Apache-2.0, Copyright 2026 Self-Command.
   migration code retains its license in third_party/reference-paper-studio/LICENSE.
 - Open XML SDK 3.4.1: MIT, installed through NuGet; unmodified dependency.
 - python-docx 1.2.0: MIT; unmodified Python dependency.
+- docxcompose 2.2.0: MIT, 4teamwork contributors; unmodified dependency. The
+  RegionComposer adapter subclasses its merge implementation, explicitly controls
+  header/footer policy and rejects auxiliary objects whose merge is not verified.
 - Pandoc 3.12.1: GPL-2.0-or-later, separate unmodified executable, never embedded
   into the proprietary or Python application code.
 - LibreOffice 26.8.1: MPL-2.0, separate unmodified executable.
