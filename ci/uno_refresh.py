@@ -1,5 +1,6 @@
 """System-Python UNO client for the pinned LibreOffice compatibility renderer."""
 import os
+import json
 from pathlib import Path
 import sys
 import time
@@ -32,6 +33,27 @@ try:
     document.TextFields.refresh()
     for index in range(document.DocumentIndexes.Count): document.DocumentIndexes.getByIndex(index).update()
     document.TextFields.refresh()
+    layout = {'paragraphs': [], 'tables': []}
+    cursor = document.CurrentController.ViewCursor
+    enumeration = document.Text.createEnumeration()
+    while enumeration.hasMoreElements():
+        item = enumeration.nextElement()
+        if item.supportsService('com.sun.star.text.Paragraph'):
+            cursor.gotoRange(item.Start, False)
+            layout['paragraphs'].append({'text': item.String, 'page': cursor.Page,
+                'x_pt': cursor.Position.X * 72 / 2540, 'y_pt': cursor.Position.Y * 72 / 2540})
+    for name in document.TextTables.ElementNames:
+        table = document.TextTables.getByName(name)
+        rows = []
+        try:
+            for index in range(table.Rows.Count):
+                cell = table.getCellByPosition(0, index); cursor.gotoRange(cell.Start, False)
+                rows.append({'row': index, 'page': cursor.Page, 'x_pt': cursor.Position.X * 72 / 2540,
+                    'y_pt': cursor.Position.Y * 72 / 2540, 'text': cell.String})
+        except Exception as exc:
+            rows.append({'diagnostic': 'Merged table row positions need manual review: ' + str(exc)})
+        layout['tables'].append({'name': name, 'rows': rows})
+    output.with_suffix('.layout.json').write_text(json.dumps(layout, ensure_ascii=False, indent=2))
     document.storeToURL(uno.systemPathToFileUrl(str(output)), (prop('FilterName', 'writer_pdf_Export'), prop('Overwrite', True)))
     # Compatibility copy is diagnostic only: never replace the original editable DOCX.
     refreshed = output.with_suffix('.refreshed.docx')

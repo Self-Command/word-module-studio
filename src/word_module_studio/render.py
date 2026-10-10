@@ -20,6 +20,7 @@ def render(source, folder):
     pdf = folder / (source.stem + '.pdf')
     fingerprints = []
     with tempfile.TemporaryDirectory() as temporary:
+        refresh_source = source
         for attempt in range(3):
             with socket.socket() as connection:
                 connection.bind(('127.0.0.1', 0)); port = connection.getsockname()[1]
@@ -27,7 +28,7 @@ def render(source, folder):
             process = subprocess.Popen(['libreoffice', '-env:UserInstallation=' + profile.as_uri(), '--headless', '--norestore', '--nodefault',
                 f'--accept=socket,host=127.0.0.1,port={port};urp;StarOffice.ServiceManager'], stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
             try:
-                run(['/usr/bin/python3', ROOT / 'ci/uno_refresh.py', source, pdf, port], timeout=120)
+                run(['/usr/bin/python3', ROOT / 'ci/uno_refresh.py', refresh_source, pdf, port], timeout=120)
             finally:
                 if process.poll() is None: process.terminate()
                 try: process.wait(timeout=10)
@@ -37,9 +38,13 @@ def render(source, folder):
                 signature = [(page.width, page.height, [(c['text'], round(c['x0'], 2), round(c['top'], 2)) for c in page.chars]) for page in document.pages]
             fingerprints.append(hashlib.sha256(json.dumps(signature, ensure_ascii=False).encode()).hexdigest())
             if len(fingerprints) > 1 and fingerprints[-1] == fingerprints[-2]: break
+            # Carry the refreshed cache forward so TOC/page dependencies can converge.
+            import shutil
+            refresh_source = Path(temporary) / ('refresh-' + str(attempt) + '.docx')
+            shutil.copyfile(pdf.with_suffix('.refreshed.docx'), refresh_source)
         else: raise WordError('FIELD_PAGINATION_NOT_CONVERGED')
     run(['pdftoppm', '-png', '-r', '110', pdf, folder / 'page'], timeout=180)
-    pages = sorted(folder.glob('page-*.png'))
+    pages = sorted(folder.glob('page-*.png'), key=lambda p: int(p.stem.rsplit('-', 1)[-1]))
     if not pages: raise WordError('PAGE_PREVIEWS_MISSING')
     issues = geometry(pdf)
     report = {'schema_version': 1, 'build_success': True, 'automatic_pass': not any(i['severity'] == 'error' for i in issues),
@@ -88,14 +93,24 @@ def receipt(proof_folder, value):
     if value.get('run_id') != report['run_id'] or value.get('output_sha256') != report['output_sha256']:
         raise WordError('VISUAL_RECEIPT_IDENTITY_MISMATCH')
     if value.get('pages') != report['pages']: raise WordError('VISUAL_RECEIPT_PAGE_MISMATCH')
+    for page in report['pages']:
+        if digest(proof_folder / page['file']) != page['sha256']: raise WordError('VISUAL_RECEIPT_PAGE_CHANGED')
     if not value.get('reviewer') or len(value.get('checklist', [])) != 21:
         raise WordError('VISUAL_RECEIPT_INCOMPLETE')
     if any(item.get('result') not in ('pass', 'fail', 'not-applicable') for item in value['checklist']):
         raise WordError('VISUAL_RECEIPT_INVALID_RESULT')
+    if {item.get('id') for item in value['checklist']} != {f'V{i:02}' for i in range(1, 22)}:
+        raise WordError('VISUAL_RECEIPT_CHECKLIST_MISMATCH')
+    reviews = value.get('page_reviews', [])
+    if {p.get('page') for p in reviews} != set(range(1, len(report['pages']) + 1)) or len(reviews) != len(report['pages']):
+        raise WordError('VISUAL_RECEIPT_PAGE_REVIEWS_INCOMPLETE')
+    if any(p.get('status') not in ('pass', 'fail') or not p.get('observations') for p in reviews):
+        raise WordError('VISUAL_RECEIPT_PAGE_REVIEWS_INCOMPLETE')
     report['visual_review_complete'] = True
     report['visual_issues_found'] = bool(value.get('findings')) or any(item['result'] == 'fail' for item in value['checklist'])
     report['delivery_accepted'] = report['automatic_pass'] and not report['visual_issues_found']
     report['reviewer'] = value['reviewer']
     report['findings'] = value.get('findings', [])
+    report['page_reviews'] = reviews
     write_json(proof_folder / 'visual-report.json', report)
     return report
