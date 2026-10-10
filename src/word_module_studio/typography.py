@@ -42,11 +42,17 @@ def apply(package, target, module, props):
         return {'operation': operation, 'properties': properties}
     if operation == 'frame':
         if target['kind'] != 'paragraph': raise WordError('FRAME_PARAGRAPH_REQUIRED')
-        if set(props) - {'operation', 'attributes'}: raise WordError('FRAME_PROPERTY_UNSUPPORTED')
+        if set(props) - {'operation', 'attributes', 'characters'}: raise WordError('FRAME_PROPERTY_UNSUPPORTED')
         attributes = props.get('attributes', {})
         allowed = {'dropCap', 'lines', 'w', 'h', 'x', 'y', 'hSpace', 'vSpace', 'wrap', 'hAnchor', 'vAnchor', 'hRule', 'xAlign', 'yAlign', 'anchorLock'}
         if not attributes or set(attributes) - allowed: raise WordError('FRAME_PROPERTY_UNSUPPORTED')
-        package.save(); result = _sdk(package.path, target['id'], module, props); reload(package); return result
+        drop = None
+        if attributes.get('dropCap') in ('drop', 'margin') and '{{' not in target['text']:
+            drop = split_drop_cap(package, target, props.get('characters', 1))
+            target = drop['target']
+        package.save(); result = _sdk(package.path, target['id'], module, {'operation': operation, 'attributes': attributes}); reload(package)
+        if drop: result['drop_cap_characters'] = drop['text']
+        return result
     if operation == 'embed_fonts':
         if set(props) - {'operation', 'fonts'}: raise WordError('FONT_EMBED_PROPERTY_UNSUPPORTED')
         from fontTools.ttLib import TTFont
@@ -68,3 +74,43 @@ def apply(package, target, module, props):
             package.save(); result = _sdk(package.path, target['id'], module, {'operation': operation, 'fonts': fonts}); reload(package)
         result['sources'] = records; return result
     raise WordError('TYPOGRAPHY_EXTENSION_UNSUPPORTED', operation)
+
+
+def split_drop_cap(package, target, count):
+    """Map a selected text prefix to Word's separate drop-cap frame paragraph."""
+    from copy import deepcopy
+    from lxml import etree as E
+    from .package import W, NS, ID
+    paragraph = target['element']; runs = paragraph.findall(W + 'r')
+    if any(n.tag not in (W + 'pPr', W + 'r') for n in paragraph) or any(n.tag not in (W + 'rPr', W + 't') for r in runs for n in r):
+        raise WordError('DROP_CAP_COMPLEX_PARAGRAPH_UNSUPPORTED')
+    full = ''.join(t.text or '' for r in runs for t in r.findall(W + 't'))
+    if not isinstance(count, int) or isinstance(count, bool) or not 1 <= count < len(full): raise WordError('DROP_CAP_CHARACTERS_INVALID')
+    cap = E.Element(W + 'p')
+    properties = paragraph.find(W + 'pPr')
+    if properties is not None:
+        cap.append(deepcopy(properties))
+        frame = properties.find(W + 'framePr')
+        if frame is not None: properties.remove(frame)
+    remaining = count
+    for run in list(runs):
+        text = ''.join(t.text or '' for t in run.findall(W + 't'))
+        if not remaining: break
+        take = min(len(text), remaining)
+        prefix = deepcopy(run)
+        for child in list(prefix):
+            if child.tag != W + 'rPr': prefix.remove(child)
+        E.SubElement(prefix, W + 't').text = text[:take]
+        if prefix.get(ID): del prefix.attrib[ID]
+        cap.append(prefix)
+        if take == len(text): paragraph.remove(run)
+        else:
+            for child in list(run):
+                if child.tag != W + 'rPr': run.remove(child)
+            E.SubElement(run, W + 't').text = text[take:]
+        remaining -= take
+    paragraph.addprevious(cap)
+    if ''.join(cap.xpath('.//w:t/text()', namespaces=NS)) + ''.join(paragraph.xpath('.//w:t/text()', namespaces=NS)) != full:
+        raise WordError('DROP_CAP_TEXT_CHANGED')
+    selected = next(o for o in package.objects(stamp=True) if o['element'] is cap)
+    return {'target': selected, 'text': full[:count]}

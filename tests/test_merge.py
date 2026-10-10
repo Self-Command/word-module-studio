@@ -33,6 +33,9 @@ def test_merge_native_auxiliary_parts_and_source_headers(tmp_path):
     assert len(list(root.iter(W + 'sectPr'))) == 2
     headers = ''.join(package.parts[n].decode() for n in package.parts if n.startswith('word/header') and n.endswith('.xml'))
     assert 'First header' in headers and 'Second header' in headers
+    from word_module_studio.render import render
+    report = render(output, tmp_path / 'merge-proof')
+    assert report['automatic_pass'], report['issues']
 
 
 def test_extract_object_keeps_native_dependencies(document, tmp_path):

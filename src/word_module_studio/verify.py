@@ -47,7 +47,8 @@ def preservation(before, after, operations):
             from .field_cache import cached_run_ids
             authorized.update(cached_run_ids(old_package))
         props = operation.get('props', {})
-        changes_content = operation['action'] == 'remove' or operation['action'] == 'extension' and operation['module'] in ('M02', 'M10', 'M13', 'M16') or any(
+        drop_cap = operation['action'] == 'extension' and operation['module'] in ('M03', 'M13') and props.get('operation') == 'frame' and props.get('attributes', {}).get('dropCap') in ('drop', 'margin')
+        changes_content = drop_cap or operation['action'] == 'remove' or operation['action'] == 'extension' and operation['module'] in ('M02', 'M10', 'M13', 'M16') or any(
             key in props for key in ('text', 'find', 'replace', 'data', 'formula', 'revision.type', 'revision.action'))
         if not changes_content: continue
         target = old_package.locate(operation['target'])

@@ -209,6 +209,10 @@ def compose(markdown, manifest, output, *, region=None, resources=(), data=None)
     values = {r['id']: '' for r in spec['regions']}
     values.update({slot['key']: '' for r in spec['regions'] for slot in r.get('slots', [])}); values.update(data or {})
     fill(package, {'element': package.xml('word/document.xml')}, {'operation': 'fill', 'data': values})
+    if slot_frame is not None and slot_frame.get(W + 'dropCap') in ('drop', 'margin'):
+        from .typography import apply as typography_apply
+        target = next(o for o in package.objects() if o['kind'] == 'paragraph' and o['element'].find('w:pPr/w:framePr', namespaces=NS) is not None)
+        typography_apply(package, target, 'M03', {'operation': 'frame', 'attributes': {E.QName(k).localname: v for k, v in slot_frame.attrib.items()}})
     from .migration.math_metrics import configure
     metrics = configure({'fonts': spec['fonts']})
     from .math import apply as equation_apply

@@ -284,6 +284,8 @@ def test_core_object_gallery(tmp_path):
     manifest = build(policy, tmp_path / 'template')
     source = tmp_path / 'objects.md'; source.write_text('# Core objects\n\nContainer anchor text.\n\nFloating picture anchor.\n\nShape anchor.\n\nTextbox anchor.\n\n| State | Detail |\n|---|---|\n| One | Merged native data |\n| Two | Retained second row |\n\nNote target.[^note]\n\n[^note]: Object gallery native note.', encoding='utf-8')
     output = tmp_path / 'objects.docx'; compose(source, manifest, output)
+    output = apply(output, tmp_path, 'M10', item(output, 'table'), action='extension',
+        props={'operation': 'merge', 'row_start': 1, 'row_end': 1, 'column_start': 0, 'column_end': 1}, name='merged-cell')
     output = apply(output, tmp_path, 'M11', item(output, 'paragraph', 'Floating picture anchor.'), action='add', kind='picture',
         props={'path': str(Path('fixtures/upstream/word/pictures-logo.png').resolve()), 'width': '3cm', 'height': '1.5cm', 'anchor': True, 'wrap': 'square',
             'hRelative': 'column', 'vRelative': 'paragraph', 'hPosition': '0cm', 'vPosition': '0cm', 'alt': 'Retained logo'}, name='image')
@@ -303,3 +305,8 @@ def test_drop_cap_visual_gallery(document, tmp_path):
     output = apply(output, tmp_path, 'M03', item(output, 'paragraph', 'Drop cap paragraph demonstrates a native frame with retained editable text.'), action='extension',
         props={'operation': 'frame', 'attributes': {'dropCap': 'drop', 'lines': 3, 'hSpace': 120, 'wrap': 'around'}}, name='drop-cap')
     report = render(output, tmp_path / 'proof'); assert report['automatic_pass'], report['issues']
+    import pdfplumber
+    with pdfplumber.open(tmp_path / 'proof/drop-cap.pdf') as pdf:
+        capitals = [c['size'] for p in pdf.pages for c in p.chars if c['text'] == 'D']
+        body = [c['size'] for p in pdf.pages for c in p.chars if c['text'] == 's']
+    assert capitals and body and max(capitals) > max(body) * 1.5, 'Native drop cap must appear at its requested line height'
