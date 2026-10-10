@@ -45,13 +45,17 @@ def render(source, folder):
     pages = sorted(folder.glob('page-*.png'), key=lambda p: int(p.stem.rsplit('-', 1)[-1]))
     if not pages: raise WordError('PAGE_PREVIEWS_MISSING')
     issues = geometry(pdf)
+    from .container_proof import check
+    layout = json.loads(pdf.with_suffix('.layout.json').read_text())
+    containers = check(source, pdf, layout)
+    issues.extend(containers['issues'])
     report = {'schema_version': 1, 'build_success': True, 'automatic_pass': not any(i['severity'] == 'error' for i in issues),
         'visual_review_complete': False, 'delivery_accepted': False, 'renderer': 'LibreOffice 26.8.1 compatibility proof; not Microsoft Word native rendering',
         'run_id': os.environ['GITHUB_RUN_ID'], 'input_sha256': digest(source), 'output_sha256': digest(pdf),
         'pages': [{'file': p.name, 'sha256': digest(p)} for p in pages], 'convergence': fingerprints,
-        'issues': issues, 'actual_fonts': pdf_fonts(pdf),
+        'issues': issues, 'container_proof': containers, 'actual_fonts': pdf_fonts(pdf),
         'font_resolution': font_resolution(source),
-        'math_font_application': json.loads(pdf.with_suffix('.layout.json').read_text()).get('formula_fonts', [])}
+        'math_font_application': layout.get('formula_fonts', [])}
     write_json(folder / 'render-report.json', report)
     return report
 

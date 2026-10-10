@@ -63,15 +63,22 @@ try:
     document.TextFields.refresh()
     for index in range(document.DocumentIndexes.Count): document.DocumentIndexes.getByIndex(index).update()
     document.TextFields.refresh()
-    layout = {'paragraphs': [], 'tables': [], 'formula_fonts': formula_fonts}
+    layout = {'paragraphs': [], 'tables': [], 'frames': [], 'shapes': [], 'formula_fonts': formula_fonts}
     cursor = document.CurrentController.ViewCursor
     enumeration = document.Text.createEnumeration()
     while enumeration.hasMoreElements():
         item = enumeration.nextElement()
         if item.supportsService('com.sun.star.text.Paragraph'):
             cursor.gotoRange(item.Start, False)
+            style = document.StyleFamilies.getByName('PageStyles').getByName(cursor.PageStyleName)
+            columns = style.TextColumns.getColumns()
+            page = {'width_pt': style.Width * 72 / 2540, 'height_pt': style.Height * 72 / 2540,
+                'left_pt': style.LeftMargin * 72 / 2540, 'right_pt': style.RightMargin * 72 / 2540,
+                'top_pt': style.TopMargin * 72 / 2540, 'bottom_pt': style.BottomMargin * 72 / 2540,
+                'columns': [{'width': c.Width, 'left_pt': c.LeftMargin * 72 / 2540,
+                    'right_pt': c.RightMargin * 72 / 2540} for c in columns]}
             layout['paragraphs'].append({'text': item.String, 'page': cursor.Page,
-                'x_pt': cursor.Position.X * 72 / 2540, 'y_pt': cursor.Position.Y * 72 / 2540})
+                'x_pt': cursor.Position.X * 72 / 2540, 'y_pt': cursor.Position.Y * 72 / 2540, 'page_geometry': page})
     for name in document.TextTables.ElementNames:
         table = document.TextTables.getByName(name)
         rows = []
@@ -83,6 +90,24 @@ try:
         except Exception as exc:
             rows.append({'diagnostic': 'Merged table row positions need manual review: ' + str(exc)})
         layout['tables'].append({'name': name, 'rows': rows})
+    for name in document.TextFrames.ElementNames:
+        frame = document.TextFrames.getByName(name)
+        cursor.gotoRange(frame.Anchor, False)
+        left = getattr(frame, 'LeftBorderDistance', 0) * 72 / 2540
+        right = getattr(frame, 'RightBorderDistance', 0) * 72 / 2540
+        layout['frames'].append({'name': name, 'text': frame.String, 'page': cursor.Page,
+            'width_pt': frame.Size.Width * 72 / 2540, 'height_pt': frame.Size.Height * 72 / 2540,
+            'left_inset_pt': left, 'right_inset_pt': right})
+    draw = document.DrawPage
+    for index in range(draw.Count):
+        shape = draw.getByIndex(index)
+        record = {'index': index, 'kind': shape.ShapeType,
+            'width_pt': shape.Size.Width * 72 / 2540, 'height_pt': shape.Size.Height * 72 / 2540,
+            'x_pt': shape.Position.X * 72 / 2540, 'y_pt': shape.Position.Y * 72 / 2540}
+        try:
+            cursor.gotoRange(shape.Anchor, False); record['page'] = cursor.Page
+        except Exception: record['page'] = None
+        layout['shapes'].append(record)
     output.with_suffix('.layout.json').write_text(json.dumps(layout, ensure_ascii=False, indent=2))
     shutil.copyfile(pass_file, output)
     # Compatibility copy is diagnostic only: never replace the original editable DOCX.

@@ -161,6 +161,9 @@ def test_practical_math_never_splits_nested_atoms(document, tmp_path):
         props={'formula': formula, 'number': 'F1', 'policy': 'practical'})
     actual = Package(output).xml('word/document.xml').find('.//' + M + 'f')
     from word_module_studio.migration.math_layout import tree
+    for node in actual.iter():
+        for key in list(node.attrib):
+            if key.startswith('{' + NS['wms'] + '}'): del node.attrib[key]
     assert tree(actual) == tree(expected)
     assert actual.find('.//' + M + 'eqArr') is None
     report = json.loads(output.with_suffix('.operations.json').read_text())['operations'][0]['result']
@@ -177,3 +180,122 @@ def test_field_cache_refresh_changes_only_results(document, tmp_path):
     assert result['fields_updated'][0]['result_text'] == '1'
     assert without_cache(Package(output)) == baseline and digest(document) == before
     assert result['cache_convergence_passes'] == 2
+
+
+def _field(body, instruction, cached='STALE'):
+    p = E.SubElement(body, W + 'p')
+    for kind in ('begin', 'separate', 'end'):
+        if kind == 'separate':
+            E.SubElement(E.SubElement(p, W + 'r'), W + 'instrText').text = instruction
+        E.SubElement(E.SubElement(p, W + 'r'), W + 'fldChar').set(W + 'fldCharType', kind)
+        if kind == 'separate': E.SubElement(E.SubElement(p, W + 'r'), W + 't').text = cached
+    return p
+
+
+def test_toc_and_caption_index_refresh_after_edit(tmp_path):
+    from docx import Document
+    from docx.shared import Pt
+    from word_module_studio.field_cache import refresh, fields, result_nodes, without_cache
+    source = tmp_path / 'indexes.docx'; doc = Document()
+    doc.styles['Normal'].font.name = 'Liberation Serif'; doc.styles['Normal'].font.size = Pt(11)
+    doc.add_heading('Index proof', 1)
+    doc.add_heading('Retained chapter', 1); doc.add_paragraph('RETAINED section text.')
+    doc.add_page_break(); doc.add_heading('Deleted chapter', 1); doc.add_paragraph('REMOVE section text.')
+    doc.save(source); package = Package(source); body = package.xml('word/document.xml').find(W + 'body')
+    toc = _field(body, r' TOC \o "1-3" \h '); body.remove(toc); body.insert(1, toc)
+    caption = _field(body, r' SEQ Figure ', '1')
+    E.SubElement(E.SubElement(caption, W + 'r'), W + 't').text = ' Caption evidence'
+    index = _field(body, r' TOC \c "Figure" \h '); body.remove(index); body.insert(2, index)
+    _field(body, r' XE "Retained topic" ', '')
+    _field(body, r' INDEX \h "A" ')
+    # Keep section properties last.
+    section = body.find(W + 'sectPr'); body.remove(section); body.append(section)
+    package.save(); before = digest(source); baseline = without_cache(Package(source))
+    first = tmp_path / 'first.docx'; report = refresh(source, first, tmp_path / 'first-proof')
+    assert digest(source) == before and without_cache(Package(first)) == baseline
+    records = report['fields_updated']; toc_text = next(r['result_text'] for r in records if '\\o' in r['instruction'])
+    assert 'Retained chapter' in toc_text and 'Deleted chapter' in toc_text
+    assert any('Caption evidence' in r['result_text'] for r in records if '\\c' in r['instruction'])
+    assert any('Retained topic' in r['result_text'] for r in records if r['instruction'].strip().startswith('INDEX'))
+    doc = Document(first)
+    for p in list(doc.paragraphs):
+        if p.text == 'Deleted chapter' or p.text == 'REMOVE section text.': p._element.getparent().remove(p._element)
+    doc.add_page_break(); doc.add_heading('Added chapter', 1); doc.add_paragraph('ADDED content.')
+    edited = tmp_path / 'edited.docx'; doc.save(edited)
+    final = tmp_path / 'final.docx'; report = refresh(edited, final, tmp_path / 'final-proof')
+    text = next(r['result_text'] for r in report['fields_updated'] if '\\o' in r['instruction'])
+    assert 'Deleted chapter' not in text and 'Added chapter' in text and 'Retained chapter' in text
+    assert report['automatic_pass'], report['proof']['issues']
+
+
+@pytest.mark.parametrize('variant', ['single', 'double', 'triple', 'unequal', 'landscape'])
+def test_generic_layout_gallery(tmp_path, variant):
+    from word_module_studio.compose import compose
+    columns = {'single': 1, 'double': 2, 'triple': 3, 'unequal': 2, 'landscape': 2}[variant]
+    policy = spec(columns); policy['id'] = 'core-' + variant
+    policy['regions'] = [policy['regions'][1]]; region = policy['regions'][0]
+    region.update(header='Core layout / ' + variant, footer='Page {{PAGE}} / {{NUMPAGES}}')
+    if variant == 'unequal': region['column_widths_twips'] = [3500, 5572]
+    if variant == 'landscape': region['page'].update(width_twips=16838, height_twips=11906)
+    policy['fonts']['rtl'] = 'Noto Sans Arabic'
+    policy.update(typography={'kinsoku': True, 'autoHyphenation': True},
+        table_policy={'layout': 'autofit', 'preferred_width_pct': 95}, equations={'long_formula': 'practical'})
+    policy['styles']['Normal'].update(native={'widowControl': True, 'keepLines': False})
+    manifest = build(policy, tmp_path / 'template')
+    paragraphs = ['# Core layout ' + variant, '中文排版，标点禁则与分页测试。中文内容保留。',
+        'مرحبا بالعالم', '1. First numbered observation\n2. Second numbered observation']
+    for index in range(8): paragraphs.append('REGION' + str(index) + ' ' + 'Shared native modules keep text in its assigned container. ' * 15)
+    paragraphs += [r'$$\begin{aligned}x+y&=1\\x-y&=0\end{aligned}\tag{A1}$$',
+        '$$s=' + '+'.join('x_{' + str(i) + '}' for i in range(24)) + r'\tag{L1}$$',
+        '| Item | Result |\n|---|---|\n| DATA_A | 123 |\n| DATA_B | 456 |\n\nTable: Retained data',
+        'Footnote target.[^note]\n\n[^note]: Retained footnote evidence.']
+    markdown = tmp_path / 'layout.md'; markdown.write_text('\n\n'.join(paragraphs), encoding='utf-8')
+    output = tmp_path / ('core-' + variant + '.docx'); composition = compose(markdown, manifest, output)
+    output = apply(output, tmp_path, 'M03', item(output, 'paragraph', 'مرحبا بالعالم'), props={'bidi': True, 'align': 'right'}, name='direction')
+    report = render(output, tmp_path / 'proof')
+    assert report['automatic_pass'], report['issues']
+    assert report['container_proof']['paragraphs']
+    import pdfplumber
+    with pdfplumber.open(tmp_path / 'proof/direction.pdf') as pdf:
+        text = ''.join(p.extract_text() or '' for p in pdf.pages)
+        assert all('REGION' + str(i) in text for i in range(8))
+        assert '123' in text and '456' in text and '(A1)' in text and '(L1)' in text
+    package = Package(output)
+    assert package.xml('word/footnotes.xml').find('.//' + W + 't') is not None
+    assert not any('split-fraction' in str(e['changes']) for e in composition['equations'])
+
+
+@pytest.mark.parametrize('chart_type', ['column', 'bar', 'line', 'pie', 'area', 'scatter'])
+def test_core_chart_gallery(document, tmp_path, chart_type):
+    output = apply(document, tmp_path, 'M12', item(document, 'paragraph', 'second'), action='add', kind='chart',
+        props={'chartType': chart_type, 'data': 'Series:1,3,2', 'categories': 'A,B,C', 'title': chart_type + ' editable chart', 'width': '11cm', 'height': '7cm'})
+    report = render(output, tmp_path / 'proof'); assert report['automatic_pass'], report['issues']
+    assert report['container_proof']['shapes']
+
+
+def test_core_object_gallery(tmp_path):
+    from word_module_studio.compose import compose
+    policy = spec(1); policy['regions'] = [policy['regions'][1]]
+    policy.update(font_embedding={'enabled': True, 'redistributable': True, 'roles': ['latin']})
+    manifest = build(policy, tmp_path / 'template')
+    source = tmp_path / 'objects.md'; source.write_text('# Core objects\n\nContainer anchor text.\n\nFloating picture anchor.\n\nShape anchor.\n\nTextbox anchor.\n\n| State | Detail |\n|---|---|\n| One | Merged native data |\n| Two | Retained second row |\n\nNote target.[^note]\n\n[^note]: Object gallery native note.', encoding='utf-8')
+    output = tmp_path / 'objects.docx'; compose(source, manifest, output)
+    output = apply(output, tmp_path, 'M11', item(output, 'paragraph', 'Floating picture anchor.'), action='add', kind='picture',
+        props={'path': str(Path('fixtures/upstream/word/pictures-logo.png').resolve()), 'width': '3cm', 'height': '1.5cm', 'anchor': True, 'wrap': 'square',
+            'hRelative': 'column', 'vRelative': 'paragraph', 'hPosition': '0cm', 'vPosition': '0cm', 'alt': 'Retained logo'}, name='image')
+    output = apply(output, tmp_path, 'M13', item(output, 'body'), action='add', kind='shape',
+        props={'geometry': 'ellipse', 'width': '3cm', 'height': '1cm', 'fill': '88AAEE', 'anchor.x': '0cm', 'anchor.y': '0cm'}, name='shape')
+    output = apply(output, tmp_path, 'M13', item(output, 'body'), action='add', kind='textbox',
+        props={'text': 'Editable box content', 'width': '5cm', 'height': '1.5cm', 'anchor.x': '4cm', 'anchor.y': '0cm'}, name='box')
+    # Independent native frame interface uses a complete framed paragraph.
+    output = apply(output, tmp_path, 'M03', item(output, 'paragraph', 'Container anchor text.'), action='extension',
+        props={'operation': 'frame', 'attributes': {'w': 3000, 'h': 600, 'wrap': 'around', 'hAnchor': 'margin', 'vAnchor': 'text', 'hSpace': 120}}, name='frame')
+    report = render(output, tmp_path / 'proof'); assert report['automatic_pass'], report['issues']
+    assert report['container_proof']['frames'] or report['container_proof']['shapes']
+
+
+def test_drop_cap_visual_gallery(document, tmp_path):
+    output = apply(document, tmp_path, 'M03', item(document, 'paragraph', 'first'), props={'text': 'Drop cap paragraph demonstrates a native frame with retained editable text.'})
+    output = apply(output, tmp_path, 'M03', item(output, 'paragraph', 'Drop cap paragraph demonstrates a native frame with retained editable text.'), action='extension',
+        props={'operation': 'frame', 'attributes': {'dropCap': 'drop', 'lines': 3, 'hSpace': 120, 'wrap': 'around'}}, name='drop-cap')
+    report = render(output, tmp_path / 'proof'); assert report['automatic_pass'], report['issues']

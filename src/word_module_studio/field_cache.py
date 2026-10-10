@@ -79,6 +79,15 @@ def replace_result(record, nodes):
     if start_run.getparent() is end_run.getparent():
         parent = start_run.getparent(); children = list(parent)
         for node in children[children.index(start_run) + 1:children.index(end_run)]: parent.remove(node)
+        if parent.tag == W + 'p' and any(node.tag == W + 'p' for node in nodes) and len(nodes) > 1:
+            ending = E.Element(W + 'p')
+            if parent.find(W + 'pPr') is not None: ending.append(deepcopy(parent.find(W + 'pPr')))
+            for node in list(parent)[list(parent).index(end_run):]: ending.append(node)
+            parent.addnext(ending)
+            for index, node in enumerate(nodes):
+                if index == 0 and node.tag == W + 'p': parent.extend(n for n in list(node) if n.tag != W + 'pPr')
+                else: ending.addprevious(node if node.tag == W + 'p' else _paragraph(node))
+            record['begin'].set(W + 'dirty', 'false'); return
         position = list(parent).index(end_run)
         for node in nodes:
             values = [n for n in node if n.tag != W + 'pPr'] if node.tag == W + 'p' else [node]
@@ -91,6 +100,9 @@ def replace_result(record, nodes):
         for node in list(end)[:list(end).index(end_run)]:
             if node.tag != W + 'pPr': end.remove(node)
         for node in blocks[blocks.index(start) + 1:blocks.index(end)]: parent.remove(node)
+        if not nodes:
+            start.extend(n for n in list(end) if n.tag != W + 'pPr'); parent.remove(end)
+            record['begin'].set(W + 'dirty', 'false'); return
         for index, node in enumerate(nodes):
             if index == 0 and node.tag == W + 'p': start.extend(n for n in list(node) if n.tag != W + 'pPr')
             else: end.addprevious(node if node.tag == W + 'p' else _paragraph(node))
@@ -121,8 +133,13 @@ def without_cache(package):
         for record in reversed(fields(root)): replace_result(record, [])
         for node in root.iter():
             for key in list(node.attrib):
-                if key.startswith('{' + NS['wms'] + '}'): del node.attrib[key]
-        result[part] = {'text': list(root.xpath('//w:t/text()', namespaces=NS)), 'math': [tree(m) for m in root.iter(M + 'oMath')]}
+                if key.startswith('{' + NS['wms'] + '}') or key in (W + 'dirty', '{' + NS['mc'] + '}Ignorable'): del node.attrib[key]
+        # Renderer-generated hyperlink targets are the only additions outside caches.
+        generated = {n.get(W + 'id') for n in root.iter(W + 'bookmarkStart') if (n.get(W + 'name') or '').startswith('_WMSCache')}
+        for node in list(root.iter()):
+            if node.tag in (W + 'bookmarkStart', W + 'bookmarkEnd') and node.get(W + 'id') in generated: node.getparent().remove(node)
+        E.cleanup_namespaces(root)
+        result[part] = E.tostring(root, method='c14n')
     return result
 
 
@@ -164,10 +181,12 @@ def transplant(source, refreshed):
                         text = ''.join(paragraphs[0].xpath('.//w:t/text()', namespaces=NS)) if paragraphs else ''
                         targets = [p for p in original.iter(W + 'p') if ''.join(p.xpath('.//w:t/text()', namespaces=NS)) == text] if text else []
                         if len(targets) != 1: raise WordError('FIELD_CACHE_ANCHOR_UNRESOLVED', anchor)
-                        start = E.Element(W + 'bookmarkStart'); start.set(W + 'id', str(next_bookmark)); start.set(W + 'name', anchor)
+                        new_anchor = '_WMSCache' + str(next_bookmark)
+                        node.set(W + 'anchor', new_anchor)
+                        start = E.Element(W + 'bookmarkStart'); start.set(W + 'id', str(next_bookmark)); start.set(W + 'name', new_anchor)
                         end = E.Element(W + 'bookmarkEnd'); end.set(W + 'id', str(next_bookmark)); next_bookmark += 1
                         position = 1 if targets[0].find(W + 'pPr') is not None else 0
-                        targets[0].insert(position, start); targets[0].append(end); names.add(anchor)
+                        targets[0].insert(position, start); targets[0].append(end); names.add(new_anchor)
                     relation_id = node.get('{' + NS['r'] + '}id')
                     if relation_id:
                         relationship_part = posixpath.dirname(candidate_part) + '/_rels/' + posixpath.basename(candidate_part) + '.rels'
