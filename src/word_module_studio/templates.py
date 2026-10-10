@@ -49,7 +49,8 @@ def build(spec, folder):
     from docx.oxml.ns import qn
     document = Document()
     for name, rule in spec['styles'].items():
-        style = document.styles[name] if name in document.styles else document.styles.add_style(name, 1)
+        style = next((s for s in document.styles if s.style_id == name or s.name == name), None)
+        if style is None: style = document.styles.add_style(name, 1)
         style.font.name = spec['fonts']['latin']
         style.font.size = Pt(rule['size_pt'])
         style.font.bold, style.font.italic = rule.get('bold', False), rule.get('italic', False)
@@ -62,7 +63,10 @@ def build(spec, folder):
         pformat.keep_with_next = rule.get('keep_next', False)
         pformat.line_spacing = rule.get('line_spacing', 1.0)
         if 'alignment' in rule: pformat.alignment = {'left': 0, 'center': 1, 'right': 2, 'justify': 3}[rule['alignment']]
-        if rule.get('based_on'): style.base_style = document.styles[rule['based_on']]
+        if rule.get('based_on'):
+            parent = next((s for s in document.styles if s.style_id == rule['based_on'] or s.name == rule['based_on']), None)
+            if parent is None: raise WordError('STYLE_PARENT_MISSING', rule['based_on'])
+            style.base_style = parent
     document.save(folder / 'master.docx')
     package = Package(folder / 'master.docx')
     root = package.xml('word/document.xml')

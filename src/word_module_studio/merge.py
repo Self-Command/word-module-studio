@@ -15,6 +15,22 @@ class NativeComposer(Composer):
         from .merge_parts import auxiliary
         auxiliary(self, source, element)
 
+    def renumber_docpr_ids(self):
+        # Upstream relationship copier returns generic Parts for copied headers.
+        # Handle both generic and typed native XML parts without losing images.
+        from docx.oxml import parse_xml
+        from .merge_parts import save_root
+        tag = '{http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing}docPr'
+        roots = [(None, self.doc.element)]
+        for rel in self.doc.part.rels.values():
+            if not rel.is_external and rel.reltype in (RT.HEADER, RT.FOOTER):
+                part = rel.target_part
+                roots.append((part, parse_xml(part.blob)))
+        identifier = 1
+        for part, root in roots:
+            for node in root.iter(tag): node.set('id', str(identifier)); identifier += 1
+            if part is not None: save_root(part, root)
+
 
 class RegionComposer(NativeComposer):
     def __init__(self, document):
