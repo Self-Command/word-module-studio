@@ -25,7 +25,7 @@ geometry and checks the registered master/spec/font fingerprints.
 | M07 Fields/references | OfficeCLI bookmarks, links, SEQ/REF/PAGEREF; `captions.apply` | Independent Figure/Table/Equation counters; missing targets fail |
 | M08 Contents/index | OfficeCLI TOC and native field types; UNO refresh | Actual page cache; at most three convergence attempts |
 | M09 Mathematics | Pandoc OMML, reversible structural wrapping, baseline/centre number layout | Shared font metrics and column budget; no font shrink/raster fallback |
-| M10 Tables | OfficeCLI row/column/cell actions; `tables.apply`: merge, format, split with continued captions | Explicit verified row split; crossing vertical merge fails |
+| M10 Tables | OfficeCLI row/column/cell actions; `tables.apply`: merge, format, explicit split or `paginate` with continued captions | Cloud row-position discovery, caption space and at most three checks; crossing vertical merge fails |
 | M11 Pictures | OfficeCLI inline/anchor/wrap/crop/alt; resource copier and proportional column cap | Explicit local image resources; missing files fail |
 | M12 Charts | OfficeCLI chart/series/axis; SDK synchronises editable workbook data | Native chart XML, formula ranges and externalData relationship |
 | M13 Shapes | OfficeCLI shapes/textboxes/connectors/watermarks; `shapes.apply`: group, rotate, text effects | Native editable DrawingML; group members must be shapes |

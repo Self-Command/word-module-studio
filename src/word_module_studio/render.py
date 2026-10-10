@@ -50,6 +50,7 @@ def render(source, folder):
         'run_id': os.environ['GITHUB_RUN_ID'], 'input_sha256': digest(source), 'output_sha256': digest(pdf),
         'pages': [{'file': p.name, 'sha256': digest(p)} for p in pages], 'convergence': fingerprints,
         'issues': issues, 'actual_fonts': pdf_fonts(pdf),
+        'font_resolution': font_resolution(source),
         'math_font_application': json.loads(pdf.with_suffix('.layout.json').read_text()).get('formula_fonts', [])}
     write_json(folder / 'render-report.json', report)
     return report
@@ -83,6 +84,54 @@ def pdf_fonts(pdf):
     require_actions()
     with pdfplumber.open(pdf) as document:
         return sorted({c['fontname'] for page in document.pages for c in page.chars})
+
+
+def font_resolution(source):
+    """Report unavailable existing-document families without silently claiming them."""
+    from lxml import etree as E
+    package = Package(source)
+    requested = set()
+    styles = package.xml('word/styles.xml') if 'word/styles.xml' in package.parts else None
+    theme = package.xml('word/theme/theme1.xml') if 'word/theme/theme1.xml' in package.parts else None
+    def collect(properties):
+        if properties is None: return
+        for key, value in properties.attrib.items():
+            role = E.QName(key).localname
+            if role in ('ascii', 'hAnsi', 'eastAsia', 'cs') and value: requested.add(value)
+            elif role.endswith('Theme') and theme is not None:
+                group = 'majorFont' if value.startswith('major') else 'minorFont'
+                face = 'latin' if role in ('asciiTheme', 'hAnsiTheme') else 'ea' if role == 'eastAsiaTheme' else 'cs'
+                matches = theme.xpath('//*[local-name()=$group]/*[local-name()=$face]', group=group, face=face)
+                if matches and matches[0].get('typeface'): requested.add(matches[0].get('typeface'))
+    for part in package.parts:
+        if not part.startswith('word/') or not part.endswith('.xml') or part in ('word/styles.xml', 'word/theme/theme1.xml'): continue
+        root = package.xml(part)
+        for paragraph in root.iter(W + 'p'):
+            if not paragraph.xpath('.//w:t | .//m:t', namespaces=NS): continue
+            rule = paragraph.find('w:pPr/w:pStyle', namespaces=NS)
+            identifier = rule.get(W + 'val') if rule is not None else 'Normal'
+            visited = set()
+            has_fonts = False
+            while styles is not None and identifier not in visited:
+                visited.add(identifier)
+                matches = styles.xpath('./w:style[@w:styleId=$name]', namespaces=NS, name=identifier)
+                if not matches: break
+                properties = matches[0].find('w:rPr/w:rFonts', namespaces=NS)
+                has_fonts = has_fonts or properties is not None and bool(properties.attrib)
+                collect(properties)
+                base = matches[0].find(W + 'basedOn')
+                identifier = base.get(W + 'val') if base is not None else 'Normal'
+            if not has_fonts and styles is not None: collect(styles.find('w:docDefaults/w:rPrDefault/w:rPr/w:rFonts', namespaces=NS))
+        for node in root.findall('.//' + W + 'rFonts'): collect(node)
+    if 'word/settings.xml' in package.parts:
+        math_font = package.xml('word/settings.xml').find('m:mathPr/m:mathFont', namespaces=NS)
+        if math_font is not None: requested.add(math_font.get('{' + NS['m'] + '}val'))
+    result = []
+    for family in sorted(requested):
+        actual = run(['fc-match', '-f', '%{family}\n%{file}', family]).splitlines()
+        result.append({'requested': family, 'resolved': actual[0], 'file': actual[1],
+            'exact_family': family.casefold() in [name.strip().casefold() for name in actual[0].split(',')]})
+    return result
 
 
 def receipt(proof_folder, value):
