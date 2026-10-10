@@ -26,6 +26,10 @@ if (args[0] == "apply") {
         foreach (var width in widths) columns.Append(new Column { Width = width.ToString(), Space = gap.ToString() });
         var old = target.GetFirstChild<Columns>();
         if (old != null) target.ReplaceChild(columns, old); else target.AddChild(columns, true);
+    } else if (operation == "sync_charts") {
+        var paths = properties.GetProperty("parts").EnumerateArray().Select(p => "/" + p.GetString()!.TrimStart('/')).ToHashSet();
+        foreach (var chart in document.MainDocumentPart!.ChartParts.Where(p => paths.Contains(p.Uri.ToString())))
+            EditableCharts.Synchronize(chart);
     } else if (operation == "convert_notes") {
         var direction = properties.GetProperty("to").GetString();
         var main = document.MainDocumentPart!;
@@ -42,6 +46,7 @@ if (args[0] == "apply") {
             }
             foreach (var reference in main.Document.Descendants<FootnoteReference>().ToArray())
                 reference.Parent!.ReplaceChild(new EndnoteReference { Id = reference.Id }, reference);
+            CopyNoteRelationships(source, destination);
             destination.Endnotes.Save(); main.DeletePart(source);
         } else if (direction == "footnote") {
             var source = main.EndnotesPart ?? throw new InvalidOperationException("ENDNOTES_MISSING");
@@ -56,6 +61,7 @@ if (args[0] == "apply") {
             }
             foreach (var reference in main.Document.Descendants<EndnoteReference>().ToArray())
                 reference.Parent!.ReplaceChild(new FootnoteReference { Id = reference.Id }, reference);
+            CopyNoteRelationships(source, destination);
             destination.Footnotes.Save(); main.DeletePart(source);
         } else throw new ArgumentException("INVALID_NOTE_CONVERSION");
     } else throw new ArgumentException("SDK_EXTENSION_UNSUPPORTED");
@@ -69,3 +75,9 @@ var errors = validator.Validate(document).Select(e => new {
 }).ToList();
 Console.WriteLine(JsonSerializer.Serialize(new { version = "3.4.1", target = "Office2021", errors }));
 return errors.Count == 0 ? 0 : 2;
+
+static void CopyNoteRelationships(OpenXmlPart source, OpenXmlPart destination) {
+    foreach (var part in source.Parts) destination.AddPart(part.OpenXmlPart, part.RelationshipId);
+    foreach (var rel in source.HyperlinkRelationships) destination.AddHyperlinkRelationship(rel.Uri, rel.IsExternal, rel.Id);
+    foreach (var rel in source.ExternalRelationships) destination.AddExternalRelationship(rel.RelationshipType, rel.Uri, rel.Id);
+}

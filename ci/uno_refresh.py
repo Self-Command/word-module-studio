@@ -25,7 +25,8 @@ for attempt in range(30):
 if connection is None: raise RuntimeError('RENDERER_CONNECTION_FAILED')
 desktop = connection.ServiceManager.createInstanceWithContext('com.sun.star.frame.Desktop', connection)
 document = desktop.loadComponentFromURL(uno.systemPathToFileUrl(str(source)), '_blank', 0,
-    (prop('Hidden', True), prop('ReadOnly', False), prop('UpdateDocMode', 3), prop('MacroExecutionMode', 4)))
+    (prop('Hidden', True), prop('ReadOnly', False), prop('UpdateDocMode', 3),
+     prop('MacroExecutionMode', uno.getConstantByName('com.sun.star.document.MacroExecMode.NEVER_EXECUTE'))))
 if document is None: raise RuntimeError('RENDERER_LOAD_FAILED')
 try:
     document.TextFields.refresh()

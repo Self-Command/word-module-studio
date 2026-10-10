@@ -55,7 +55,13 @@ def execute(batch, input_path, output_path, *, template=None):
                 context = LayoutContext.resolve(package, target) if target["part"] == "word/document.xml" else None
                 if context and any(key.lower().startswith("margin") for key in props) and module != "M05":
                     raise WordError("CONTEXT_LAYOUT_OVERRIDE")
+                chart_before = {name: data for name, data in package.parts.items() if '/charts/' in name and name.endswith('.xml')}
                 result = backend.edit(work, target["path"], action, kind, props)
+                if module == 'M12' and action != 'remove':
+                    from .extensions import _sdk
+                    changed = [name for name, data in Package(work).parts.items()
+                        if '/charts/' in name and name.endswith('.xml') and chart_before.get(name) != data]
+                    if changed: result = {'backend': result, 'editable_data': _sdk(work, target['id'], module, {'operation': 'sync_charts', 'parts': changed})}
             package = Package(work)
             package.objects(stamp=True)
             package.save()

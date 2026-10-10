@@ -109,7 +109,13 @@ def test_editable_chart(document, tmp_path, chart_type):
         props={'chartType': chart_type, 'data': 'Series:1,3,2', 'categories': 'A,B,C', 'title': 'Editable chart', 'width': '7cm', 'height': '5cm'})
     package = Package(output)
     assert any(n.startswith('word/charts/') and n.endswith('.xml') for n in package.parts)
-    assert any(node.get('Type', '').endswith('/package') for name in package.parts if name.endswith('.rels') for node in package.xml(name)), 'Chart data must be editable'
+    chart_name = next(n for n in package.parts if n.startswith('word/charts/') and n.endswith('.xml'))
+    c = {'c': 'http://schemas.openxmlformats.org/drawingml/2006/chart', 'r': NS['r']}
+    chart = package.xml(chart_name)
+    assert chart.xpath('//c:externalData[@r:id]', namespaces=c), 'Chart must link editable data'
+    assert len(chart.xpath('//c:f/text()', namespaces=c)) >= 3
+    rel_name = str(Path(chart_name).parent / '_rels' / (Path(chart_name).name + '.rels'))
+    assert any(node.get('Type', '').endswith('/package') for node in package.xml(rel_name)), 'Chart data must be editable'
 
 
 def test_native_shape(document, tmp_path):

@@ -55,7 +55,7 @@ def apply(package, item, props):
             E.SubElement(ppr, W + 'jc').set(W + 'val', 'center')
             display = E.SubElement(p, M + 'oMathPara')
             display.append(formula)
-        elif any(formula.iter(M + 'eqArr')):
+        elif any(formula.iter(M + 'eqArr')) or len(list(formula.iter(M + 'mr'))) > 1:
             table = _equation_table(formula, '(' + str(props['number']) + ')', min(context.column_widths_twips), number_width)
             _append(target, table)
             return {'original_math': original, 'changes': changes, 'mode': mode, 'number': props['number'], 'layout': 'centered-multiline', 'budget_pt': budget}
